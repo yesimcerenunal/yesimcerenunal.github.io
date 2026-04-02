@@ -8,6 +8,7 @@ import react from '@vitejs/plugin-react'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const projectRoot = path.resolve(__dirname)
 
+
 function gallerySyncPlugin() {
   const run = () => {
     execSync('node scripts/sync-gallery-from-disk.mjs', {

@@ -8,7 +8,6 @@ import {
   useState,
   useCallback,
   useMemo,
-  Suspense,
   type MouseEvent,
   type MutableRefObject,
   type Ref,
@@ -20,7 +19,7 @@ import {
   useThree,
   type ThreeEvent,
 } from "@react-three/fiber";
-import { Environment, OrbitControls } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import { motion, AnimatePresence } from "motion/react";
 import { X } from "lucide-react";
 import * as THREE from "three";
@@ -617,70 +616,6 @@ function ZoomFrameSync({
 
 const PLACEHOLDER_GRAY = new THREE.Color(0x5c5c66);
 
-/** Shared matte back: neutral warm gray / off-white gradient — not mirrored artwork. */
-let galleryCardBackMatteTexture: THREE.Texture | null = null;
-function getGalleryCardBackMatteTexture(): THREE.Texture {
-  if (galleryCardBackMatteTexture) return galleryCardBackMatteTexture;
-  const w = 256;
-  const h = 256;
-  const canvas =
-    typeof document !== "undefined" ? document.createElement("canvas") : null;
-  if (!canvas) {
-    const data = new Uint8Array([240, 238, 234, 255]);
-    const t = new THREE.DataTexture(data, 1, 1, THREE.RGBAFormat);
-    t.colorSpace = THREE.SRGBColorSpace;
-    t.needsUpdate = true;
-    galleryCardBackMatteTexture = t;
-    return t;
-  }
-  canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) {
-    const data = new Uint8Array([240, 238, 234, 255]);
-    const t = new THREE.DataTexture(data, 1, 1, THREE.RGBAFormat);
-    t.colorSpace = THREE.SRGBColorSpace;
-    t.needsUpdate = true;
-    galleryCardBackMatteTexture = t;
-    return t;
-  }
-  const g = ctx.createLinearGradient(0, 0, w, h);
-  g.addColorStop(0, "rgb(228, 226, 222)");
-  g.addColorStop(0.48, "rgb(248, 246, 242)");
-  g.addColorStop(1, "rgb(224, 222, 218)");
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, w, h);
-  const v = ctx.createRadialGradient(
-    w * 0.5,
-    h * 0.5,
-    0,
-    w * 0.5,
-    h * 0.5,
-    w * 0.72,
-  );
-  v.addColorStop(0, "rgba(255, 255, 255, 0.14)");
-  v.addColorStop(1, "rgba(210, 208, 204, 0.1)");
-  ctx.fillStyle = v;
-  ctx.fillRect(0, 0, w, h);
-  const id = ctx.getImageData(0, 0, w, h);
-  const d = id.data;
-  for (let i = 0; i < d.length; i += 4) {
-    const n = (Math.random() - 0.5) * 5;
-    d[i] = Math.min(255, Math.max(0, d[i] + n));
-    d[i + 1] = Math.min(255, Math.max(0, d[i + 1] + n));
-    d[i + 2] = Math.min(255, Math.max(0, d[i + 2] + n));
-  }
-  ctx.putImageData(id, 0, 0);
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  tex.minFilter = THREE.LinearMipmapLinearFilter;
-  tex.magFilter = THREE.LinearFilter;
-  tex.generateMipmaps = true;
-  tex.needsUpdate = true;
-  galleryCardBackMatteTexture = tex;
-  return tex;
-}
-
 interface GallerySceneProps {
   images: GalleryImage[];
   visibleIndices: number[];
@@ -726,6 +661,23 @@ function GalleryCardMesh({
 
   const texture = useResilientTexture(primaryGalleryImageUrl(image));
 
+  const backMap = useMemo(() => {
+    if (!texture) return null;
+    const t = texture.clone();
+    t.wrapS = THREE.RepeatWrapping;
+    /** Horizontal mirror of the front face UVs (matches square crop) */
+    t.repeat.set(-texture.repeat.x, texture.repeat.y);
+    t.offset.set(texture.repeat.x + texture.offset.x, texture.offset.y);
+    t.needsUpdate = true;
+    return t;
+  }, [texture]);
+
+  useEffect(() => {
+    return () => {
+      if (backMap) backMap.dispose();
+    };
+  }, [backMap]);
+
   const geometry = useMemo(
     () => new THREE.BoxGeometry(CARD_W, CARD_H, CARD_D),
     [],
@@ -733,37 +685,30 @@ function GalleryCardMesh({
 
   const materials = useMemo(() => {
     const hasMap = Boolean(texture);
-    const backMatte = getGalleryCardBackMatteTexture();
     const edge = new THREE.MeshStandardMaterial({
-      color: new THREE.Color(0xf7f7f9),
-      roughness: 0.42,
-      metalness: 0.06,
+      color: new THREE.Color(0x9a9ca8),
+      roughness: 0.55,
+      metalness: 0.05,
       transparent: false,
       opacity: 1,
       depthWrite: true,
     });
-    /** Semi-matte / light glossy print: bright, subtle lighting + environment reflections. */
-    const front = new THREE.MeshStandardMaterial({
+    /**
+     * Unlit artwork. Stronger than full-white multiply so covers stay photographic, not paper-white.
+     */
+    const front = new THREE.MeshBasicMaterial({
       map: texture ?? undefined,
-      color: hasMap
-        ? new THREE.Color(0.94, 0.95, 0.97)
-        : PLACEHOLDER_GRAY,
-      roughness: 0.38,
-      metalness: 0.06,
-      envMapIntensity: 0.45,
+      color: hasMap ? new THREE.Color(0.74, 0.74, 0.78) : PLACEHOLDER_GRAY,
       transparent: false,
       opacity: 1,
       depthWrite: true,
     });
-    /** Solid matte neutral back — not mirrored artwork; soft gradient + faint texture. */
+    /** Muted back; no emissive glow (avoids a bright slab when the edge catches light) */
     const back = new THREE.MeshStandardMaterial({
-      map: backMatte,
-      color: hasMap
-        ? new THREE.Color(0.96, 0.95, 0.93)
-        : new THREE.Color(0.82, 0.81, 0.79),
-      roughness: 0.94,
+      map: backMap ?? texture ?? undefined,
+      color: hasMap ? new THREE.Color(0.78, 0.78, 0.82) : PLACEHOLDER_GRAY,
+      roughness: 0.91,
       metalness: 0,
-      envMapIntensity: 0.08,
       emissive: new THREE.Color(0x000000),
       emissiveIntensity: 0,
       transparent: false,
@@ -776,10 +721,10 @@ function GalleryCardMesh({
       THREE.MeshStandardMaterial,
       THREE.MeshStandardMaterial,
       THREE.MeshStandardMaterial,
-      THREE.MeshStandardMaterial,
+      THREE.MeshBasicMaterial,
       THREE.MeshStandardMaterial,
     ];
-  }, [texture]);
+  }, [texture, backMap]);
 
   useEffect(() => {
     return () => {
@@ -1098,12 +1043,9 @@ function GalleryScene({
         zoomRef={zoomFxRef}
       />
       <SceneCursor hovered={hoveredIndex !== null} />
-      <ambientLight intensity={0.88} />
-      <directionalLight position={[4.5, 8, 6]} intensity={0.92} />
-      <directionalLight position={[-3.2, 2.4, -2.2]} intensity={0.38} />
-      <Suspense fallback={null}>
-        <Environment preset="studio" environmentIntensity={0.35} />
-      </Suspense>
+      <ambientLight intensity={0.78} />
+      <directionalLight position={[4.5, 8, 6]} intensity={1.02} />
+      <directionalLight position={[-3, 2, -2]} intensity={0.32} />
 
       <OrbitControls
         makeDefault
@@ -1566,7 +1508,7 @@ export function Gallery3D({
               gl.setClearColor(0x000000, 0);
               gl.setClearAlpha(0);
               gl.toneMapping = THREE.ACESFilmicToneMapping;
-              gl.toneMappingExposure = 1.06;
+              gl.toneMappingExposure = 1.02;
               if (camera instanceof THREE.PerspectiveCamera) {
                 camera.fov = CAMERA_FOV;
                 camera.near = CAMERA_NEAR;
@@ -1598,28 +1540,19 @@ export function Gallery3D({
 
           <div
             className="pointer-events-none absolute inset-0 flex items-center justify-center"
-            aria-hidden
-          >
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "radial-gradient(ellipse at center, transparent 38%, rgba(255,255,255,0.55) 100%)",
-                filter: "blur(56px)",
-                opacity: 0.45,
-              }}
-            />
-            <div
-              className="rounded-full"
-              style={{
-                width: "min(48vw, 420px)",
-                height: "min(48vw, 420px)",
-                background:
-                  "radial-gradient(ellipse at center, rgba(255,255,255,0.98) 0%, rgba(250,250,255,0.55) 28%, rgba(248,248,252,0.18) 52%, transparent 78%)",
-                filter: "blur(52px)",
-                opacity: 0.92,
-              }}
-            />
+          aria-hidden
+        >
+          <div
+            className="rounded-full"
+            style={{
+                width: "min(42vw, 380px)",
+                height: "min(42vw, 380px)",
+              background:
+                  "radial-gradient(ellipse at center, rgba(255,255,255,0.95) 0%, rgba(245,245,250,0.35) 35%, transparent 72%)",
+                filter: "blur(48px)",
+                opacity: 0.85,
+            }}
+          />
           </div>
         </div>
 
