@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "generated": "2026-04-02T02:06:22.086Z",
+  "projects": [
+    {
+      "category": "Interactive / VR",
+      "categoryFolder": "interactive-vr",
+      "slug": "Cozy Experience",
+      "images": [
+        "gallery/interactive-vr/Cozy Experience/0.jpg",
+        "gallery/interactive-vr/Cozy Experience/1.mp4",
+        "gallery/interactive-vr/Cozy Experience/2.jpg",
+        "gallery/interactive-vr/Cozy Experience/3.jpg",
+        "gallery/interactive-vr/Cozy Experience/4.jpg",
+        "gallery/interactive-vr/Cozy Experience/5.jpg",
+        "gallery/interactive-vr/Cozy Experience/6.jpg",
+        "gallery/interactive-vr/Cozy Experience/7.jpg"
+      ]
+    },
+    {
+      "category": "Interactive / VR",
+      "categoryFolder": "interactive-vr",
+      "slug": "VR Experience",
+      "images": [
+        "gallery/interactive-vr/VR Experience/0.jpg",
+        "gallery/interactive-vr/VR Experience/1.mp4",
+        "gallery/interactive-vr/VR Experience/2.jpg",
+        "gallery/interactive-vr/VR Experience/3.jpg",
+        "gallery/interactive-vr/VR Experience/4.mp4",
+        "gallery/interactive-vr/VR Experience/5.mp4",
+        "gallery/interactive-vr/VR Experience/6.mp4"
+      ]
+    },
+    {
+      "category": "Motion",
+      "categoryFolder": "motion",
+      "slug": "Jazz Fest Commercial",
+      "images": [
+        "gallery/motion/Jazz Fest Commercial/0.jpg",
+        "gallery/motion/Jazz Fest Commercial/1.jpg",
+        "gallery/motion/Jazz Fest Commercial/2.mp4"
+      ]
+    },
+    {
+      "category": "Motion",
+      "categoryFolder": "motion",
+      "slug": "Spotify Canvas Design",
+      "images": [
+        "gallery/motion/Spotify Canvas Design/0.jpg",
+        "gallery/motion/Spotify Canvas Design/1.jpg",
+        "gallery/motion/Spotify Canvas Design/2.mp4"
+      ]
+    },
+    {
+      "category": "Campaigns",
+      "categoryFolder": "campaigns",
+      "slug": "JusteDebout",
+      "images": [
+        "gallery/campaigns/JusteDebout/0.jpg",
+        "gallery/campaigns/JusteDebout/1.mp4",
+        "gallery/campaigns/JusteDebout/2.jpg",
+        "gallery/campaigns/JusteDebout/3.jpg"
+      ]
+    },
+    {
+      "category": "Campaigns",
+      "categoryFolder": "campaigns",
+      "slug": "Western Union",
+      "images": [
+        "gallery/campaigns/Western Union/0.jpg",
+        "gallery/campaigns/Western Union/1.mp4"
+      ]
+    },
+    {
+      "category": "3D Archive",
+      "categoryFolder": "3d-archive",
+      "slug": "Emberfall-Environment",
+      "images": [
+        "gallery/3d-archive/Emberfall-Environment/0.jpg",
+        "gallery/3d-archive/Emberfall-Environment/1.mp4",
+        "gallery/3d-archive/Emberfall-Environment/3.jpg",
+        "gallery/3d-archive/Emberfall-Environment/4.jpg",
+        "gallery/3d-archive/Emberfall-Environment/22.mp4"
+      ]
+    },
+    {
+      "category": "3D Archive",
+      "categoryFolder": "3d-archive",
+      "slug": "FB",
+      "images": [
+        "gallery/3d-archive/FB/0.jpg",
+        "gallery/3d-archive/FB/1.mp4"
+      ]
+    },
+    {
+      "category": "2D Archive",
+      "categoryFolder": "2d-archive",
+      "slug": "Illustrations",
+      "images": [
+        "gallery/2d-archive/Illustrations/0.jpg",
+        "gallery/2d-archive/Illustrations/1.jpg",
+        "gallery/2d-archive/Illustrations/2.jpg",
+        "gallery/2d-archive/Illustrations/3.jpg",
+        "gallery/2d-archive/Illustrations/4.jpg"
+      ]
+    },
+    {
+      "category": "2D Archive",
+      "categoryFolder": "2d-archive",
+      "slug": "Psychodelic Magazine",
+      "images": [
+        "gallery/2d-archive/Psychodelic Magazine/0.jpg",
+        "gallery/2d-archive/Psychodelic Magazine/1.jpg",
+        "gallery/2d-archive/Psychodelic Magazine/2.jpg",
+        "gallery/2d-archive/Psychodelic Magazine/3.jpg",
+        "gallery/2d-archive/Psychodelic Magazine/4.jpg"
+      ]
+    }
+  ]
+}

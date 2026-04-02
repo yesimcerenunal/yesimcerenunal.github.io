@@ -1,0 +1,50 @@
+#!/usr/bin/env node
+/**
+ * Runs gallery sync (filesystem → manifest), then writes a minimal valid JPEG
+ * into every image path in the manifest plus public/fallback.jpg.
+ * Replace files under public/gallery with your own assets; keep paths or re-sync.
+ */
+import fs from "node:fs";
+import path from "node:path";
+import { execSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const root = path.join(__dirname, "..");
+const publicRoot = path.join(root, "public");
+const manifestPath = path.join(root, "src", "app", "data", "gallery-manifest.json");
+
+execSync("node scripts/sync-gallery-from-disk.mjs", {
+  cwd: root,
+  stdio: "inherit",
+});
+
+/** Tiny 1×1 JPEG (shared placeholder until you replace files) */
+const JPEG = Buffer.from(
+  "/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwAA8A/9k=",
+  "base64",
+);
+
+if (!fs.existsSync(manifestPath)) {
+  console.error("Missing gallery-manifest.json — run npm run gallery:sync first.");
+  process.exit(1);
+}
+
+const VIDEO_RE = /\.(mp4|webm)$/i;
+
+const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+let count = 0;
+for (const project of manifest.projects) {
+  for (const rel of project.images) {
+    if (VIDEO_RE.test(rel)) continue;
+    const dest = path.join(publicRoot, rel);
+    fs.mkdirSync(path.dirname(dest), { recursive: true });
+    fs.writeFileSync(dest, JPEG);
+    count += 1;
+  }
+}
+
+const fallback = path.join(publicRoot, "fallback.jpg");
+fs.writeFileSync(fallback, JPEG);
+
+console.log(`Wrote ${count} gallery placeholders + public/fallback.jpg`);

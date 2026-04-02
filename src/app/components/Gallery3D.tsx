@@ -1,0 +1,1741 @@
+import {
+  createContext,
+  useContext,
+  forwardRef,
+  useRef,
+  useEffect,
+  useLayoutEffect,
+  useState,
+  useCallback,
+  useMemo,
+  Suspense,
+  type MouseEvent,
+  type MutableRefObject,
+  type Ref,
+  type VideoHTMLAttributes,
+} from "react";
+import {
+  Canvas,
+  useFrame,
+  useThree,
+  type ThreeEvent,
+} from "@react-three/fiber";
+import { Environment, OrbitControls } from "@react-three/drei";
+import { motion, AnimatePresence } from "motion/react";
+import { X } from "lucide-react";
+import * as THREE from "three";
+import { useLanguage } from "../context/LanguageContext";
+import {
+  localizedCategory,
+  portfolioProjectCopy,
+} from "../i18n/translations";
+import { publicAsset } from "../utils/publicAsset";
+import {
+  clearGalleryDetailVideoPreload,
+  detailPageMediaUrls,
+  firstDetailVideoUrl,
+  galleryFilenameIndex,
+  isVideoUrl,
+  prefetchFirstDetailVideo,
+  primaryGalleryTextureUrl,
+} from "../utils/galleryMedia";
+
+/** Gallery hint: full visibility, then fade to soft after this (ms) on load / category change */
+const EXPLORE_HINT_FLASH_MS = 2000;
+
+/** Detail modal: allow first-row video at top; others only when vertically centered in the scroller. */
+const DETAIL_FIRST_VIDEO_SCROLL_TOP_MAX = 56;
+const DETAIL_VIDEO_CENTER_BAND_FRAC = 0.22;
+/** Initial playback level (0–1) when a clip loads; audience can change it with the player controls. */
+const DETAIL_VIDEO_VOLUME = 0.2;
+
+/** Avoid audio before the first frame is decoded (`loadedmetadata` alone is not enough). */
+function videoCanShowFrame(v: HTMLVideoElement): boolean {
+  return v.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA;
+}
+
+function syncDetailVideoPlayback(
+  scrollEl: HTMLDivElement,
+  detailUrls: readonly string[],
+  srcFor: (u: string) => string,
+  failed: Record<string, boolean>,
+  itemEls: readonly (HTMLElement | null)[],
+  videoEls: readonly (HTMLVideoElement | null)[],
+): void {
+  const firstUrl = detailUrls[0];
+  const firstIsVideo =
+    firstUrl != null &&
+    !failed[firstUrl] &&
+    isVideoUrl(srcFor(firstUrl));
+
+  const cRect = scrollEl.getBoundingClientRect();
+  const centerY = cRect.top + cRect.height / 2;
+  const band = Math.max(56, cRect.height * DETAIL_VIDEO_CENTER_BAND_FRAC);
+
+  let playIndex = -1;
+
+  if (firstIsVideo && scrollEl.scrollTop < DETAIL_FIRST_VIDEO_SCROLL_TOP_MAX) {
+    playIndex = 0;
+  } else {
+    let bestI = -1;
+    let bestDist = Infinity;
+    for (let i = 0; i < detailUrls.length; i++) {
+      const u = detailUrls[i];
+      if (!u || failed[u] || !isVideoUrl(srcFor(u))) continue;
+      const wrap = itemEls[i];
+      if (!wrap) continue;
+      const r = wrap.getBoundingClientRect();
+      const mid = r.top + r.height / 2;
+      const dist = Math.abs(mid - centerY);
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestI = i;
+      }
+    }
+    if (bestI >= 0 && bestDist <= band) {
+      playIndex = bestI;
+    }
+  }
+
+  for (let i = 0; i < videoEls.length; i++) {
+    const v = videoEls[i];
+    if (!v) continue;
+    const u = detailUrls[i];
+    if (!u || failed[u] || !isVideoUrl(srcFor(u))) continue;
+    if (i === playIndex) {
+      if (videoCanShowFrame(v)) {
+        void v.play().catch(() => {});
+      }
+    } else {
+      v.pause();
+    }
+  }
+}
+
+export interface GalleryImage {
+  /** `categoryFolder/slug` — matches `portfolio.projects` keys in translations.ts */
+  projectKey: string;
+  /** Sorted by filename: `0.*` = hero/thumbnail; `1.*`, `2.*`, … = detail + order (see sync script). */
+  images: string[];
+  category: string;
+}
+
+interface Gallery3DProps {
+  images: GalleryImage[];
+  /** "All" shows every card; otherwise must match `image.category` */
+  activeFilter?: "All" | string;
+  onHoverCategory?: (category: string | null) => void;
+  onOpenImage?: (image: GalleryImage) => void;
+  onCloseModal?: () => void;
+}
+
+/** Public root fallback (`/public/fallback.jpg`) */
+function fallbackImageUrl(): string {
+  return publicAsset("fallback.jpg");
+}
+
+export function primaryGalleryImageUrl(item: GalleryImage): string {
+  return primaryGalleryTextureUrl(item.images);
+}
+
+const sharedTextureLoader = new THREE.TextureLoader();
+sharedTextureLoader.setCrossOrigin("anonymous");
+
+function configureTexture(t: THREE.Texture): void {
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.minFilter = THREE.LinearMipmapLinearFilter;
+  t.magFilter = THREE.LinearFilter;
+  t.generateMipmaps = true;
+  t.needsUpdate = true;
+}
+
+/**
+ * Maps the image with object-fit: cover onto the square card faces (1080×1080 intent)
+ * so non-square sources are center-cropped instead of stretched.
+ */
+function applySquareFaceTextureUV(t: THREE.Texture): void {
+  const img = t.image as { width?: number; height?: number } | undefined;
+  const w = img?.width ?? 0;
+  const h = img?.height ?? 0;
+  if (!w || !h) return;
+  const ar = w / h;
+  t.wrapS = THREE.ClampToEdgeWrapping;
+  t.wrapT = THREE.ClampToEdgeWrapping;
+  if (ar >= 1) {
+    const rx = 1 / ar;
+    t.repeat.set(rx, 1);
+    t.offset.set((1 - rx) / 2, 0);
+  } else {
+    t.repeat.set(1, ar);
+    t.offset.set(0, (1 - ar) / 2);
+  }
+  t.needsUpdate = true;
+}
+
+function createSolidFallbackTexture(): THREE.DataTexture {
+  const data = new Uint8Array([0x52, 0x52, 0x5c, 255]);
+  const tex = new THREE.DataTexture(data, 1, 1, THREE.RGBAFormat);
+  tex.needsUpdate = true;
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.magFilter = THREE.NearestFilter;
+  tex.minFilter = THREE.NearestFilter;
+  return tex;
+}
+
+/**
+ * Loads a texture via TextureLoader; never throws. Falls back to `publicAsset("fallback.jpg")`, then a solid color.
+ * Only exposes a texture once the GPU image is fully loaded (or fallback is ready).
+ */
+function useResilientTexture(imageUrl: string | undefined): THREE.Texture | null {
+  const [texture, setTexture] = useState<THREE.Texture | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    let activeTexture: THREE.Texture | null = null;
+
+    const commit = (t: THREE.Texture) => {
+      if (cancelled) {
+        t.dispose();
+        return;
+      }
+      if (activeTexture && activeTexture !== t) {
+        activeTexture.dispose();
+      }
+      activeTexture = t;
+      configureTexture(t);
+      setTexture(t);
+    };
+
+    const loadSolid = () => {
+      if (cancelled) return;
+      try {
+        const solid = createSolidFallbackTexture();
+        applySquareFaceTextureUV(solid);
+        commit(solid);
+      } catch (e) {
+        console.error("[Gallery3D] Solid fallback texture failed:", e);
+      }
+    };
+
+    const loadFallbackAsset = () => {
+      const url = fallbackImageUrl();
+      sharedTextureLoader.load(
+        url,
+        (loaded) => {
+          if (cancelled) {
+            loaded.dispose();
+            return;
+          }
+          applySquareFaceTextureUV(loaded);
+          commit(loaded);
+        },
+        undefined,
+        (err) => {
+          console.error(
+            "[Gallery3D] Fallback asset failed to load:",
+            url,
+            err,
+          );
+          loadSolid();
+        },
+      );
+    };
+
+    const loadPrimary = (url: string) => {
+      sharedTextureLoader.load(
+        url,
+        (loaded) => {
+          if (cancelled) {
+            loaded.dispose();
+            return;
+          }
+          applySquareFaceTextureUV(loaded);
+          commit(loaded);
+        },
+        undefined,
+        (_err) => {
+          console.error(
+            "[Gallery3D] Image failed to load (using fallback asset):",
+            url,
+          );
+          loadFallbackAsset();
+        },
+      );
+    };
+
+    const primary = imageUrl?.trim();
+    if (!primary) {
+      console.warn(
+        "[Gallery3D] Missing or empty image URL; using fallback asset.",
+      );
+      loadFallbackAsset();
+    } else {
+      loadPrimary(primary);
+    }
+
+    return () => {
+      cancelled = true;
+      if (activeTexture) {
+        activeTexture.dispose();
+        activeTexture = null;
+      }
+      setTexture(null);
+    };
+  }, [imageUrl]);
+
+  return texture;
+}
+
+/** Arc length (world units) between adjacent cards — lower = denser ring, more overlap */
+const ORBIT_CARD_SPACING = 1.12;
+/** Floor radius for “All” — many items; keeps the large circular gallery look */
+const ORBIT_MIN_RADIUS_ALL = 3.2;
+/**
+ * Floor radius when a specific category is selected (usually few items).
+ * Much smaller than {@link ORBIT_MIN_RADIUS_ALL} so 1–3 pieces sit on a tight ring.
+ */
+const ORBIT_MIN_RADIUS_FILTERED = 0.62;
+/** When exactly two pieces are on the ring, enforce a wider radius so they do not overlap */
+const ORBIT_TWO_ITEM_MIN_RADIUS = 0.78;
+
+/**
+ * Front/back faces match hero artwork aspect: 1080×1080 (square).
+ * Box face is width (X) × height (Y); export `0.*` at this size to avoid stretching.
+ */
+const CARD_FACE_PIXEL_W = 1080;
+const CARD_FACE_PIXEL_H = 1080;
+const CARD_FACE_ASPECT_W_OVER_H = CARD_FACE_PIXEL_W / CARD_FACE_PIXEL_H;
+
+/** Thin print slab: width × height × depth (`BoxGeometry`; depth keeps edges visible) */
+const CARD_W = 0.82;
+const CARD_H = CARD_W / CARD_FACE_ASPECT_W_OVER_H;
+const CARD_D = 0.014;
+
+/** Circumference = n × spacing → radius = n×spacing / (2π); never below minRadius */
+function ringRadiusWorld(itemCount: number, minRadiusWorld: number): number {
+  const spacing =
+    itemCount === 2 ? ORBIT_CARD_SPACING * 1.1 : ORBIT_CARD_SPACING;
+  const radius = (itemCount * spacing) / (2 * Math.PI);
+  let r = Math.max(radius, minRadiusWorld);
+  if (itemCount === 2) {
+    r = Math.max(r, ORBIT_TWO_ITEM_MIN_RADIUS);
+  }
+  return r;
+}
+
+/** Used by camera framing math (must sit before carouselFramingExtents) */
+const HOVER_SCALE = 1.06;
+const HOVER_LIFT = 0.16;
+/** Uniform mesh scale — larger cards; hover/zoom multiply on top (textures unchanged) */
+const CARD_MESH_BASE_SCALE = 1.2;
+/** Pull ring positions toward center for a tighter circle (after parallax) */
+const RING_RADIAL_COMPACT = 0.8;
+/**
+ * When mesh scale > 1, nudge the group toward ring center so growth reads inward
+ * (pull = (scale - 1) * SCALE_INWARD_K * ringRadius).
+ */
+const SCALE_INWARD_K = 0.5;
+const ZOOM_RING_EXPAND = 0.062;
+const ZOOM_DEPTH_PULL = 0.22;
+const ZOOM_PARALLAX_Y = 0.1;
+const ZOOM_SCALE_BOOST = 0.042;
+
+/**
+ * Reference vertical FOV for orbit distance math and Canvas projection.
+ * `AdaptiveFovSync` smoothes around this baseline (~60° vs the old ~78° wide look).
+ */
+const CAMERA_FOV = 60;
+/** Tight near plane; stay well under min orbit distance */
+const CAMERA_NEAR = 0.05;
+const CAMERA_FAR = 2000;
+
+/** Frustum slack vs scaled carousel bounds (slightly tighter → closer allowed min orbit) */
+const FRAMING_MARGIN = 0.88;
+
+/** Uniform scale for the carousel group (larger on screen without shrinking orbit min) */
+const GALLERY_GROUP_WORLD_SCALE = 1.15;
+
+/** Cinematic FOV at min vs max orbit distance (deg); clamped up by geometry */
+const ADAPTIVE_FOV_AT_MIN_DISTANCE = 50;
+const ADAPTIVE_FOV_AT_MAX_DISTANCE = 57;
+const ADAPTIVE_FOV_ABSOLUTE_CAP = 72;
+/** Exponential smoothing for FOV follow (~0.08–0.12 effective step at 60fps) */
+const ADAPTIVE_FOV_SMOOTHING = 9.5;
+/** Closer than pure geometric min; floorFov in AdaptiveFovSync widens FOV if needed to avoid clipping */
+const ORBIT_MIN_DISTANCE_RELAX = 0.76;
+/** Max orbit distance as a multiple of min (wider zoom-out; min = closest zoom unchanged) */
+const ORBIT_MAX_DISTANCE_RATIO = 1.62;
+/**
+ * Initial camera distance between min and max (0 = closest zoom, 1 = farthest).
+ * Higher = calmer opening frame; scroll still reaches `min`.
+ */
+const DEFAULT_ORBIT_DISTANCE_T = 0.58;
+
+/**
+ * Orbit pivot + ring anchor (world Y). Lifts the layout so framing is balanced
+ * (avoids empty top / clipped bottom) while keeping pan disabled so Y never drifts.
+ */
+const ORBIT_TARGET_Y = 0.28;
+const _orbitTarget = new THREE.Vector3(0, ORBIT_TARGET_Y, 0);
+
+/**
+ * Baseline elevation in the YZ plane (from +Z toward +Y). atan(ratio) matches
+ * the old CAMERA_YZ_RATIO line; bias nudges the ring slightly higher on screen.
+ */
+const CAMERA_YZ_RATIO = 0.76 / 9.42;
+const CAMERA_ELEVATION_BIAS = 0.024;
+
+function cameraElevationAngle(): number {
+  return Math.atan(CAMERA_YZ_RATIO) + CAMERA_ELEVATION_BIAS;
+}
+
+/**
+ * Worst-case carousel bounds (hover + zoom parallax on ring) for framing math.
+ * Scaled by `GALLERY_GROUP_WORLD_SCALE` so orbit limits match the scaled group.
+ */
+function carouselFramingExtents(ringRadius: number): {
+  radialMax: number;
+  verticalHalf: number;
+} {
+  const sMax =
+    CARD_MESH_BASE_SCALE * HOVER_SCALE * (1 + ZOOM_SCALE_BOOST);
+  const rRing =
+    ringRadius * (1 + ZOOM_RING_EXPAND) * RING_RADIAL_COMPACT;
+  const radialMax =
+    (rRing + (CARD_W * sMax) * 0.52 + ZOOM_DEPTH_PULL * 0.34) *
+    GALLERY_GROUP_WORLD_SCALE;
+  const verticalHalf =
+    ((CARD_H * sMax) * 0.52 + HOVER_LIFT + ZOOM_PARALLAX_Y * 0.48) *
+    GALLERY_GROUP_WORLD_SCALE;
+  return { radialMax, verticalHalf };
+}
+
+/**
+ * Minimum orbit distance (camera to target) so the full carousel stays inside the
+ * vertical and horizontal frusta for the given FOV and aspect.
+ */
+function minSafeOrbitDistance(
+  ringRadius: number,
+  fovVerticalDeg: number,
+  aspect: number,
+): number {
+  const { radialMax, verticalHalf } = carouselFramingExtents(ringRadius);
+  const boundRadius = Math.hypot(radialMax, verticalHalf);
+  const fovRad = THREE.MathUtils.degToRad(fovVerticalDeg);
+  const tanHalfV = Math.tan(fovRad * 0.5);
+  const tanHalfH = Math.tan(fovRad * 0.5) * Math.max(aspect, 0.25);
+  const dVert = (boundRadius * FRAMING_MARGIN) / tanHalfV;
+  const dHorz = (radialMax * FRAMING_MARGIN) / tanHalfH;
+  /** Soft floor so tiny filters stay usable; geometric dVert usually dominates */
+  return Math.max(
+    dVert,
+    dHorz,
+    ringRadius * GALLERY_GROUP_WORLD_SCALE * 0.28,
+  );
+}
+
+/**
+ * Minimum vertical FOV (deg) at distance `d` so carousel bounds stay in frustum.
+ * Mirrors `minSafeOrbitDistance` geometry (inverse problem).
+ */
+function minimumVerticalFovDegrees(
+  distance: number,
+  ringRadius: number,
+  aspect: number,
+): number {
+  const d = Math.max(distance, 1e-4);
+  const { radialMax, verticalHalf } = carouselFramingExtents(ringRadius);
+  const boundRadius = Math.hypot(radialMax, verticalHalf);
+  const a = Math.max(aspect, 0.25);
+  const tanHalfFromVertical = (boundRadius * FRAMING_MARGIN) / d;
+  const tanHalfFromHorizontal = (radialMax * FRAMING_MARGIN) / (d * a);
+  const tanHalf = Math.max(tanHalfFromVertical, tanHalfFromHorizontal);
+  const capped = Math.min(tanHalf, Math.tan(THREE.MathUtils.degToRad(89)));
+  return THREE.MathUtils.radToDeg(2 * Math.atan(capped));
+}
+
+function orbitZoomLimits(
+  ringRadius: number,
+  aspect: number,
+): { min: number; max: number } {
+  const geometricMin = minSafeOrbitDistance(ringRadius, CAMERA_FOV, aspect);
+  /** Allow noticeably closer zoom; stay above a small ring-relative floor */
+  const min = Math.max(
+    geometricMin * ORBIT_MIN_DISTANCE_RELAX,
+    ringRadius * GALLERY_GROUP_WORLD_SCALE * 0.2,
+  );
+  const max = min * ORBIT_MAX_DISTANCE_RATIO;
+  return { min, max };
+}
+
+/**
+ * Default orbit: between min (closest zoom) and max so the scene opens zoomed out,
+ * not parked at the near limit.
+ */
+function baseOrbitCameraDistance(
+  ringRadius: number,
+  aspect: number,
+): number {
+  const { min, max } = orbitZoomLimits(ringRadius, aspect);
+  return THREE.MathUtils.lerp(min, max, DEFAULT_ORBIT_DISTANCE_T);
+}
+
+/**
+ * Places the camera on the YZ meridian at exact Euclidean distance `distance`
+ * from the orbit target (matches OrbitControls distance + zoom limits).
+ */
+function setCameraPositionForOrbitDistance(
+  camera: THREE.Camera,
+  distance: number,
+): void {
+  const e = cameraElevationAngle();
+  const sy = Math.sin(e) * distance;
+  const cz = Math.cos(e) * distance;
+  camera.position.set(0, ORBIT_TARGET_Y + sy, cz);
+  camera.lookAt(_orbitTarget);
+  if (camera instanceof THREE.PerspectiveCamera) {
+    camera.updateProjectionMatrix();
+  }
+}
+
+function cameraTupleForOrbitDistance(distance: number): [number, number, number] {
+  const e = cameraElevationAngle();
+  return [0, ORBIT_TARGET_Y + Math.sin(e) * distance, Math.cos(e) * distance];
+}
+
+function defaultViewportAspect(): number {
+  if (typeof window === "undefined") return 1.5;
+  const h = Math.max(1, window.innerHeight);
+  return THREE.MathUtils.clamp(window.innerWidth / h, 0.5, 2.5);
+}
+
+function RingCameraSync({ ringRadius }: { ringRadius: number }) {
+  const { camera, size } = useThree();
+  const aspect = Math.max(
+    size.width / Math.max(size.height, 1),
+    0.25,
+  );
+  const { min, max } = useMemo(
+    () => orbitZoomLimits(ringRadius, aspect),
+    [ringRadius, aspect],
+  );
+  const baseD = useMemo(
+    () => THREE.MathUtils.clamp(baseOrbitCameraDistance(ringRadius, aspect), min, max),
+    [ringRadius, aspect, min, max],
+  );
+
+  useLayoutEffect(() => {
+    setCameraPositionForOrbitDistance(camera, baseD);
+    if (camera instanceof THREE.PerspectiveCamera) {
+      camera.near = CAMERA_NEAR;
+      camera.far = CAMERA_FAR;
+      camera.updateProjectionMatrix();
+    }
+  }, [ringRadius, camera, baseD]);
+
+  return null;
+}
+
+function AdaptiveFovSync({
+  ringRadius,
+  minDistance,
+  maxDistance,
+}: {
+  ringRadius: number;
+  minDistance: number;
+  maxDistance: number;
+}) {
+  const { camera, size } = useThree();
+  const aspect = Math.max(size.width / Math.max(size.height, 1), 0.25);
+
+  useFrame((_, delta) => {
+    if (!(camera instanceof THREE.PerspectiveCamera)) return;
+
+    const dist = camera.position.distanceTo(_orbitTarget);
+    const floorFov = minimumVerticalFovDegrees(dist, ringRadius, aspect);
+
+    const span = Math.max(maxDistance - minDistance, 1e-5);
+    const u = THREE.MathUtils.clamp((dist - minDistance) / span, 0, 1);
+    const smoothT = u * u * (3 - 2 * u);
+    const cinematic = THREE.MathUtils.lerp(
+      ADAPTIVE_FOV_AT_MIN_DISTANCE,
+      ADAPTIVE_FOV_AT_MAX_DISTANCE,
+      smoothT,
+    );
+
+    const targetFov = Math.min(
+      Math.max(cinematic, floorFov),
+      ADAPTIVE_FOV_ABSOLUTE_CAP,
+    );
+
+    const alpha = 1 - Math.exp(-ADAPTIVE_FOV_SMOOTHING * delta);
+    camera.fov = THREE.MathUtils.lerp(camera.fov, targetFov, alpha);
+    camera.updateProjectionMatrix();
+  });
+
+  return null;
+}
+
+const AUTO_ROTATE_SPEED = 0.45;
+const HOVER_LERP = 10;
+
+/** Zoom-driven layout/parallax (smoothed in useFrame) */
+const ZOOM_LERP = 7;
+const ZOOM_TO_CAM_Y_DAMP = 0.42;
+const FACING_OPACITY_MIN = 0.44;
+const FACING_OPACITY_MAX = 1;
+
+const _scratchA = new THREE.Vector3();
+const _toCamera = new THREE.Vector3();
+const _frontNormal = new THREE.Vector3();
+
+type ZoomFxRef = React.MutableRefObject<{
+  zoomIn: number;
+  camAzimuth: number;
+}>;
+
+const ZoomFxContext = createContext<ZoomFxRef | null>(null);
+
+function ZoomFrameSync({
+  minDistance,
+  maxDistance,
+  zoomRef,
+}: {
+  minDistance: number;
+  maxDistance: number;
+  zoomRef: ZoomFxRef;
+}) {
+  const { camera } = useThree();
+  useFrame(() => {
+    const dist = camera.position.distanceTo(_orbitTarget);
+    const zoomIn = 1 - THREE.MathUtils.smoothstep(dist, minDistance, maxDistance);
+    zoomRef.current.zoomIn = zoomIn;
+    zoomRef.current.camAzimuth = Math.atan2(camera.position.x, camera.position.z);
+  });
+  return null;
+}
+
+const PLACEHOLDER_GRAY = new THREE.Color(0x5c5c66);
+
+/** Shared matte back: neutral warm gray / off-white gradient — not mirrored artwork. */
+let galleryCardBackMatteTexture: THREE.Texture | null = null;
+function getGalleryCardBackMatteTexture(): THREE.Texture {
+  if (galleryCardBackMatteTexture) return galleryCardBackMatteTexture;
+  const w = 256;
+  const h = 256;
+  const canvas =
+    typeof document !== "undefined" ? document.createElement("canvas") : null;
+  if (!canvas) {
+    const data = new Uint8Array([240, 238, 234, 255]);
+    const t = new THREE.DataTexture(data, 1, 1, THREE.RGBAFormat);
+    t.colorSpace = THREE.SRGBColorSpace;
+    t.needsUpdate = true;
+    galleryCardBackMatteTexture = t;
+    return t;
+  }
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    const data = new Uint8Array([240, 238, 234, 255]);
+    const t = new THREE.DataTexture(data, 1, 1, THREE.RGBAFormat);
+    t.colorSpace = THREE.SRGBColorSpace;
+    t.needsUpdate = true;
+    galleryCardBackMatteTexture = t;
+    return t;
+  }
+  const g = ctx.createLinearGradient(0, 0, w, h);
+  g.addColorStop(0, "rgb(228, 226, 222)");
+  g.addColorStop(0.48, "rgb(248, 246, 242)");
+  g.addColorStop(1, "rgb(224, 222, 218)");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, w, h);
+  const v = ctx.createRadialGradient(
+    w * 0.5,
+    h * 0.5,
+    0,
+    w * 0.5,
+    h * 0.5,
+    w * 0.72,
+  );
+  v.addColorStop(0, "rgba(255, 255, 255, 0.14)");
+  v.addColorStop(1, "rgba(210, 208, 204, 0.1)");
+  ctx.fillStyle = v;
+  ctx.fillRect(0, 0, w, h);
+  const id = ctx.getImageData(0, 0, w, h);
+  const d = id.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const n = (Math.random() - 0.5) * 5;
+    d[i] = Math.min(255, Math.max(0, d[i] + n));
+    d[i + 1] = Math.min(255, Math.max(0, d[i + 1] + n));
+    d[i + 2] = Math.min(255, Math.max(0, d[i + 2] + n));
+  }
+  ctx.putImageData(id, 0, 0);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.minFilter = THREE.LinearMipmapLinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  tex.generateMipmaps = true;
+  tex.needsUpdate = true;
+  galleryCardBackMatteTexture = tex;
+  return tex;
+}
+
+interface GallerySceneProps {
+  images: GalleryImage[];
+  visibleIndices: number[];
+  ringRadius: number;
+  hoveredIndex: number | null;
+  setHoveredIndex: (i: number | null) => void;
+  modalOpen: boolean;
+  onHoverCategory?: (category: string | null) => void;
+  onPick: (image: GalleryImage) => void;
+  onSoftGalleryHint: () => void;
+}
+
+function GalleryCardMesh({
+  image,
+  slot,
+  visibleCount,
+  radius,
+  hovered,
+  modalOpen,
+  onHoverStart,
+  onHoverEnd,
+  onPick,
+  onSoftGalleryHint,
+}: {
+  image: GalleryImage;
+  slot: number;
+  visibleCount: number;
+  radius: number;
+  hovered: boolean;
+  modalOpen: boolean;
+  onHoverStart: () => void;
+  onHoverEnd: () => void;
+  onPick: () => void;
+  onSoftGalleryHint: () => void;
+}) {
+  const zoomFxRef = useContext(ZoomFxContext);
+  const groupRef = useRef<THREE.Group>(null);
+  const meshRef = useRef<THREE.Mesh>(null);
+  const pointerDown = useRef<{ x: number; y: number } | null>(null);
+  const smoothZoomRef = useRef(0);
+  const smoothOpacityRef = useRef(1);
+  const smoothMeshScaleRef = useRef(CARD_MESH_BASE_SCALE);
+
+  const texture = useResilientTexture(primaryGalleryImageUrl(image));
+
+  const geometry = useMemo(
+    () => new THREE.BoxGeometry(CARD_W, CARD_H, CARD_D),
+    [],
+  );
+
+  const materials = useMemo(() => {
+    const hasMap = Boolean(texture);
+    const backMatte = getGalleryCardBackMatteTexture();
+    const edge = new THREE.MeshStandardMaterial({
+      color: new THREE.Color(0xf7f7f9),
+      roughness: 0.42,
+      metalness: 0.06,
+      transparent: false,
+      opacity: 1,
+      depthWrite: true,
+    });
+    /** Semi-matte / light glossy print: bright, subtle lighting + environment reflections. */
+    const front = new THREE.MeshStandardMaterial({
+      map: texture ?? undefined,
+      color: hasMap
+        ? new THREE.Color(0.94, 0.95, 0.97)
+        : PLACEHOLDER_GRAY,
+      roughness: 0.38,
+      metalness: 0.06,
+      envMapIntensity: 0.45,
+      transparent: false,
+      opacity: 1,
+      depthWrite: true,
+    });
+    /** Solid matte neutral back — not mirrored artwork; soft gradient + faint texture. */
+    const back = new THREE.MeshStandardMaterial({
+      map: backMatte,
+      color: hasMap
+        ? new THREE.Color(0.96, 0.95, 0.93)
+        : new THREE.Color(0.82, 0.81, 0.79),
+      roughness: 0.94,
+      metalness: 0,
+      envMapIntensity: 0.08,
+      emissive: new THREE.Color(0x000000),
+      emissiveIntensity: 0,
+      transparent: false,
+      opacity: 1,
+      depthWrite: true,
+    });
+    /** Box face order: +x, −x, +y, −y, +z (front), −z (back) */
+    return [edge, edge, edge, edge, front, back] as [
+      THREE.MeshStandardMaterial,
+      THREE.MeshStandardMaterial,
+      THREE.MeshStandardMaterial,
+      THREE.MeshStandardMaterial,
+      THREE.MeshStandardMaterial,
+      THREE.MeshStandardMaterial,
+    ];
+  }, [texture]);
+
+  useEffect(() => {
+    return () => {
+      geometry.dispose();
+    };
+  }, [geometry]);
+
+  useEffect(() => {
+    return () => {
+      materials.forEach((m) => {
+        m.map = null;
+        m.dispose();
+      });
+    };
+  }, [materials]);
+
+  const { camera } = useThree();
+
+  useFrame((_, delta) => {
+    const g = groupRef.current;
+    const mesh = meshRef.current;
+    if (!g || !mesh || !zoomFxRef) return;
+
+    const n = Math.max(visibleCount, 1);
+    const angle = (slot / n) * Math.PI * 2;
+
+    const zk = Math.min(1, delta * ZOOM_LERP);
+    const zTarget = zoomFxRef.current.zoomIn;
+    smoothZoomRef.current = THREE.MathUtils.lerp(
+      smoothZoomRef.current,
+      zTarget,
+      zk,
+    );
+    const zi = smoothZoomRef.current;
+
+    const R = radius * (1 + ZOOM_RING_EXPAND * zi);
+    const bx = Math.sin(angle) * R;
+    const bz = Math.cos(angle) * R;
+
+    _toCamera.subVectors(
+      camera.position,
+      _scratchA.set(bx, ORBIT_TARGET_Y, bz),
+    );
+    const len = _toCamera.length();
+    if (len > 1e-6) _toCamera.multiplyScalar(1 / len);
+    _toCamera.y *= ZOOM_TO_CAM_Y_DAMP;
+    _toCamera.normalize();
+
+    const depth = ZOOM_DEPTH_PULL * zi;
+    let basePx = bx + _toCamera.x * depth;
+    let basePz = bz + _toCamera.z * depth;
+    basePx *= RING_RADIAL_COMPACT;
+    basePz *= RING_RADIAL_COMPACT;
+
+    const t = Math.min(1, delta * HOVER_LERP);
+    const zoomScale = 1 + ZOOM_SCALE_BOOST * zi;
+    const targetS =
+      CARD_MESH_BASE_SCALE * (hovered ? HOVER_SCALE : 1) * zoomScale;
+    const targetY = hovered ? HOVER_LIFT : 0;
+
+    const s = THREE.MathUtils.lerp(smoothMeshScaleRef.current, targetS, t);
+    smoothMeshScaleRef.current = s;
+    mesh.scale.setScalar(s);
+    g.scale.set(1, 1, 1);
+
+    const y = THREE.MathUtils.lerp(g.position.y, targetY, t);
+
+    const dx = -basePx;
+    const dz = -basePz;
+    const radialLen = Math.hypot(dx, dz);
+    let inwardX = 0;
+    let inwardZ = 0;
+    if (radialLen > 1e-6) {
+      inwardX = dx / radialLen;
+      inwardZ = dz / radialLen;
+    }
+    const inwardPull = (s - 1) * SCALE_INWARD_K * radius;
+    const px = basePx + inwardX * inwardPull;
+    const pz = basePz + inwardZ * inwardPull;
+
+    g.position.set(px, y, pz);
+    /**
+     * Ring layout: front (+Z) faces radially outward from the hub (good for many cards).
+     * With exactly two items, that puts one toward the camera and one away — back face reads as “wrong”.
+     * Billboarding on XZ keeps both fronts facing the viewer.
+     */
+    let yaw: number;
+    if (n === 2) {
+      _toCamera.subVectors(
+        camera.position,
+        _scratchA.set(px, ORBIT_TARGET_Y + y, pz),
+      );
+      _toCamera.y = 0;
+      const hLen = Math.hypot(_toCamera.x, _toCamera.z);
+      if (hLen > 1e-6) {
+        yaw = Math.atan2(_toCamera.x, _toCamera.z);
+      } else {
+        yaw = Math.atan2(dx, dz) - Math.PI / 2;
+      }
+    } else {
+      /** +X (right edge) toward ring center; yaw from ring slot (basePx/basePz), not inward offset */
+      yaw = Math.atan2(dx, dz) - Math.PI / 2;
+    }
+    g.rotation.set(0, 0, 0);
+    mesh.rotation.set(0, yaw, 0);
+
+    _frontNormal.set(0, 0, 1).applyAxisAngle(
+      THREE.Object3D.DEFAULT_UP,
+      yaw,
+    );
+    _toCamera.subVectors(
+      camera.position,
+      _scratchA.set(px, ORBIT_TARGET_Y + y, pz),
+    );
+    const dCam = _toCamera.length();
+    if (dCam > 1e-6) _toCamera.multiplyScalar(1 / dCam);
+    const facing = THREE.MathUtils.clamp(_frontNormal.dot(_toCamera), 0, 1);
+    const targetOp = THREE.MathUtils.lerp(
+      FACING_OPACITY_MIN,
+      FACING_OPACITY_MAX,
+      0.18 + 0.82 * facing,
+    );
+    smoothOpacityRef.current = THREE.MathUtils.lerp(
+      smoothOpacityRef.current,
+      targetOp,
+      Math.min(1, delta * ZOOM_LERP * 0.85),
+    );
+    const op = smoothOpacityRef.current;
+
+    const mats = mesh.material;
+    const list = Array.isArray(mats) ? mats : [mats];
+    /** Box face order: +x, −x, +y, −y, +z (front), −z (back) */
+    for (let i = 0; i < list.length; i++) {
+      const m = list[i];
+      if (i === 4 || i === 5) {
+        m.opacity = 1;
+        m.transparent = false;
+        m.depthWrite = true;
+        continue;
+      }
+      const edge = m as THREE.MeshStandardMaterial;
+      edge.opacity = op;
+      edge.transparent = op < 0.998;
+      edge.depthWrite = op > 0.92;
+    }
+  });
+
+  return (
+    <group ref={groupRef} frustumCulled={false}>
+      <mesh
+        ref={meshRef}
+        geometry={geometry}
+        material={materials}
+        frustumCulled={false}
+        onPointerOver={(e: ThreeEvent<PointerEvent>) => {
+          e.stopPropagation();
+          if (modalOpen) return;
+          onHoverStart();
+        }}
+        onPointerOut={(e: ThreeEvent<PointerEvent>) => {
+          e.stopPropagation();
+          onHoverEnd();
+        }}
+        onPointerDown={(e: ThreeEvent<PointerEvent>) => {
+          e.stopPropagation();
+          onSoftGalleryHint();
+          prefetchFirstDetailVideo(image.images);
+          pointerDown.current = { x: e.clientX, y: e.clientY };
+        }}
+        onPointerUp={(e: ThreeEvent<PointerEvent>) => {
+          e.stopPropagation();
+          const p = pointerDown.current;
+          pointerDown.current = null;
+          if (modalOpen || !p) return;
+          if (Math.hypot(e.clientX - p.x, e.clientY - p.y) > 12) {
+            return;
+          }
+          onPick();
+        }}
+      />
+    </group>
+  );
+}
+
+function SceneCursor({ hovered }: { hovered: boolean }) {
+  const { gl } = useThree();
+  useEffect(() => {
+    gl.domElement.style.cursor = hovered ? "pointer" : "grab";
+  }, [gl, hovered]);
+  return null;
+}
+
+/** Dev-only: formatted console snapshot of camera, orbit, and ring (see user request). */
+const GALLERY_SCENE_DEBUG =
+  typeof import.meta !== "undefined" && Boolean(import.meta.env?.DEV);
+
+type OrbitControlsLike = {
+  minDistance: number;
+  maxDistance: number;
+  target: THREE.Vector3;
+  getPolarAngle: () => number;
+  addEventListener: (type: string, listener: () => void) => void;
+  removeEventListener: (type: string, listener: () => void) => void;
+};
+
+function GallerySceneDebugLogger({
+  ringRadius,
+  minDistance,
+  maxDistance,
+  logOnInteraction,
+}: {
+  ringRadius: number;
+  minDistance: number;
+  maxDistance: number;
+  /** Log again on orbit start/end (avoids spamming every `change` frame) */
+  logOnInteraction: boolean;
+}) {
+  const camera = useThree((s) => s.camera);
+  const controls = useThree((s) => s.controls) as OrbitControlsLike | null;
+
+  const logSnapshot = useCallback(
+    (label: string) => {
+      if (!controls) return;
+      const p = camera.position;
+      const t = controls.target;
+      const dist = p.distanceTo(t);
+      const polar = controls.getPolarAngle();
+      const polarDeg = THREE.MathUtils.radToDeg(polar);
+      const isPersp = camera instanceof THREE.PerspectiveCamera;
+
+      console.log(
+        [
+          "",
+          "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+          `[Gallery3D / 3D scene] ${label}`,
+          "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+          "▸ Camera",
+          `    position:     x=${p.x.toFixed(4)}  y=${p.y.toFixed(4)}  z=${p.z.toFixed(4)}`,
+          `    fov:          ${isPersp ? `${camera.fov.toFixed(3)}° (vertical)` : "N/A (not PerspectiveCamera)"}`,
+          `    near / far:   ${isPersp ? `${camera.near} / ${camera.far}` : "N/A"}`,
+          "",
+          "▸ OrbitControls",
+          `    distance (camera → target): ${dist.toFixed(4)}`,
+          `    target (world):             x=${t.x.toFixed(4)}  y=${t.y.toFixed(4)}  z=${t.z.toFixed(4)}`,
+          `    minDistance / maxDistance:  ${controls.minDistance.toFixed(4)} / ${controls.maxDistance.toFixed(4)}`,
+          `    polar angle:                ${polar.toFixed(5)} rad  (${polarDeg.toFixed(2)}°)`,
+          "",
+          "▸ Gallery ring",
+          `    carousel center (world):    matches orbit target above (ring group origin)`,
+          `    ringRadius (layout math):   ${ringRadius.toFixed(4)}`,
+          `    group vertical offset:      Y = ${ORBIT_TARGET_Y}  (group position [0, ORBIT_TARGET_Y, 0])`,
+          "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+          "",
+        ].join("\n"),
+      );
+    },
+    [camera, controls, ringRadius],
+  );
+
+  useEffect(() => {
+    if (!GALLERY_SCENE_DEBUG || !controls) return;
+
+    let rafOuter = 0;
+    let rafInner = 0;
+    rafOuter = requestAnimationFrame(() => {
+      rafInner = requestAnimationFrame(() => {
+        logSnapshot("first load (after camera + controls sync)");
+      });
+    });
+
+    const onStart = () => {
+      if (logOnInteraction) logSnapshot("interaction start");
+    };
+    const onEnd = () => {
+      if (logOnInteraction) logSnapshot("interaction end");
+    };
+    controls.addEventListener("start", onStart);
+    controls.addEventListener("end", onEnd);
+
+    return () => {
+      cancelAnimationFrame(rafOuter);
+      cancelAnimationFrame(rafInner);
+      controls.removeEventListener("start", onStart);
+      controls.removeEventListener("end", onEnd);
+    };
+  }, [controls, logOnInteraction, logSnapshot]);
+
+  return null;
+}
+
+function GalleryScene({
+  images,
+  visibleIndices,
+  ringRadius,
+  hoveredIndex,
+  setHoveredIndex,
+  modalOpen,
+  onHoverCategory,
+  onPick,
+  onSoftGalleryHint,
+}: GallerySceneProps) {
+  const visibleCount = visibleIndices.length;
+  const { size } = useThree();
+  const aspect = Math.max(size.width / Math.max(size.height, 1), 0.25);
+  const { min: minZoomDistance, max: maxZoomDistance } = useMemo(
+    () => orbitZoomLimits(ringRadius, aspect),
+    [ringRadius, aspect],
+  );
+  const zoomFxRef = useRef({ zoomIn: 0, camAzimuth: 0 });
+
+  return (
+    <ZoomFxContext.Provider value={zoomFxRef}>
+      <ZoomFrameSync
+        minDistance={minZoomDistance}
+        maxDistance={maxZoomDistance}
+        zoomRef={zoomFxRef}
+      />
+      <SceneCursor hovered={hoveredIndex !== null} />
+      <ambientLight intensity={0.88} />
+      <directionalLight position={[4.5, 8, 6]} intensity={0.92} />
+      <directionalLight position={[-3.2, 2.4, -2.2]} intensity={0.38} />
+      <Suspense fallback={null}>
+        <Environment preset="studio" environmentIntensity={0.35} />
+      </Suspense>
+
+      <OrbitControls
+        makeDefault
+        enabled={!modalOpen}
+        enablePan={false}
+        enableZoom={!modalOpen}
+        enableDamping
+        dampingFactor={0.065}
+        zoomSpeed={0.46}
+        minDistance={minZoomDistance}
+        maxDistance={maxZoomDistance}
+        autoRotate={!modalOpen && hoveredIndex === null}
+        autoRotateSpeed={AUTO_ROTATE_SPEED}
+        minPolarAngle={THREE.MathUtils.degToRad(78)}
+        maxPolarAngle={THREE.MathUtils.degToRad(88)}
+        target={[0, ORBIT_TARGET_Y, 0]}
+        onStart={onSoftGalleryHint}
+      />
+      <RingCameraSync ringRadius={ringRadius} />
+      <AdaptiveFovSync
+        ringRadius={ringRadius}
+        minDistance={minZoomDistance}
+        maxDistance={maxZoomDistance}
+      />
+      {GALLERY_SCENE_DEBUG ? (
+        <GallerySceneDebugLogger
+          ringRadius={ringRadius}
+          minDistance={minZoomDistance}
+          maxDistance={maxZoomDistance}
+          logOnInteraction
+        />
+      ) : null}
+
+      <group
+        position={[0, ORBIT_TARGET_Y, 0]}
+        scale={GALLERY_GROUP_WORLD_SCALE}
+        frustumCulled={false}
+      >
+        {visibleIndices.map((imageIndex, slot) => {
+          const image = images[imageIndex];
+          if (!image) return null;
+          return (
+            <GalleryCardMesh
+              key={`card-${imageIndex}`}
+              image={image}
+              slot={slot}
+              visibleCount={visibleIndices.length}
+              radius={ringRadius}
+              hovered={hoveredIndex === imageIndex}
+              modalOpen={modalOpen}
+              onHoverStart={() => {
+                setHoveredIndex(imageIndex);
+                onHoverCategory?.(image.category);
+              }}
+              onHoverEnd={() => {
+                setHoveredIndex(null);
+                onHoverCategory?.(null);
+              }}
+              onPick={() => onPick(image)}
+              onSoftGalleryHint={onSoftGalleryHint}
+            />
+          );
+        })}
+      </group>
+    </ZoomFxContext.Provider>
+  );
+}
+
+/** Portfolio detail: index `0` is hero only; `1+` stacked vertically, aspect preserved. */
+const ProjectImageScroll = forwardRef(function ProjectImageScroll(
+  {
+    urls,
+    heroAlt,
+  }: {
+    urls: string[];
+    heroAlt: string;
+  },
+  forwardedRef: Ref<HTMLDivElement>,
+) {
+  const detailUrls = useMemo(() => detailPageMediaUrls(urls), [urls]);
+  const firstVideoUrl = useMemo(() => firstDetailVideoUrl(urls), [urls]);
+  const [failed, setFailed] = useState<Record<string, boolean>>({});
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const setScrollRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      (scrollRef as MutableRefObject<HTMLDivElement | null>).current = node;
+      if (typeof forwardedRef === "function") {
+        forwardedRef(node);
+      } else if (forwardedRef != null) {
+        (forwardedRef as MutableRefObject<HTMLDivElement | null>).current =
+          node;
+      }
+    },
+    [forwardedRef],
+  );
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+
+  const detailUrlsKey = useMemo(() => detailUrls.join("\0"), [detailUrls]);
+  const [readyUrls, setReadyUrls] = useState<Set<string>>(() => new Set());
+
+  useEffect(() => {
+    setReadyUrls(new Set());
+  }, [detailUrlsKey]);
+
+  const markDetailMediaReady = useCallback((u: string) => {
+    setReadyUrls((prev) => {
+      if (prev.has(u)) return prev;
+      const next = new Set(prev);
+      next.add(u);
+      return next;
+    });
+  }, []);
+
+  const detailMediaAllReady = useMemo(() => {
+    if (detailUrls.length === 0) return true;
+    return detailUrls.every((u) => failed[u] || readyUrls.has(u));
+  }, [detailUrls, failed, readyUrls]);
+
+  const srcFor = useCallback(
+    (url: string) =>
+      failed[url] ? fallbackImageUrl() : url,
+    [failed],
+  );
+
+  const syncPlayback = useCallback(() => {
+    const root = scrollRef.current;
+    if (!root) return;
+    syncDetailVideoPlayback(
+      root,
+      detailUrls,
+      srcFor,
+      failed,
+      itemRefs.current,
+      videoRefs.current,
+    );
+  }, [detailUrls, srcFor, failed]);
+
+  const playbackRafRef = useRef(0);
+  const schedulePlaybackSync = useCallback(() => {
+    if (playbackRafRef.current !== 0) return;
+    playbackRafRef.current = requestAnimationFrame(() => {
+      playbackRafRef.current = 0;
+      syncPlayback();
+    });
+  }, [syncPlayback]);
+
+  useLayoutEffect(() => {
+    itemRefs.current.length = detailUrls.length;
+    videoRefs.current.length = detailUrls.length;
+  }, [detailUrls.length]);
+
+  useEffect(() => {
+    return () => {
+      if (playbackRafRef.current !== 0) {
+        cancelAnimationFrame(playbackRafRef.current);
+        playbackRafRef.current = 0;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const root = scrollRef.current;
+    if (!root || detailUrls.length === 0) return;
+    syncPlayback();
+    root.addEventListener("scroll", schedulePlaybackSync, { passive: true });
+    const ro = new ResizeObserver(() => schedulePlaybackSync());
+    ro.observe(root);
+    window.addEventListener("resize", schedulePlaybackSync);
+    return () => {
+      root.removeEventListener("scroll", schedulePlaybackSync);
+      ro.disconnect();
+      window.removeEventListener("resize", schedulePlaybackSync);
+    };
+  }, [detailUrls.length, schedulePlaybackSync, syncPlayback]);
+
+  useLayoutEffect(() => {
+    if (detailUrls.length === 0) return;
+    syncPlayback();
+  }, [detailUrls, failed, syncPlayback]);
+
+  useLayoutEffect(() => {
+    if (!detailMediaAllReady) return;
+    schedulePlaybackSync();
+  }, [detailMediaAllReady, schedulePlaybackSync]);
+
+  if (detailUrls.length === 0) {
+    return (
+      <div
+        ref={setScrollRef}
+        className="min-h-[min(70vh,580px)] w-full min-w-0 bg-transparent"
+        role="region"
+        aria-label={heroAlt}
+      />
+    );
+  }
+
+  return (
+    <div
+      ref={setScrollRef}
+      className="max-h-[min(70vh,580px)] w-full min-w-0 overflow-y-auto overscroll-y-contain bg-transparent [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:h-0 [&::-webkit-scrollbar]:w-0"
+      role="region"
+      aria-label={heroAlt}
+    >
+      <div
+        className={`flex w-full flex-col gap-8 transition-opacity duration-300 ease-out motion-reduce:transition-none ${
+          detailMediaAllReady
+            ? "opacity-100"
+            : "pointer-events-none opacity-0"
+        }`}
+        aria-busy={!detailMediaAllReady}
+      >
+        {detailUrls.map((url, i) => {
+          const src = srcFor(url);
+          const indexLabel = galleryFilenameIndex(url);
+          const showVideo = !failed[url] && isVideoUrl(src);
+          const label =
+            indexLabel != null ? `${heroAlt} — ${indexLabel}` : heroAlt;
+          const isPrimaryDetailVideo =
+            showVideo && firstVideoUrl != null && url === firstVideoUrl;
+          return (
+            <div
+              key={`${url}-${i}`}
+              ref={(el) => {
+                itemRefs.current[i] = el;
+              }}
+              className="w-full shrink-0"
+            >
+              {showVideo ? (
+                <video
+                  ref={(el) => {
+                    videoRefs.current[i] = el;
+                  }}
+                  src={src}
+                  controls
+                  controlsList="nodownload"
+                  playsInline
+                  preload="auto"
+                  {...(isPrimaryDetailVideo
+                    ? ({ fetchPriority: "high" } as VideoHTMLAttributes<HTMLVideoElement>)
+                    : ({
+                        fetchPriority: "auto",
+                      } as VideoHTMLAttributes<HTMLVideoElement>))}
+                  className="block h-auto max-w-full w-full"
+                  aria-label={label}
+                  onLoadedMetadata={schedulePlaybackSync}
+                  onLoadedData={(e) => {
+                    const v = e.currentTarget;
+                    if (v.dataset.portfolioDefaultVolume !== "1") {
+                      v.dataset.portfolioDefaultVolume = "1";
+                      v.volume = DETAIL_VIDEO_VOLUME;
+                    }
+                    markDetailMediaReady(url);
+                    schedulePlaybackSync();
+                  }}
+                  onCanPlay={schedulePlaybackSync}
+                  onError={() => {
+                    setFailed((f) => ({ ...f, [url]: true }));
+                    markDetailMediaReady(url);
+                    console.error("[Gallery3D] Modal video failed:", url);
+                  }}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                  }}
+                />
+              ) : (
+                <img
+                  src={src}
+                  alt={label}
+                  className="block h-auto max-w-full w-full select-none"
+                  draggable={false}
+                  loading="eager"
+                  decoding="async"
+                  fetchPriority={i === 0 ? "high" : "auto"}
+                  onLoad={() => {
+                    markDetailMediaReady(url);
+                  }}
+                  onError={() => {
+                    setFailed((f) => ({ ...f, [url]: true }));
+                    markDetailMediaReady(url);
+                    console.error("[Gallery3D] Modal image failed:", url);
+                  }}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                  }}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+});
+
+ProjectImageScroll.displayName = "ProjectImageScroll";
+
+export function Gallery3D({
+  images,
+  activeFilter = "All",
+  onHoverCategory,
+  onOpenImage,
+  onCloseModal,
+}: Gallery3DProps) {
+  const { messages } = useLanguage();
+  const { gallery: galleryCopy } = messages;
+
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
+
+  const selectedPortfolioCopy =
+    selectedImage != null
+      ? portfolioProjectCopy(messages, selectedImage.projectKey)
+      : null;
+
+  /** Full-opacity “flash”; false = resting soft style (low opacity + nudge) */
+  const [exploreHintProminent, setExploreHintProminent] = useState(true);
+  const exploreHintFlashGenerationRef = useRef(0);
+
+  /** Softer hint immediately when the user drags the gallery (also invalidates pending fade timer). */
+  const softenExploreHintFromInteraction = useCallback(() => {
+    exploreHintFlashGenerationRef.current += 1;
+    setExploreHintProminent(false);
+  }, []);
+
+  useEffect(() => {
+    exploreHintFlashGenerationRef.current += 1;
+    const gen = exploreHintFlashGenerationRef.current;
+
+    setExploreHintProminent(true);
+    const id = window.setTimeout(() => {
+      if (gen === exploreHintFlashGenerationRef.current) {
+        setExploreHintProminent(false);
+      }
+    }, EXPLORE_HINT_FLASH_MS);
+
+    return () => {
+      window.clearTimeout(id);
+    };
+  }, [activeFilter]);
+
+  const visibleIndices = useMemo(() => {
+    return images
+      .map((img, i) =>
+        activeFilter === "All" || img.category === activeFilter ? i : -1,
+      )
+      .filter((i): i is number => i >= 0);
+  }, [images, activeFilter]);
+
+  const ringRadius = useMemo(
+    () =>
+      ringRadiusWorld(
+        visibleIndices.length,
+        activeFilter === "All"
+          ? ORBIT_MIN_RADIUS_ALL
+          : ORBIT_MIN_RADIUS_FILTERED,
+      ),
+    [visibleIndices.length, activeFilter],
+  );
+
+  const cameraWorldPos = useMemo((): [number, number, number] => {
+    const aspect = defaultViewportAspect();
+    const { min, max } = orbitZoomLimits(ringRadius, aspect);
+    const D = THREE.MathUtils.clamp(
+      baseOrbitCameraDistance(ringRadius, aspect),
+      min,
+      max,
+    );
+    return cameraTupleForOrbitDistance(D);
+  }, [ringRadius]);
+
+  const closeModal = useCallback(() => {
+    setSelectedImage(null);
+    onCloseModal?.();
+  }, [onCloseModal]);
+
+  const handlePick = useCallback(
+    (image: GalleryImage) => {
+      prefetchFirstDetailVideo(image.images);
+      setSelectedImage(image);
+      onOpenImage?.(image);
+    },
+    [onOpenImage],
+  );
+
+  const detailModalOpen = selectedImage !== null;
+  const detailModalScrollRef = useRef<HTMLDivElement>(null);
+  const modalDetailWheelRootRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    if (!detailModalOpen) return;
+    const root = modalDetailWheelRootRef.current;
+    if (!root) return;
+
+    const onWheel = (e: WheelEvent) => {
+      const scrollEl = detailModalScrollRef.current;
+      if (!scrollEl) return;
+      if (scrollEl.scrollHeight <= scrollEl.clientHeight + 1) return;
+
+      const delta = e.deltaY;
+      const { scrollTop, scrollHeight, clientHeight } = scrollEl;
+      const atTop = scrollTop <= 0.5;
+      const atBottom = scrollTop + clientHeight >= scrollHeight - 0.5;
+
+      if (delta < 0 && atTop) return;
+      if (delta > 0 && atBottom) return;
+
+      e.preventDefault();
+      scrollEl.scrollTop += delta;
+    };
+
+    root.addEventListener("wheel", onWheel, { passive: false, capture: true });
+    return () => root.removeEventListener("wheel", onWheel, true);
+  }, [detailModalOpen, selectedImage?.projectKey]);
+
+  useEffect(() => {
+    if (!detailModalOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [detailModalOpen]);
+
+  useEffect(() => {
+    if (!detailModalOpen) {
+      clearGalleryDetailVideoPreload();
+      return;
+    }
+    return () => {
+      clearGalleryDetailVideoPreload();
+    };
+  }, [detailModalOpen]);
+
+  return (
+    <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col">
+      <div className="flex min-h-0 w-full flex-1 flex-col px-2 pb-0 pt-0 sm:px-4">
+        <div
+          className="relative min-h-[220px] w-full min-w-0 flex-1 basis-0 select-none sm:min-h-[240px]"
+          style={{ touchAction: "none" }}
+          onWheelCapture={softenExploreHintFromInteraction}
+          onPointerDownCapture={softenExploreHintFromInteraction}
+        >
+          <Canvas
+            className="absolute inset-0 h-full w-full touch-none [transform:translateZ(0)]"
+            gl={{
+              antialias: true,
+              alpha: true,
+              preserveDrawingBuffer: true,
+              powerPreference: "high-performance",
+            }}
+            camera={{
+              fov: CAMERA_FOV,
+              near: CAMERA_NEAR,
+              far: CAMERA_FAR,
+              position: cameraWorldPos,
+            }}
+            onCreated={({ gl, scene, camera }) => {
+              scene.background = null;
+              gl.setClearColor(0x000000, 0);
+              gl.setClearAlpha(0);
+              gl.toneMapping = THREE.ACESFilmicToneMapping;
+              gl.toneMappingExposure = 1.06;
+              if (camera instanceof THREE.PerspectiveCamera) {
+                camera.fov = CAMERA_FOV;
+                camera.near = CAMERA_NEAR;
+                camera.far = CAMERA_FAR;
+              }
+              camera.position.set(
+                cameraWorldPos[0],
+                cameraWorldPos[1],
+                cameraWorldPos[2],
+              );
+              camera.lookAt(0, ORBIT_TARGET_Y, 0);
+              if (camera instanceof THREE.PerspectiveCamera) {
+                camera.updateProjectionMatrix();
+              }
+            }}
+          >
+            <GalleryScene
+              images={images}
+              visibleIndices={visibleIndices}
+              ringRadius={ringRadius}
+              hoveredIndex={hoveredIndex}
+              setHoveredIndex={setHoveredIndex}
+              modalOpen={detailModalOpen}
+              onHoverCategory={onHoverCategory}
+              onPick={handlePick}
+              onSoftGalleryHint={softenExploreHintFromInteraction}
+            />
+          </Canvas>
+
+          <div
+            className="pointer-events-none absolute inset-0 flex items-center justify-center"
+            aria-hidden
+          >
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  "radial-gradient(ellipse at center, transparent 38%, rgba(255,255,255,0.55) 100%)",
+                filter: "blur(56px)",
+                opacity: 0.45,
+              }}
+            />
+            <div
+              className="rounded-full"
+              style={{
+                width: "min(48vw, 420px)",
+                height: "min(48vw, 420px)",
+                background:
+                  "radial-gradient(ellipse at center, rgba(255,255,255,0.98) 0%, rgba(250,250,255,0.55) 28%, rgba(248,248,252,0.18) 52%, transparent 78%)",
+                filter: "blur(52px)",
+                opacity: 0.92,
+              }}
+            />
+          </div>
+        </div>
+
+        <p
+          className={`pointer-events-none w-full max-w-lg shrink-0 self-center px-4 pb-1 pt-2 text-center text-[11px] uppercase leading-snug tracking-[0.18em] transition-[opacity,transform,filter] duration-500 ease-out motion-reduce:transition-none sm:pb-1.5 ${
+            exploreHintProminent
+              ? "translate-y-0 text-gray-400 opacity-100 [filter:none]"
+              : "translate-y-1 text-gray-400/75 opacity-[0.28] [filter:blur(0.35px)] motion-reduce:translate-y-0"
+          }`}
+          aria-live="polite"
+        >
+          {galleryCopy.exploreHint}
+        </p>
+      </div>
+
+      <AnimatePresence>
+        {selectedImage && (
+          <motion.div
+            key="modal-backdrop"
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+            className="fixed inset-0 z-50 [isolation:isolate]"
+          >
+            <div
+              ref={modalDetailWheelRootRef}
+              className="absolute inset-0 flex items-center justify-center p-6 sm:p-10"
+              style={{
+                background: "var(--modal-backdrop)",
+                backdropFilter: "blur(20px)",
+                WebkitBackdropFilter: "blur(20px)",
+              }}
+              onClick={closeModal}
+              role="presentation"
+            >
+            <motion.div
+              key="modal-card"
+              initial={{ scale: 0.94, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.94, opacity: 0, y: 20 }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+              className="relative flex w-full max-w-6xl flex-col items-stretch gap-10 lg:flex-row lg:items-start lg:gap-14"
+              onClick={(e: MouseEvent<HTMLDivElement>) => e.stopPropagation()}
+            >
+              <div className="min-h-0 w-full min-w-0 flex-1 shrink-0 bg-app-shell-bg lg:max-w-[min(100%,560px)]">
+                <ProjectImageScroll
+                  ref={detailModalScrollRef}
+                  key={`${selectedImage.projectKey}|${selectedImage.images.join("|")}`}
+                  urls={selectedImage.images}
+                  heroAlt={
+                    selectedPortfolioCopy?.title ?? selectedImage.projectKey
+                  }
+                />
+              </div>
+
+              <motion.div
+                initial={{ x: 24, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{
+                  delay: 0.1,
+                  duration: 0.4,
+                  ease: [0.25, 0.46, 0.45, 0.94],
+                }}
+                className="flex flex-1 flex-col justify-center space-y-6 lg:sticky lg:top-24 lg:max-w-md lg:self-start"
+              >
+                <div>
+                  <p className="mb-2 text-xs uppercase tracking-[0.2em] text-gray-400">
+                    {localizedCategory(messages, selectedImage.category)}
+                  </p>
+                  <h2
+                    className="mb-4 tracking-tight text-gray-900"
+                    style={{ fontSize: "1.75rem", lineHeight: 1.25 }}
+                  >
+                    {selectedPortfolioCopy?.title ?? selectedImage.projectKey}
+                  </h2>
+                  <p className="text-[0.95rem] leading-relaxed text-gray-500">
+                    {selectedPortfolioCopy?.description ?? ""}
+                  </p>
+                </div>
+
+                <div className="flex items-baseline gap-4 border-t border-gray-100/80 pt-4">
+                  <span className="text-xs uppercase tracking-[0.18em] text-gray-400">
+                    {galleryCopy.modalYear}
+                  </span>
+                  <span className="tabular-nums text-gray-800">
+                    {selectedPortfolioCopy?.year ?? ""}
+                  </span>
+                </div>
+
+                <motion.button
+                  type="button"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={closeModal}
+                  className="mt-2 w-fit rounded-full bg-gray-900 px-6 py-2.5 text-sm tracking-wide text-white"
+                  style={{ fontWeight: 500 }}
+                >
+                  {galleryCopy.backToGallery}
+                </motion.button>
+              </motion.div>
+
+              <button
+                type="button"
+                onClick={closeModal}
+                className="absolute -right-1 -top-1 rounded-full bg-white p-2.5 transition-transform hover:scale-105 lg:right-0 lg:top-0"
+                style={{ boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}
+                aria-label={galleryCopy.close}
+              >
+                <X className="h-5 w-5 text-gray-600" />
+              </button>
+            </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
