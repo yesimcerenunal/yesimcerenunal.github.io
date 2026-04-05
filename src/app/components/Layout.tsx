@@ -23,13 +23,13 @@ function LayoutShell() {
   }, [location.pathname, resetCategories]);
 
   return (
-    <div className="flex h-dvh max-h-dvh min-h-0 overflow-hidden bg-app-shell-bg">
+    <div className="flex h-dvh max-h-dvh min-h-0 overflow-hidden bg-transparent">
       <Navigation />
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <header className="flex shrink-0 items-baseline justify-end gap-5 px-7 pb-1 pt-5 sm:gap-6 sm:px-12 sm:pb-1.5 sm:pt-6 lg:px-14 lg:pt-7">
           <LanguageSwitcher />
-          <p className="text-[0.75rem] font-semibold uppercase tracking-[0.22em] text-gray-900 sm:text-sm">
+          <p className="text-[0.75rem] font-semibold uppercase tracking-[0.22em] text-foreground sm:text-sm">
             {messages.layout.brandName}
           </p>
         </header>

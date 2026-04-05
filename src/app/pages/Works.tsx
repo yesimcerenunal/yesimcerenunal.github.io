@@ -22,7 +22,7 @@ export function Works() {
 
   return (
     <div className="relative flex min-h-0 min-w-0 w-full max-w-full flex-1 flex-col">
-      <h1 className="pointer-events-none absolute left-0 top-0 z-20 text-[0.7rem] font-medium uppercase tracking-[0.12em] text-gray-400">
+      <h1 className="pointer-events-none absolute left-0 top-0 z-20 text-[0.7rem] font-medium uppercase tracking-[0.12em] text-muted-foreground">
         {messages.nav.gallery}
       </h1>
       <Gallery3D

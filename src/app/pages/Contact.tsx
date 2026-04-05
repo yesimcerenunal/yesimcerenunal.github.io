@@ -6,9 +6,9 @@ import {
 } from "../config/contact";
 
 const fieldClass =
-  "mt-1.5 w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition-[box-shadow,border-color] placeholder:text-gray-400 focus:border-gray-300 focus:ring-2 focus:ring-gray-900/5";
+  "mt-1.5 w-full rounded-lg border border-border bg-input-background px-3 py-2.5 text-sm text-foreground outline-none transition-[box-shadow,border-color] placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/25";
 
-const labelClass = "block text-[0.8rem] font-medium text-gray-700";
+const labelClass = "block text-[0.8rem] font-medium text-foreground/85";
 
 export function Contact() {
   const { messages } = useLanguage();
@@ -22,29 +22,29 @@ export function Contact() {
       transition={{ duration: 0.6 }}
       className="max-w-3xl"
     >
-      <h1 className="mb-8 text-[0.7rem] font-medium uppercase tracking-[0.12em] text-gray-400">
+      <h1 className="mb-8 text-[0.7rem] font-medium uppercase tracking-[0.12em] text-muted-foreground">
         {c.title}
       </h1>
 
-      <div className="space-y-8 leading-relaxed text-gray-600">
+      <div className="space-y-8 leading-relaxed text-muted-foreground">
         <div className="space-y-5">
-          <p className="text-xl text-gray-900">{c.headline}</p>
+          <p className="text-xl text-foreground">{c.headline}</p>
           <p>{c.description}</p>
         </div>
 
         <div className="flex flex-col items-start gap-3">
           <a
             href={mailtoHref}
-            className="inline-flex w-fit rounded-full bg-gray-900 px-6 py-2.5 text-sm font-medium tracking-wide text-white transition-opacity hover:opacity-90"
+            className="inline-flex w-fit rounded-full bg-primary px-6 py-2.5 text-sm font-medium tracking-wide text-primary-foreground transition-opacity hover:opacity-90"
           >
             {c.emailCta}
           </a>
-          <p className="max-w-md text-[0.8rem] leading-snug text-gray-500">
+          <p className="max-w-md text-[0.8rem] leading-snug text-muted-foreground">
             {c.rolesLine}
           </p>
         </div>
 
-        <div className="border-t border-gray-100 pt-10">
+        <div className="border-t border-border pt-10">
           {FORMSPREE_ENDPOINT ? (
             <form
               action={FORMSPREE_ENDPOINT}
@@ -95,13 +95,13 @@ export function Contact() {
               </div>
               <button
                 type="submit"
-                className="rounded-full border border-gray-200 bg-white px-6 py-2.5 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-50"
+                className="rounded-full border border-border bg-card px-6 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
               >
                 {c.send}
               </button>
             </form>
           ) : (
-            <p className="max-w-lg text-sm text-gray-500">{c.noFormNote}</p>
+            <p className="max-w-lg text-sm text-muted-foreground">{c.noFormNote}</p>
           )}
         </div>
       </div>

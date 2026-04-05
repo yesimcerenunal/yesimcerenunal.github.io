@@ -42,7 +42,7 @@ export function GestureControl() {
   return (
     <div className="absolute top-8 left-1/2 -translate-x-1/2 z-10 flex items-start gap-3">
       {/* Webcam Feed */}
-      <div className="relative rounded-lg overflow-hidden shadow-lg border border-gray-200">
+      <div className="relative rounded-lg overflow-hidden shadow-lg border border-border">
         <video
           ref={videoRef}
           autoPlay
@@ -55,7 +55,7 @@ export function GestureControl() {
       {/* Control Button */}
       <button
         onClick={() => setIsGestureEnabled(false)}
-        className="bg-white border border-gray-200 rounded-lg px-4 py-2 shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+        className="bg-card border border-border rounded-lg px-4 py-2 shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
       >
         <X className="w-4 h-4" />
         {messages.layout.gestureControlOff}

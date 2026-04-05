@@ -26,9 +26,9 @@ export function Navigation() {
   };
 
   return (
-    <aside className="flex w-48 shrink-0 flex-col border-r border-gray-100/90 px-6 pb-6 pt-6 sm:w-56 sm:px-8 sm:pb-8 sm:pt-8">
+    <aside className="flex w-48 shrink-0 flex-col border-r border-border px-6 pb-6 pt-6 sm:w-56 sm:px-8 sm:pb-8 sm:pt-8">
       <div className="mb-10">
-        <p className="text-[0.78rem] font-medium uppercase leading-tight tracking-[0.14em] text-gray-900">
+        <p className="text-[0.78rem] font-medium uppercase leading-tight tracking-[0.14em] text-foreground">
           {sidebar.portfolio}
         </p>
       </div>
@@ -41,20 +41,22 @@ export function Navigation() {
           <button
             type="button"
             onClick={() => setFilter("all")}
-            className="rounded-lg px-2.5 py-1.5 text-left text-[0.82rem] tracking-[0.01em] transition-all duration-300 ease-out hover:bg-gray-100/90"
+            className="rounded-lg px-2.5 py-1.5 text-left text-[0.82rem] tracking-[0.01em] transition-all duration-300 ease-out hover:bg-muted/70"
             style={{
               fontWeight: filterSlug === "all" ? 600 : 500,
               color:
                 filterSlug === "all"
-                  ? "#111"
+                  ? "var(--foreground)"
                   : galleryHighlight
-                    ? "#6b7280"
-                    : "#9ca3af",
+                    ? "var(--nav-text-mid)"
+                    : "var(--nav-text-faint)",
               background:
-                filterSlug === "all" ? "rgb(244, 244, 246)" : "transparent",
+                filterSlug === "all"
+                  ? "var(--nav-filter-active-bg)"
+                  : "transparent",
               boxShadow:
                 filterSlug === "all"
-                  ? "inset 0 0 0 1px rgba(0,0,0,0.06)"
+                  ? "inset 0 0 0 1px var(--nav-filter-active-ring)"
                   : "none",
             }}
           >
@@ -71,19 +73,19 @@ export function Navigation() {
                 key={canonical}
                 type="button"
                 onClick={() => setFilter(slug)}
-                className="rounded-lg px-2.5 py-1.5 text-left text-[0.82rem] tracking-[0.01em] transition-all duration-300 ease-out hover:bg-gray-100/90"
+                className="rounded-lg px-2.5 py-1.5 text-left text-[0.82rem] tracking-[0.01em] transition-all duration-300 ease-out hover:bg-muted/70"
                 style={{
                   fontWeight: isFilterActive ? 600 : 500,
                   color: isFilterActive
-                    ? "#111"
+                    ? "var(--foreground)"
                     : isGalleryGlow
-                      ? "#4b5563"
-                      : "#9ca3af",
+                      ? "var(--nav-text-mid)"
+                      : "var(--nav-text-faint)",
                   background: isFilterActive
-                    ? "rgb(244, 244, 246)"
+                    ? "var(--nav-filter-active-bg)"
                     : "transparent",
                   boxShadow: isFilterActive
-                    ? "inset 0 0 0 1px rgba(0,0,0,0.06)"
+                    ? "inset 0 0 0 1px var(--nav-filter-active-ring)"
                     : "none",
                   transform: isGalleryGlow ? "scale(1.02)" : "scale(1)",
                   transformOrigin: "left center",
@@ -97,7 +99,7 @@ export function Navigation() {
       ) : null}
 
       <div className="mt-auto pt-10">
-        <p className="max-w-[14rem] text-[0.72rem] leading-[1.6] tracking-[0.01em] text-gray-400">
+        <p className="max-w-[14rem] text-[0.72rem] leading-[1.6] tracking-[0.01em] text-muted-foreground">
           {isWorks ? sidebar.taglineWorks : sidebar.taglineOther}
         </p>
       </div>

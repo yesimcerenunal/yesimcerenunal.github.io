@@ -21,7 +21,7 @@ export function LanguageSwitcher() {
 
   return (
     <nav
-      className="flex items-center gap-x-2 text-[0.65rem] font-medium uppercase tracking-[0.14em] text-gray-900 sm:text-[0.68rem]"
+      className="flex items-center gap-x-2 text-[0.65rem] font-medium uppercase tracking-[0.14em] text-foreground sm:text-[0.68rem]"
       aria-label={messages.aria.languageSwitcher}
     >
       {LOCALES.map((code, index) => {
@@ -30,7 +30,7 @@ export function LanguageSwitcher() {
           <Fragment key={code}>
             {index > 0 ? (
               <span
-                className="select-none text-gray-300/90"
+                className="select-none text-muted-foreground/80"
                 style={{ opacity: 0.45 }}
                 aria-hidden
               >
@@ -42,16 +42,16 @@ export function LanguageSwitcher() {
               tabIndex={0}
               onClick={() => setLocale(code)}
               onKeyDown={(e) => onKeyToggle(code, e)}
-              className={`relative cursor-pointer select-none outline-none transition-[opacity,color] duration-200 ease-out focus-visible:ring-1 focus-visible:ring-gray-900/20 focus-visible:ring-offset-2 ${
+              className={`relative cursor-pointer select-none outline-none transition-[opacity,color] duration-200 ease-out focus-visible:ring-1 focus-visible:ring-ring/35 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                 active
-                  ? "font-bold text-gray-900 opacity-100"
-                  : "font-medium text-gray-500 opacity-[0.5] hover:text-gray-700 hover:opacity-[0.72]"
+                  ? "font-bold text-foreground opacity-100"
+                  : "font-medium text-muted-foreground opacity-[0.5] hover:text-foreground hover:opacity-[0.72]"
               } `}
             >
               <span
                 className={
                   active
-                    ? "after:absolute after:left-0 after:right-0 after:top-full after:mt-0.5 after:h-px after:rounded-full after:bg-gray-900/40 after:content-['']"
+                    ? "after:absolute after:left-0 after:right-0 after:top-full after:mt-0.5 after:h-px after:rounded-full after:bg-foreground/35 after:content-['']"
                     : undefined
                 }
               >

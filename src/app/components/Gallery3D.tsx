@@ -318,6 +318,45 @@ const ORBIT_MIN_RADIUS_ALL = 3.2;
 const ORBIT_MIN_RADIUS_FILTERED = 0.62;
 /** When exactly two pieces are on the ring, enforce a wider radius so they do not overlap */
 const ORBIT_TWO_ITEM_MIN_RADIUS = 0.78;
+/**
+ * With 4+ items on a filtered ring (e.g. Motion), enforce a wider orbit so neighbors
+ * don’t feel glued — more empty “hub” in the middle.
+ */
+const ORBIT_MIN_RADIUS_FILTERED_MANY = 1.06;
+/** Extra arc length between cards when a category filter is active (3 items). */
+const FILTERED_RING_SPACING_MULT_3 = 1.28;
+/** Extra arc length when 4+ items on a filtered ring (Motion, etc.). */
+const FILTERED_RING_SPACING_MULT_4PLUS = 1.52;
+/** Slightly shrink cards on crowded filtered rings so the orbit reads larger vs. slabs. */
+const FILTERED_MANY_CARD_SCALE = 0.9;
+/**
+ * Filtered view, exactly two cards: Interactive / VR, 3D Archive, 2D Archive — a bit smaller
+ * (Motion-style orbit; zoom still brings detail).
+ */
+const FILTERED_TWO_ITEM_ARCHIVE_SCALE = 0.86;
+/** Categories that use {@link FILTERED_TWO_ITEM_ARCHIVE_SCALE} when two items are on the ring. */
+const ORBITAL_SMALL_TWO_ITEM_CATEGORIES = new Set<string>([
+  "Interactive / VR",
+  "3D Archive",
+  "2D Archive",
+]);
+
+/**
+ * “All” cloud gallery: smaller cards (GIF-like), 3D scatter + drift (replaces flat ring).
+ */
+const ALL_CLOUD_LAYOUT_SCALE = 0.46;
+/** Extra radius for orbit / FOV framing so the 3D shell doesn’t clip. */
+const ALL_CLOUD_FRAMING_RADIUS_MULT = 1.52;
+/** Organic motion: world units drift on each axis. */
+const ALL_CLOUD_DRIFT_AMP = 0.1;
+/** Subtle tilt wobble on the mesh (radians). */
+const ALL_CLOUD_WOBBLE_AMP = 0.07;
+/** “All” view: circular disc — segment count for smooth outline. */
+const ALL_CLOUD_CIRCLE_SEGMENTS = 72;
+/** Distance-based scale: near camera / mid / far shell (orbit drag updates naturally). */
+const ALL_CLOUD_DEPTH_NEAR_SCALE = 1.44;
+const ALL_CLOUD_DEPTH_MID_SCALE = 0.88;
+const ALL_CLOUD_DEPTH_FAR_SCALE = 0.48;
 
 /**
  * Front/back faces match hero artwork aspect: 1080×1080 (square).
@@ -331,15 +370,95 @@ const CARD_FACE_ASPECT_W_OVER_H = CARD_FACE_PIXEL_W / CARD_FACE_PIXEL_H;
 const CARD_W = 0.82;
 const CARD_H = CARD_W / CARD_FACE_ASPECT_W_OVER_H;
 const CARD_D = 0.014;
+/** Deterministic 0–1 hash for per-slot scatter (stable across frames). */
+function slotHash01(slot: number, salt: number): number {
+  const x = Math.sin(slot * 12.9898 + salt * 78.233) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+/**
+ * Fibonacci sphere + jitter — loose “planet shell” of thumbnails (not a flat ring).
+ */
+function allCloudBasePosition(
+  slot: number,
+  n: number,
+  shellRadius: number,
+): [number, number, number] {
+  if (n <= 0) return [0, 0, shellRadius];
+  if (n === 1) return [0, 0, shellRadius * 0.94];
+  const golden = Math.PI * (3 - Math.sqrt(5));
+  const i = slot + 0.5;
+  const y = 1 - (i / n) * 2;
+  const clampY = THREE.MathUtils.clamp(y, -0.999, 0.999);
+  const theta = golden * slot;
+  const h1 = slotHash01(slot, 1);
+  const h2 = slotHash01(slot, 2);
+  const h3 = slotHash01(slot, 3);
+  const radialJitter = 0.76 + h1 * 0.26;
+  const thetaJitter = (h2 - 0.5) * 0.62;
+  const yJitter = (h3 - 0.5) * 0.32;
+  const t = theta + thetaJitter;
+  const yF = clampY + yJitter;
+  const yClamped = THREE.MathUtils.clamp(yF, -0.94, 0.94);
+  const rAdj = Math.sqrt(Math.max(0, 1 - yClamped * yClamped));
+  const x = Math.cos(t) * rAdj * shellRadius * radialJitter;
+  const z = Math.sin(t) * rAdj * shellRadius * radialJitter;
+  const yW = yClamped * shellRadius * radialJitter;
+  return [x, yW, z];
+}
+
+/**
+ * Three depth bands (near / mid / far) from camera–card distance; smooth as the orbit drags.
+ * `orbitMin` / `orbitMax` are the same zoom limits as OrbitControls (world units to target).
+ */
+function allCloudDistanceScale(
+  dist: number,
+  orbitMin: number,
+  orbitMax: number,
+): number {
+  const d0 = orbitMin * 0.56;
+  const d1 = THREE.MathUtils.lerp(orbitMin, orbitMax, 0.36);
+  const d2 = orbitMax * 1.16;
+  if (dist <= d0) return ALL_CLOUD_DEPTH_NEAR_SCALE;
+  if (dist >= d2) return ALL_CLOUD_DEPTH_FAR_SCALE;
+  if (dist <= d1) {
+    const t = THREE.MathUtils.clamp((dist - d0) / Math.max(d1 - d0, 1e-5), 0, 1);
+    const st = t * t * (3 - 2 * t);
+    return THREE.MathUtils.lerp(
+      ALL_CLOUD_DEPTH_NEAR_SCALE,
+      ALL_CLOUD_DEPTH_MID_SCALE,
+      st,
+    );
+  }
+  const t = THREE.MathUtils.clamp((dist - d1) / Math.max(d2 - d1, 1e-5), 0, 1);
+  const st = t * t * (3 - 2 * t);
+  return THREE.MathUtils.lerp(
+    ALL_CLOUD_DEPTH_MID_SCALE,
+    ALL_CLOUD_DEPTH_FAR_SCALE,
+    st,
+  );
+}
 
 /** Circumference = n × spacing → radius = n×spacing / (2π); never below minRadius */
-function ringRadiusWorld(itemCount: number, minRadiusWorld: number): number {
-  const spacing =
+function ringRadiusWorld(
+  itemCount: number,
+  minRadiusWorld: number,
+  isFilteredCategory: boolean,
+): number {
+  let spacing =
     itemCount === 2 ? ORBIT_CARD_SPACING * 1.1 : ORBIT_CARD_SPACING;
+  if (isFilteredCategory && itemCount >= 4) {
+    spacing *= FILTERED_RING_SPACING_MULT_4PLUS;
+  } else if (isFilteredCategory && itemCount === 3) {
+    spacing *= FILTERED_RING_SPACING_MULT_3;
+  }
   const radius = (itemCount * spacing) / (2 * Math.PI);
   let r = Math.max(radius, minRadiusWorld);
   if (itemCount === 2) {
     r = Math.max(r, ORBIT_TWO_ITEM_MIN_RADIUS);
+  }
+  if (isFilteredCategory && itemCount >= 4) {
+    r = Math.max(r, ORBIT_MIN_RADIUS_FILTERED_MANY);
   }
   return r;
 }
@@ -598,8 +717,11 @@ function AdaptiveFovSync({
 }
 
 const AUTO_ROTATE_SPEED = 0.45;
-/** Slightly faster orbit when a category shows exactly two cards (keeps the pair from feeling sluggish). */
-const AUTO_ROTATE_SPEED_TWO_ITEMS = 0.68;
+/**
+ * Slightly faster auto-rotate: (a) exactly two cards on the ring, or (b) a filtered category
+ * with 3+ cards — same “satellites around a hub” energy as the two-card case.
+ */
+const AUTO_ROTATE_SPEED_ORBITAL = 0.68;
 const HOVER_LERP = 10;
 
 /** Zoom-driven layout/parallax (smoothed in useFrame) */
@@ -609,6 +731,7 @@ const FACING_OPACITY_MIN = 0.44;
 const FACING_OPACITY_MAX = 1;
 
 const _scratchA = new THREE.Vector3();
+const _scratchB = new THREE.Vector3();
 const _toCamera = new THREE.Vector3();
 const _frontNormal = new THREE.Vector3();
 
@@ -640,10 +763,30 @@ function ZoomFrameSync({
 
 const PLACEHOLDER_GRAY = new THREE.Color(0x5c5c66);
 
+function usePrefersReducedMotion(): boolean {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduced(mq.matches);
+    const onChange = () => setReduced(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+  return reduced;
+}
+
 interface GallerySceneProps {
   images: GalleryImage[];
   visibleIndices: number[];
+  /** Layout shell radius (card positions). */
   ringRadius: number;
+  /** Wider radius for orbit min/max + FOV when “All” cloud needs extra margin. */
+  orbitFramingRadius: number;
+  /** Current filter label; used for per-category card scale and “All” satellite float. */
+  activeFilter: string;
+  /** True when a single category is selected (not “All”) — wider orbit + optional card scale. */
+  filteredCategoryActive: boolean;
   hoveredIndex: number | null;
   setHoveredIndex: (i: number | null) => void;
   modalOpen: boolean;
@@ -657,6 +800,11 @@ function GalleryCardMesh({
   slot,
   visibleCount,
   radius,
+  cardScaleMul,
+  filteredCategoryActive,
+  satelliteFloat,
+  orbitMinDistance,
+  orbitMaxDistance,
   hovered,
   modalOpen,
   onHoverStart,
@@ -668,6 +816,15 @@ function GalleryCardMesh({
   slot: number;
   visibleCount: number;
   radius: number;
+  /** Multiplier on {@link CARD_MESH_BASE_SCALE} for filtered rings with many items. */
+  cardScaleMul: number;
+  /** When a single category is selected — used with {@link useOrbitalBillboard} below. */
+  filteredCategoryActive: boolean;
+  /** “All” view: keep ring slots; add subtle bob + radius breathe (satellite motion). */
+  satelliteFloat: boolean;
+  /** Orbit zoom limits (world units) — depth scale bands for “All” cloud. */
+  orbitMinDistance: number;
+  orbitMaxDistance: number;
   hovered: boolean;
   modalOpen: boolean;
   onHoverStart: () => void;
@@ -676,17 +833,19 @@ function GalleryCardMesh({
   onSoftGalleryHint: () => void;
 }) {
   const zoomFxRef = useContext(ZoomFxContext);
+  const prefersReducedMotion = usePrefersReducedMotion();
   const groupRef = useRef<THREE.Group>(null);
   const meshRef = useRef<THREE.Mesh>(null);
   const pointerDown = useRef<{ x: number; y: number } | null>(null);
   const smoothZoomRef = useRef(0);
   const smoothOpacityRef = useRef(1);
   const smoothMeshScaleRef = useRef(CARD_MESH_BASE_SCALE);
+  /** Smoothed distance-based scale in “All” (near = larger, far = smaller). */
+  const smoothDepthScaleRef = useRef(1);
+  /** Hover lift only — kept separate so “All” satellite float does not fight the hover lerp. */
+  const smoothHoverYRef = useRef(0);
 
   const finalImageUrl = primaryGalleryImageUrl(image);
-  useLayoutEffect(() => {
-    console.log("PROD IMAGE URL:", finalImageUrl);
-  }, [finalImageUrl]);
   const texture = useResilientTexture(finalImageUrl);
 
   const backMap = useMemo(() => {
@@ -706,14 +865,41 @@ function GalleryCardMesh({
     };
   }, [backMap]);
 
-  const geometry = useMemo(
-    () => new THREE.BoxGeometry(CARD_W, CARD_H, CARD_D),
-    [],
-  );
+  const geometry = useMemo(() => {
+    if (satelliteFloat) {
+      /** Diameter ≈ prior square width; single texture covers the full disc. */
+      const radius = CARD_W * 0.5;
+      return new THREE.CircleGeometry(
+        radius,
+        ALL_CLOUD_CIRCLE_SEGMENTS,
+      );
+    }
+    return new THREE.BoxGeometry(CARD_W, CARD_H, CARD_D);
+  }, [satelliteFloat]);
 
-  const materials = useMemo(() => {
+  /**
+   * “All”: one circular mesh, one hero texture (no repeated faces).
+   * Filtered: box with front/back + gray edges.
+   */
+  const circleMaterial = useMemo(() => {
+    if (!satelliteFloat) return null;
     const hasMap = Boolean(texture);
-    const edge = new THREE.MeshStandardMaterial({
+    return new THREE.MeshBasicMaterial({
+      map: texture ?? undefined,
+      color: hasMap ? new THREE.Color(0.96, 0.96, 0.98) : PLACEHOLDER_GRAY,
+      transparent: false,
+      opacity: 1,
+      depthWrite: true,
+      side: THREE.DoubleSide,
+    });
+  }, [texture, satelliteFloat]);
+
+  const boxMaterials = useMemo(() => {
+    if (satelliteFloat) return null;
+    const hasMap = Boolean(texture);
+    const frontTint = hasMap ? new THREE.Color(0.96, 0.96, 0.98) : PLACEHOLDER_GRAY;
+
+    const edgeGray = new THREE.MeshStandardMaterial({
       color: new THREE.Color(0x9a9ca8),
       roughness: 0.55,
       metalness: 0.05,
@@ -721,15 +907,13 @@ function GalleryCardMesh({
       opacity: 1,
       depthWrite: true,
     });
-    /** Unlit artwork — full white tint when mapped so cards never read as black while loading. */
     const front = new THREE.MeshBasicMaterial({
       map: texture ?? undefined,
-      color: hasMap ? new THREE.Color(0.96, 0.96, 0.98) : PLACEHOLDER_GRAY,
+      color: frontTint,
       transparent: false,
       opacity: 1,
       depthWrite: true,
     });
-    /** Muted back; no emissive glow (avoids a bright slab when the edge catches light) */
     const back = new THREE.MeshStandardMaterial({
       map: backMap ?? texture ?? undefined,
       color: hasMap ? new THREE.Color(0.78, 0.78, 0.82) : PLACEHOLDER_GRAY,
@@ -741,8 +925,7 @@ function GalleryCardMesh({
       opacity: 1,
       depthWrite: true,
     });
-    /** Box face order: +x, −x, +y, −y, +z (front), −z (back) */
-    return [edge, edge, edge, edge, front, back] as [
+    return [edgeGray, edgeGray, edgeGray, edgeGray, front, back] as [
       THREE.MeshStandardMaterial,
       THREE.MeshStandardMaterial,
       THREE.MeshStandardMaterial,
@@ -750,7 +933,7 @@ function GalleryCardMesh({
       THREE.MeshBasicMaterial,
       THREE.MeshStandardMaterial,
     ];
-  }, [texture, backMap]);
+  }, [texture, backMap, satelliteFloat]);
 
   useEffect(() => {
     return () => {
@@ -760,21 +943,48 @@ function GalleryCardMesh({
 
   useEffect(() => {
     return () => {
-      materials.forEach((m) => {
+      if (circleMaterial) {
+        circleMaterial.map = null;
+        circleMaterial.dispose();
+      }
+    };
+  }, [circleMaterial]);
+
+  useEffect(() => {
+    return () => {
+      if (!boxMaterials) return;
+      const seen = new Set<THREE.Material>();
+      boxMaterials.forEach((m) => {
+        if (seen.has(m)) return;
+        seen.add(m);
         m.map = null;
         m.dispose();
       });
     };
-  }, [materials]);
+  }, [boxMaterials]);
 
   const { camera } = useThree();
 
-  useFrame((_, delta) => {
+  useLayoutEffect(() => {
+    smoothMeshScaleRef.current = CARD_MESH_BASE_SCALE * cardScaleMul;
+  }, [satelliteFloat, cardScaleMul]);
+
+  useLayoutEffect(() => {
+    smoothDepthScaleRef.current = 1;
+  }, [satelliteFloat]);
+
+  useFrame((state, delta) => {
     const g = groupRef.current;
     const mesh = meshRef.current;
     if (!g || !mesh || !zoomFxRef) return;
 
+    const floatT = state.clock.elapsedTime;
     const n = Math.max(visibleCount, 1);
+    /** “All” cloud: billboard; ring: two-card or filtered 3+. */
+    const useOrbitalBillboard =
+      satelliteFloat ||
+      n === 2 ||
+      (filteredCategoryActive && n >= 3);
     const angle = (slot / n) * Math.PI * 2;
 
     const zk = Math.min(1, delta * ZOOM_LERP);
@@ -786,62 +996,92 @@ function GalleryCardMesh({
     );
     const zi = smoothZoomRef.current;
 
-    const R = radius * (1 + ZOOM_RING_EXPAND * zi);
-    const bx = Math.sin(angle) * R;
-    const bz = Math.cos(angle) * R;
-
-    _toCamera.subVectors(
-      camera.position,
-      _scratchA.set(bx, ORBIT_TARGET_Y, bz),
-    );
-    const len = _toCamera.length();
-    if (len > 1e-6) _toCamera.multiplyScalar(1 / len);
-    _toCamera.y *= ZOOM_TO_CAM_Y_DAMP;
-    _toCamera.normalize();
-
-    const depth = ZOOM_DEPTH_PULL * zi;
-    let basePx = bx + _toCamera.x * depth;
-    let basePz = bz + _toCamera.z * depth;
-    basePx *= RING_RADIAL_COMPACT;
-    basePz *= RING_RADIAL_COMPACT;
-
     const t = Math.min(1, delta * HOVER_LERP);
     const zoomScale = 1 + ZOOM_SCALE_BOOST * zi;
     const targetS =
-      CARD_MESH_BASE_SCALE * (hovered ? HOVER_SCALE : 1) * zoomScale;
+      CARD_MESH_BASE_SCALE *
+      cardScaleMul *
+      (hovered ? HOVER_SCALE : 1) *
+      zoomScale;
     const targetY = hovered ? HOVER_LIFT : 0;
 
     const s = THREE.MathUtils.lerp(smoothMeshScaleRef.current, targetS, t);
     smoothMeshScaleRef.current = s;
-    mesh.scale.setScalar(s);
     g.scale.set(1, 1, 1);
 
-    const y = THREE.MathUtils.lerp(g.position.y, targetY, t);
+    const yHover = THREE.MathUtils.lerp(smoothHoverYRef.current, targetY, t);
+    smoothHoverYRef.current = yHover;
 
-    const dx = -basePx;
-    const dz = -basePz;
-    const radialLen = Math.hypot(dx, dz);
-    let inwardX = 0;
-    let inwardZ = 0;
-    if (radialLen > 1e-6) {
-      inwardX = dx / radialLen;
-      inwardZ = dz / radialLen;
-    }
-    const inwardPull = (s - 1) * SCALE_INWARD_K * radius;
-    const px = basePx + inwardX * inwardPull;
-    const pz = basePz + inwardZ * inwardPull;
+    const depth = ZOOM_DEPTH_PULL * zi;
 
-    g.position.set(px, y, pz);
-    /**
-     * Ring layout: front (+Z) faces radially outward from the hub (good for many cards).
-     * With exactly two items, that puts one toward the camera and one away — back face reads as “wrong”.
-     * Billboarding on XZ keeps both fronts facing the viewer.
-     */
+    let px: number;
+    let pz: number;
+    let localY: number;
+    let dx: number;
+    let dz: number;
     let yaw: number;
-    if (n === 2) {
+    let wobbleX = 0;
+    let wobbleZ = 0;
+
+    if (satelliteFloat) {
+      const shellR = radius * (1 + ZOOM_RING_EXPAND * zi) * 1.06;
+      const [cx, cy, cz] = allCloudBasePosition(slot, n, shellR);
+
       _toCamera.subVectors(
         camera.position,
-        _scratchA.set(px, ORBIT_TARGET_Y + y, pz),
+        _scratchA.set(cx, ORBIT_TARGET_Y + cy, cz),
+      );
+      const len0 = _toCamera.length();
+      if (len0 > 1e-6) _toCamera.multiplyScalar(1 / len0);
+      _toCamera.y *= ZOOM_TO_CAM_Y_DAMP;
+      _toCamera.normalize();
+
+      let basePx = cx + _toCamera.x * depth;
+      let basePy = cy + _toCamera.y * depth * ZOOM_TO_CAM_Y_DAMP;
+      let basePz = cz + _toCamera.z * depth;
+      const cloudCompact = 0.91;
+      basePx *= cloudCompact;
+      basePy *= cloudCompact;
+      basePz *= cloudCompact;
+
+      const phase = slot * 1.884 + n * 0.31;
+      let driftX = 0;
+      let driftY = 0;
+      let driftZ = 0;
+      if (!prefersReducedMotion) {
+        driftX = ALL_CLOUD_DRIFT_AMP * Math.sin(floatT * 0.67 + phase);
+        driftY =
+          ALL_CLOUD_DRIFT_AMP * 0.88 * Math.sin(floatT * 0.74 + phase * 1.4);
+        driftZ = ALL_CLOUD_DRIFT_AMP * Math.sin(floatT * 0.59 + phase * 0.85);
+        wobbleX = ALL_CLOUD_WOBBLE_AMP * Math.sin(floatT * 1.05 + phase * 2.1);
+        wobbleZ = ALL_CLOUD_WOBBLE_AMP * Math.sin(floatT * 0.88 + phase * 1.6);
+      }
+
+      const dx3 = -basePx;
+      const dy3 = -basePy;
+      const dz3 = -basePz;
+      const radialLen3 = Math.hypot(dx3, dy3, dz3);
+      let inwardX = 0;
+      let inwardY = 0;
+      let inwardZ = 0;
+      if (radialLen3 > 1e-6) {
+        inwardX = dx3 / radialLen3;
+        inwardY = dy3 / radialLen3;
+        inwardZ = dz3 / radialLen3;
+      }
+      const inwardPull = (s - 1) * SCALE_INWARD_K * radius;
+      const py =
+        basePy + inwardY * inwardPull + driftY;
+      px = basePx + inwardX * inwardPull + driftX;
+      pz = basePz + inwardZ * inwardPull + driftZ;
+      localY = py + yHover;
+
+      dx = -basePx;
+      dz = -basePz;
+
+      _toCamera.subVectors(
+        camera.position,
+        _scratchA.set(px, ORBIT_TARGET_Y + localY, pz),
       );
       _toCamera.y = 0;
       const hLen = Math.hypot(_toCamera.x, _toCamera.z);
@@ -850,12 +1090,92 @@ function GalleryCardMesh({
       } else {
         yaw = Math.atan2(dx, dz) - Math.PI / 2;
       }
+
+      g.rotation.set(0, 0, 0);
+      mesh.rotation.set(wobbleX, yaw, wobbleZ);
     } else {
-      /** +X (right edge) toward ring center; yaw from ring slot (basePx/basePz), not inward offset */
-      yaw = Math.atan2(dx, dz) - Math.PI / 2;
+      const R = radius * (1 + ZOOM_RING_EXPAND * zi);
+      const bx = Math.sin(angle) * R;
+      const bz = Math.cos(angle) * R;
+
+      _toCamera.subVectors(
+        camera.position,
+        _scratchA.set(bx, ORBIT_TARGET_Y, bz),
+      );
+      const len = _toCamera.length();
+      if (len > 1e-6) _toCamera.multiplyScalar(1 / len);
+      _toCamera.y *= ZOOM_TO_CAM_Y_DAMP;
+      _toCamera.normalize();
+
+      let basePx = bx + _toCamera.x * depth;
+      let basePz = bz + _toCamera.z * depth;
+      basePx *= RING_RADIAL_COMPACT;
+      basePz *= RING_RADIAL_COMPACT;
+
+      dx = -basePx;
+      dz = -basePz;
+      const radialLen = Math.hypot(dx, dz);
+      let inwardX = 0;
+      let inwardZ = 0;
+      if (radialLen > 1e-6) {
+        inwardX = dx / radialLen;
+        inwardZ = dz / radialLen;
+      }
+      const inwardPull = (s - 1) * SCALE_INWARD_K * radius;
+      px = basePx + inwardX * inwardPull;
+      pz = basePz + inwardZ * inwardPull;
+      localY = yHover;
+
+      if (useOrbitalBillboard) {
+        _toCamera.subVectors(
+          camera.position,
+          _scratchA.set(px, ORBIT_TARGET_Y + localY, pz),
+        );
+        _toCamera.y = 0;
+        const hLen = Math.hypot(_toCamera.x, _toCamera.z);
+        if (hLen > 1e-6) {
+          yaw = Math.atan2(_toCamera.x, _toCamera.z);
+        } else {
+          yaw = Math.atan2(dx, dz) - Math.PI / 2;
+        }
+      } else {
+        yaw = Math.atan2(dx, dz) - Math.PI / 2;
+      }
+      g.rotation.set(0, 0, 0);
+      mesh.rotation.set(0, yaw, 0);
     }
-    g.rotation.set(0, 0, 0);
-    mesh.rotation.set(0, yaw, 0);
+
+    g.position.set(px, localY, pz);
+
+    let depthScaleMul = 1;
+    if (satelliteFloat) {
+      const S = GALLERY_GROUP_WORLD_SCALE;
+      _scratchB.set(
+        px * S,
+        ORBIT_TARGET_Y + localY * S,
+        pz * S,
+      );
+      const distCam = camera.position.distanceTo(_scratchB);
+      const targetDepth = allCloudDistanceScale(
+        distCam,
+        orbitMinDistance,
+        orbitMaxDistance,
+      );
+      smoothDepthScaleRef.current = THREE.MathUtils.lerp(
+        smoothDepthScaleRef.current,
+        targetDepth,
+        Math.min(1, delta * 18),
+      );
+      depthScaleMul = smoothDepthScaleRef.current;
+    } else {
+      smoothDepthScaleRef.current = THREE.MathUtils.lerp(
+        smoothDepthScaleRef.current,
+        1,
+        Math.min(1, delta * 18),
+      );
+      depthScaleMul = smoothDepthScaleRef.current;
+    }
+    mesh.scale.setScalar(s * depthScaleMul);
 
     _frontNormal.set(0, 0, 1).applyAxisAngle(
       THREE.Object3D.DEFAULT_UP,
@@ -863,7 +1183,7 @@ function GalleryCardMesh({
     );
     _toCamera.subVectors(
       camera.position,
-      _scratchA.set(px, ORBIT_TARGET_Y + y, pz),
+      _scratchA.set(px, ORBIT_TARGET_Y + localY, pz),
     );
     const dCam = _toCamera.length();
     if (dCam > 1e-6) _toCamera.multiplyScalar(1 / dCam);
@@ -881,20 +1201,27 @@ function GalleryCardMesh({
     const op = smoothOpacityRef.current;
 
     const mats = mesh.material;
-    const list = Array.isArray(mats) ? mats : [mats];
-    /** Box face order: +x, −x, +y, −y, +z (front), −z (back) */
-    for (let i = 0; i < list.length; i++) {
-      const m = list[i];
-      if (i === 4 || i === 5) {
-        m.opacity = 1;
-        m.transparent = false;
-        m.depthWrite = true;
-        continue;
+    if (satelliteFloat && !Array.isArray(mats)) {
+      const m = mats as THREE.MeshBasicMaterial;
+      m.opacity = op;
+      m.transparent = op < 0.998;
+      m.depthWrite = op > 0.92;
+    } else {
+      const list = Array.isArray(mats) ? mats : [mats];
+      /** Box face order: +x, −x, +y, −y, +z (front), −z (back) */
+      for (let i = 0; i < list.length; i++) {
+        const m = list[i];
+        if (i === 4 || i === 5) {
+          m.opacity = 1;
+          m.transparent = false;
+          m.depthWrite = true;
+          continue;
+        }
+        const edge = m as THREE.MeshStandardMaterial | THREE.MeshBasicMaterial;
+        edge.opacity = op;
+        edge.transparent = op < 0.998;
+        edge.depthWrite = op > 0.92;
       }
-      const edge = m as THREE.MeshStandardMaterial;
-      edge.opacity = op;
-      edge.transparent = op < 0.998;
-      edge.depthWrite = op > 0.92;
     }
   });
 
@@ -903,7 +1230,9 @@ function GalleryCardMesh({
       <mesh
         ref={meshRef}
         geometry={geometry}
-        material={materials}
+        material={
+          satelliteFloat ? (circleMaterial as THREE.MeshBasicMaterial) : boxMaterials!
+        }
         frustumCulled={false}
         onPointerOver={(e: ThreeEvent<PointerEvent>) => {
           e.stopPropagation();
@@ -1045,6 +1374,9 @@ function GalleryScene({
   images,
   visibleIndices,
   ringRadius,
+  orbitFramingRadius,
+  activeFilter,
+  filteredCategoryActive,
   hoveredIndex,
   setHoveredIndex,
   modalOpen,
@@ -1053,13 +1385,38 @@ function GalleryScene({
   onSoftGalleryHint,
 }: GallerySceneProps) {
   const visibleCount = visibleIndices.length;
+  const activeFilterKey = activeFilter;
+  const cardScaleMul = useMemo(() => {
+    let mul = 1;
+    if (activeFilterKey === "All") {
+      mul *= ALL_CLOUD_LAYOUT_SCALE;
+    }
+    if (filteredCategoryActive && visibleCount >= 4) {
+      mul *= FILTERED_MANY_CARD_SCALE;
+    }
+    if (
+      filteredCategoryActive &&
+      visibleCount === 2 &&
+      ORBITAL_SMALL_TWO_ITEM_CATEGORIES.has(activeFilterKey)
+    ) {
+      mul *= FILTERED_TWO_ITEM_ARCHIVE_SCALE;
+    }
+    return mul;
+  }, [filteredCategoryActive, visibleCount, activeFilterKey]);
+
+  const satelliteFloat = activeFilterKey === "All";
+
   const autoRotateSpeed =
-    visibleCount === 2 ? AUTO_ROTATE_SPEED_TWO_ITEMS : AUTO_ROTATE_SPEED;
+    visibleCount === 2 ||
+    (filteredCategoryActive && visibleCount >= 3) ||
+    (activeFilterKey === "All" && visibleCount >= 3)
+      ? AUTO_ROTATE_SPEED_ORBITAL
+      : AUTO_ROTATE_SPEED;
   const { size } = useThree();
   const aspect = Math.max(size.width / Math.max(size.height, 1), 0.25);
   const { min: minZoomDistance, max: maxZoomDistance } = useMemo(
-    () => orbitZoomLimits(ringRadius, aspect),
-    [ringRadius, aspect],
+    () => orbitZoomLimits(orbitFramingRadius, aspect),
+    [orbitFramingRadius, aspect],
   );
   const zoomFxRef = useRef({ zoomIn: 0, camAzimuth: 0 });
 
@@ -1092,15 +1449,15 @@ function GalleryScene({
         target={[0, ORBIT_TARGET_Y, 0]}
         onStart={onSoftGalleryHint}
       />
-      <RingCameraSync ringRadius={ringRadius} />
+      <RingCameraSync ringRadius={orbitFramingRadius} />
       <AdaptiveFovSync
-        ringRadius={ringRadius}
+        ringRadius={orbitFramingRadius}
         minDistance={minZoomDistance}
         maxDistance={maxZoomDistance}
       />
       {GALLERY_SCENE_DEBUG ? (
         <GallerySceneDebugLogger
-          ringRadius={ringRadius}
+          ringRadius={orbitFramingRadius}
           minDistance={minZoomDistance}
           maxDistance={maxZoomDistance}
           logOnInteraction
@@ -1122,6 +1479,11 @@ function GalleryScene({
               slot={slot}
               visibleCount={visibleIndices.length}
               radius={ringRadius}
+              cardScaleMul={cardScaleMul}
+              filteredCategoryActive={filteredCategoryActive}
+              satelliteFloat={satelliteFloat}
+              orbitMinDistance={minZoomDistance}
+              orbitMaxDistance={maxZoomDistance}
               hovered={hoveredIndex === imageIndex}
               modalOpen={modalOpen}
               onHoverStart={() => {
@@ -1451,20 +1813,29 @@ export function Gallery3D({
         activeFilter === "All"
           ? ORBIT_MIN_RADIUS_ALL
           : ORBIT_MIN_RADIUS_FILTERED,
+        activeFilter !== "All",
       ),
     [visibleIndices.length, activeFilter],
   );
 
+  const orbitFramingRadius = useMemo(
+    () =>
+      activeFilter === "All"
+        ? ringRadius * ALL_CLOUD_FRAMING_RADIUS_MULT
+        : ringRadius,
+    [activeFilter, ringRadius],
+  );
+
   const cameraWorldPos = useMemo((): [number, number, number] => {
     const aspect = defaultViewportAspect();
-    const { min, max } = orbitZoomLimits(ringRadius, aspect);
+    const { min, max } = orbitZoomLimits(orbitFramingRadius, aspect);
     const D = THREE.MathUtils.clamp(
-      baseOrbitCameraDistance(ringRadius, aspect),
+      baseOrbitCameraDistance(orbitFramingRadius, aspect),
       min,
       max,
     );
     return cameraTupleForOrbitDistance(D);
-  }, [ringRadius]);
+  }, [orbitFramingRadius]);
 
   const closeModal = useCallback(() => {
     setSelectedImage(null);
@@ -1578,6 +1949,9 @@ export function Gallery3D({
               images={images}
               visibleIndices={visibleIndices}
               ringRadius={ringRadius}
+              orbitFramingRadius={orbitFramingRadius}
+              activeFilter={activeFilter ?? "All"}
+              filteredCategoryActive={activeFilter !== "All"}
               hoveredIndex={hoveredIndex}
               setHoveredIndex={setHoveredIndex}
               modalOpen={detailModalOpen}
@@ -1597,9 +1971,9 @@ export function Gallery3D({
                 width: "min(42vw, 380px)",
                 height: "min(42vw, 380px)",
               background:
-                  "radial-gradient(ellipse at center, rgba(255,255,255,0.95) 0%, rgba(245,245,250,0.35) 35%, transparent 72%)",
+                  "radial-gradient(ellipse at center, rgba(130,150,255,0.14) 0%, rgba(55,65,120,0.08) 38%, transparent 72%)",
                 filter: "blur(48px)",
-                opacity: 0.85,
+                opacity: 0.75,
             }}
           />
           </div>
@@ -1608,8 +1982,8 @@ export function Gallery3D({
         <p
           className={`pointer-events-none w-full max-w-lg shrink-0 self-center px-4 pb-1 pt-2 text-center text-[11px] uppercase leading-snug tracking-[0.18em] transition-[opacity,transform,filter] duration-500 ease-out motion-reduce:transition-none sm:pb-1.5 ${
             exploreHintProminent
-              ? "translate-y-0 text-gray-400 opacity-100 [filter:none]"
-              : "translate-y-1 text-gray-400/75 opacity-[0.28] [filter:blur(0.35px)] motion-reduce:translate-y-0"
+              ? "translate-y-0 text-muted-foreground opacity-100 [filter:none]"
+              : "translate-y-1 text-muted-foreground/75 opacity-[0.28] [filter:blur(0.35px)] motion-reduce:translate-y-0"
           }`}
           aria-live="polite"
         >
@@ -1667,37 +2041,37 @@ export function Gallery3D({
                 className="flex min-h-0 w-full flex-1 flex-col justify-start gap-10 lg:sticky lg:top-24 lg:max-w-md lg:self-start"
               >
                 <div>
-                  <p className="mb-2 text-xs uppercase tracking-[0.2em] text-gray-400">
+                  <p className="mb-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">
                     {localizedCategory(messages, selectedImage.category)}
                   </p>
                   <h2
-                    className="mb-4 tracking-tight text-gray-900"
+                    className="mb-4 tracking-tight text-foreground"
                     style={{ fontSize: "1.75rem", lineHeight: 1.25 }}
                   >
                     {selectedPortfolioCopy.title}
                   </h2>
-                  <p className="text-[0.95rem] leading-relaxed text-gray-500">
+                  <p className="text-[0.95rem] leading-relaxed text-muted-foreground">
                     {selectedPortfolioCopy.description}
                   </p>
                 </div>
 
-                <div className="border-t border-gray-100/80 pt-10">
+                <div className="border-t border-border pt-10">
                   <div className="flex flex-col gap-6">
                     {selectedPortfolioCopy.tools.trim() !== "" ? (
                       <div className="flex flex-col gap-1.5 sm:flex-row sm:items-baseline sm:gap-4">
-                        <span className="shrink-0 text-xs uppercase tracking-[0.18em] text-gray-400">
+                        <span className="shrink-0 text-xs uppercase tracking-[0.18em] text-muted-foreground">
                           {galleryCopy.modalToolsLabel ?? "Tools"}
                         </span>
-                        <p className="text-[0.95rem] leading-relaxed text-gray-500 sm:min-w-0 sm:flex-1">
+                        <p className="text-[0.95rem] leading-relaxed text-muted-foreground sm:min-w-0 sm:flex-1">
                           {selectedPortfolioCopy.tools}
                         </p>
                       </div>
                     ) : null}
                     <div className="flex flex-col gap-1.5 sm:flex-row sm:items-baseline sm:gap-4">
-                      <span className="shrink-0 text-xs uppercase tracking-[0.18em] text-gray-400">
+                      <span className="shrink-0 text-xs uppercase tracking-[0.18em] text-muted-foreground">
                         {galleryCopy.modalYear}
                       </span>
-                      <span className="text-[0.95rem] leading-relaxed text-gray-500 tabular-nums sm:min-w-0 sm:flex-1">
+                      <span className="text-[0.95rem] leading-relaxed text-muted-foreground tabular-nums sm:min-w-0 sm:flex-1">
                         {selectedPortfolioCopy.year}
                       </span>
                     </div>
@@ -1709,7 +2083,7 @@ export function Gallery3D({
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={closeModal}
-                  className="mt-2 w-fit rounded-full bg-gray-900 px-6 py-2.5 text-sm tracking-wide text-white"
+                  className="mt-2 w-fit rounded-full bg-primary px-6 py-2.5 text-sm tracking-wide text-primary-foreground"
                   style={{ fontWeight: 500 }}
                 >
                   {galleryCopy.backToGallery}
@@ -1719,11 +2093,14 @@ export function Gallery3D({
               <button
                 type="button"
                 onClick={closeModal}
-                className="absolute -right-1 -top-1 rounded-full bg-white p-2.5 transition-transform hover:scale-105 lg:right-0 lg:top-0"
-                style={{ boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}
+                className="absolute -right-1 -top-1 rounded-full bg-card p-2.5 text-foreground transition-transform hover:scale-105 lg:right-0 lg:top-0"
+                style={{
+                  boxShadow:
+                    "0 4px 24px color-mix(in oklch, oklch(0.05 0.02 268) 55%, transparent)",
+                }}
                 aria-label={galleryCopy.close}
               >
-                <X className="h-5 w-5 text-gray-600" />
+                <X className="h-5 w-5 text-muted-foreground" />
               </button>
             </motion.div>
             </div>
