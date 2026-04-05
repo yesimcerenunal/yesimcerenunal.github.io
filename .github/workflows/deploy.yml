@@ -34,7 +34,31 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: npm run build
+        env:
+          GITHUB_ACTIONS: "true"
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          echo "GITHUB_ACTIONS=$GITHUB_ACTIONS GITHUB_REPOSITORY=$GITHUB_REPOSITORY"
+          npm run build
+
+      - name: Verify dist/index.html uses repo-prefixed assets (project site)
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          set -eu
+          REPO="${GITHUB_REPOSITORY##*/}"
+          echo "Repo segment: $REPO"
+          if [ -z "$REPO" ] || [[ "$REPO" == *.github.io ]]; then
+            echo "User/org Pages repo — expect /assets/ at site root; OK to skip."
+            grep -E 'script |link ' dist/index.html || true
+            exit 0
+          fi
+          if ! grep -qE "/${REPO}/assets/" dist/index.html; then
+            echo "::error::dist/index.html must reference /${REPO}/assets/... (not /assets/... alone). Build must run in GitHub Actions with GITHUB_REPOSITORY set."
+            head -25 dist/index.html
+            exit 1
+          fi
+          echo "OK: index.html references /${REPO}/assets/"
 
       # Fail fast if gallery assets are missing (e.g. public/gallery not in git).
       # upload-pages-artifact packs the entire `dist/` folder; deploy-pages deploys that artifact only (no stale cache from prior runs).
@@ -59,6 +83,10 @@ jobs:
           echo ""
           echo "=== dist/gallery size ==="
           du -sh dist/gallery
+
+      # GitHub Pages serves 404.html for unknown paths — copy SPA shell so client routes work on refresh.
+      - name: SPA fallback (404.html)
+        run: cp dist/index.html dist/404.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

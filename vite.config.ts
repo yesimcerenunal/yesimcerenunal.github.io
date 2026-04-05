@@ -14,7 +14,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
  * `import.meta.env.BASE_URL` is derived from this; no VITE_BASE or manual env.
  */
 function resolveViteBase(): string {
-  if (process.env.GITHUB_ACTIONS !== 'true') {
+  // Env is always a string in Node; be tolerant of CI quirks.
+  const inGithubActions =
+    String(process.env.GITHUB_ACTIONS ?? '').toLowerCase() === 'true'
+  if (!inGithubActions) {
     return '/'
   }
   const full = (process.env.GITHUB_REPOSITORY ?? '').trim()
