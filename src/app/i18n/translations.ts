@@ -33,6 +33,8 @@ export type TranslationMessages = {
   gallery: {
     exploreHint: string;
     modalYear: string;
+    /** Shown only if a manifest project has no `portfolio.projects` entry (should not happen when translations are complete). */
+    modalProjectFallback: string;
     backToGallery: string;
     close: string;
   };
@@ -68,6 +70,7 @@ export type TranslationMessages = {
  * Detail modal copy per project. Keys must match `categoryFolder/slug` in
  * `gallery-manifest.json` (see `galleryData.ts`). All locales should list the same keys.
  */
+/** Keys must match `gallery-manifest.json` (`categoryFolder/slug`). */
 const portfolioProjectsEn: Record<string, PortfolioProjectCopy> = {
   "interactive-vr/Cozy Experience": {
     title: "Cozy Experience",
@@ -87,34 +90,16 @@ const portfolioProjectsEn: Record<string, PortfolioProjectCopy> = {
       "Commercial motion piece for a jazz festival—rhythm, typography, and picture cut to music and brand tone.",
     year: "2025",
   },
-  "2d-archive/Spotify Canvas Design": {
+  "motion/Spotify Canvas Design": {
     title: "Spotify Canvas Design",
     description:
-      "Exploring the boundary between physical and digital space through systems, type, and composition.",
+      "Data as choreography and brand-forward motion—a hero piece for launch and festival screens.",
     year: "2025",
   },
-  "2d-archive/urban-geometries": {
-    title: "Urban Geometries",
+  "campaigns/JusteDebout": {
+    title: "Juste Debout",
     description:
-      "Brand and layout study, architectural rhythm translated into graphic structure.",
-    year: "2025",
-  },
-  "2d-archive/urban-geometries copy": {
-    title: "Urban Geometries",
-    description:
-      "Brand and layout study, architectural rhythm translated into graphic structure.",
-    year: "2025",
-  },
-  "motion/Spotify Canvas Design": {
-    title: "Digital Tapestry",
-    description:
-      "Data as choreography, a single hero piece for launch and festival screens.",
-    year: "2025",
-  },
-  "campaigns/spatial-narratives": {
-    title: "Spatial Narratives",
-    description:
-      "Campaign frames for social, light, shadow, and a consistent tonal world.",
+      "Campaign and motion work for Juste Debout—rhythm, framing, and social-ready visuals built for the stage.",
     year: "2025",
   },
   "campaigns/Western Union": {
@@ -123,29 +108,29 @@ const portfolioProjectsEn: Record<string, PortfolioProjectCopy> = {
       "I worked on commercial projects for Western Union, producing animated promotional materials using Adobe After Effects. The content was developed in multiple languages including Greek, Georgian, Russian, and English, to effectively reach and engage diverse international audiences.",
     year: "2019",
   },
-  "3d-archive/sculptural-forms": {
-    title: "Sculptural Forms",
+  "3d-archive/Emberfall-Environment": {
+    title: "Realistic Short Film",
     description:
-      "Spatial design study, volume, scale, and atmosphere in a single hero environment.",
+      "End-to-end development of a large-scale, fantasy-inspired library environment for a realistic short film—at the intersection of design, storytelling, and real-time production. Set in the Emberfall Kingdom; the work covered environment assets, layout, optimized UV workflows, and the final trailer including video editing and sound design. Texturing, PBR materials, and the princess character were created by other artists.",
     year: "2024",
   },
-  "3d-archive/studio-reel": {
-    title: "HELLO WORLD",
+  "3d-archive/FB": {
+    title: "Fashion Battle",
     description:
-      "Environmental storytelling, workspace, light, and material as a designed set.",
+      "3D fashion visuals—environment, lighting, and cinematic presentation for a competitive fashion context.",
     year: "2025",
   },
-  "2d-archive/chromatic-waves-ii": {
-    title: "Chromatic Waves II",
+  "2d-archive/Illustrations": {
+    title: "Illustrations",
     description:
-      "Illustrated series, palette, texture, and rhythm in a limited print run.",
+      "Selected illustration work—series, composition, color, and narrative tone across print and digital.",
     year: "2025",
   },
-  "2d-archive/light-studies": {
-    title: "Light Studies",
+  "2d-archive/Psychodelic Magazine": {
+    title: "Psychedelic Magazine",
     description:
-      "Editorial illustration on natural light, time, and quiet narrative moments.",
-    year: "2024",
+      "Editorial and magazine spreads—layout, typography, and image treatment for a bold print identity.",
+    year: "2025",
   },
 };
 
@@ -168,34 +153,16 @@ const portfolioProjectsDe: Record<string, PortfolioProjectCopy> = {
       "Kommerzieller Motion-Spot für ein Jazzfestival—Rhythmus, Typografie und Bildschnitt auf Musik und Markenton.",
     year: "2025",
   },
-  "2d-archive/Spotify Canvas Design": {
-    title: "Abstract Reality",
-    description:
-      "Die Grenze zwischen physischem und digitalem Raum erkunden – durch Systeme, Typografie und Komposition.",
-    year: "2025",
-  },
-  "2d-archive/urban-geometries": {
-    title: "Urban Geometries",
-    description:
-      "Marken- und Layoutstudie: architektonischer Rhythmus, übersetzt in grafische Struktur.",
-    year: "2025",
-  },
-  "2d-archive/urban-geometries copy": {
-    title: "Urban Geometries",
-    description:
-      "Marken- und Layoutstudie: architektonischer Rhythmus, übersetzt in grafische Struktur.",
-    year: "2025",
-  },
   "motion/Spotify Canvas Design": {
-    title: "Digital Tapestry",
+    title: "Spotify Canvas Design",
     description:
-      "Daten als Choreografie – ein Hero-Spot für Launch und Festival-Screens.",
+      "Daten als Choreografie und markenstarke Motion—ein Hero-Spot für Launch und Festival-Screens.",
     year: "2025",
   },
-  "campaigns/spatial-narratives": {
-    title: "Spatial Narratives",
+  "campaigns/JusteDebout": {
+    title: "Juste Debout",
     description:
-      "Kampagnen-Frames für Social: Licht, Schatten und eine konsistente tonale Welt.",
+      "Kampagnen- und Motion-Arbeit für Juste Debout—Rhythmus, Framing und Social-taugliche Visuals für die Bühne.",
     year: "2025",
   },
   "campaigns/Western Union": {
@@ -204,29 +171,29 @@ const portfolioProjectsDe: Record<string, PortfolioProjectCopy> = {
       "Für Western Union habe ich kommerzielle Projekte umgesetzt und mit Adobe After Effects animierte Werbematerialien produziert. Die Inhalte entstanden in mehreren Sprachen – darunter Griechisch, Georgisch, Russisch und Englisch – um internationale Zielgruppen zu erreichen.",
     year: "2019",
   },
-  "3d-archive/sculptural-forms": {
-    title: "Sculptural Forms",
+  "3d-archive/Emberfall-Environment": {
+    title: "Realistischer Kurzfilm",
     description:
-      "Raumgestaltungsstudie: Volumen, Maßstab und Atmosphäre in einer Hero-Umgebung.",
+      "Durchgängige Entwicklung einer groß angelegten, fantasy-inspirierten Bibliotheksumgebung für einen realistischen Kurzfilm—an der Schnittstelle von Design, Storytelling und Echtzeit-Produktion. Im Königreich Emberfall; Schwerpunkt auf Umgebungs-Assets, Layout, optimierten UV-Workflows und dem finalen Trailer inklusive Videoschnitt und Sounddesign. Texturierung, PBR-Materialien und die Prinzessin-Figur wurden von anderen Künstler:innen umgesetzt.",
     year: "2024",
   },
-  "3d-archive/studio-reel": {
-    title: "Studio Reel",
+  "3d-archive/FB": {
+    title: "Fashion Battle",
     description:
-      "Umgebungs-Storytelling: Arbeitsraum, Licht und Material als inszeniertes Set.",
+      "3D-Mode-Visualisierung—Umgebung, Licht und kinematische Inszenierung für einen modischen Wettbewerbskontext.",
     year: "2025",
   },
-  "2d-archive/chromatic-waves-ii": {
-    title: "Chromatic Waves II",
+  "2d-archive/Illustrations": {
+    title: "Illustrationen",
     description:
-      "Illustrierte Serie: Palette, Textur und Rhythmus in einer limitierten Druckauflage.",
+      "Ausgewählte Illustrationsarbeit—Serie, Komposition, Farbe und Erzähltempo für Print und Digital.",
     year: "2025",
   },
-  "2d-archive/light-studies": {
-    title: "Light Studies",
+  "2d-archive/Psychodelic Magazine": {
+    title: "Psychedelic Magazine",
     description:
-      "Editorial-Illustration zu natürlichem Licht, Zeit und ruhigen Erzählmomenten.",
-    year: "2024",
+      "Editorial- und Magazin-Spreads—Layout, Typografie und Bildbehandlung für eine markante Print-Identität.",
+    year: "2025",
   },
 };
 
@@ -249,34 +216,16 @@ const portfolioProjectsTr: Record<string, PortfolioProjectCopy> = {
       "Bir caz festivali için ticari motion parçası—ritim, tipografi ve müzik ile marka tonuna göre kurgu.",
     year: "2025",
   },
-  "2d-archive/Spotify Canvas Design": {
-    title: "Abstract Reality",
-    description:
-      "Fiziksel ve dijital alan arasındaki sınırı sistemler, tipografi ve kompozisyon üzerinden keşfetmek.",
-    year: "2025",
-  },
-  "2d-archive/urban-geometries": {
-    title: "Urban Geometries",
-    description:
-      "Marka ve yerleşim çalışması: mimari ritmin grafik yapıya dönüştürülmesi.",
-    year: "2025",
-  },
-  "2d-archive/urban-geometries copy": {
-    title: "Urban Geometries",
-    description:
-      "Marka ve yerleşim çalışması: mimari ritmin grafik yapıya dönüştürülmesi.",
-    year: "2025",
-  },
   "motion/Spotify Canvas Design": {
-    title: "Digital Tapestry",
+    title: "Spotify Canvas Design",
     description:
-      "Veriyi koreografi gibi kullanan tek bir hero çalışma; lansman ve festival ekranları için.",
+      "Veriyi koreografi gibi kullanan, markaya uygun motion; lansman ve festival ekranları için hero çalışma.",
     year: "2025",
   },
-  "campaigns/spatial-narratives": {
-    title: "Spatial Narratives",
+  "campaigns/JusteDebout": {
+    title: "Juste Debout",
     description:
-      "Sosyal kampanya kareleri: ışık, gölge ve tutarlı bir tonal dünya.",
+      "Juste Debout için kampanya ve motion çalışması—ritim, kadraj ve sahneye uygun, sosyal medyaya hazır görseller.",
     year: "2025",
   },
   "campaigns/Western Union": {
@@ -285,29 +234,29 @@ const portfolioProjectsTr: Record<string, PortfolioProjectCopy> = {
       "Western Union için ticari projelerde çalıştım; Adobe After Effects ile animasyonlu tanıtım materyalleri ürettim. İçerikler Yunanca, Gürcüce, Rusça ve İngilizce dahil birden çok dilde hazırlanarak çeşitli uluslararası kitlelere ulaşmayı hedefledi.",
     year: "2019",
   },
-  "3d-archive/sculptural-forms": {
-    title: "Sculptural Forms",
+  "3d-archive/Emberfall-Environment": {
+    title: "Gerçekçi Kısa Film",
     description:
-      "Mekân tasarımı çalışması: tek bir hero ortamda hacim, ölçek ve atmosfer.",
+      "Gerçekçi bir kısa film için büyük ölçekli, fantezi esintili kütüphane ortamının uçtan uca geliştirilmesi—tasarım, hikâye anlatımı ve gerçek zamanlı üretimin kesişiminde. Emberfall Krallığı’nda geçen sahne; ortam varlıkları, yerleşim, optimize UV iş akışları ve video kurgusu ile ses tasarımını içeren nihai fragman üzerinde çalışıldı. Dokulama, PBR materyaller ve prenses karakteri diğer sanatçılara aittir.",
     year: "2024",
   },
-  "3d-archive/studio-reel": {
-    title: "Studio Reel",
+  "3d-archive/FB": {
+    title: "Fashion Battle",
     description:
-      "Ortam anlatımı: çalışma alanı, ışık ve malzemenin tasarlanmış bir set olarak kullanımı.",
+      "3D moda görselleri—rekabetçi bir moda bağlamında ortam, ışık ve sinematik sunum.",
     year: "2025",
   },
-  "2d-archive/chromatic-waves-ii": {
-    title: "Chromatic Waves II",
+  "2d-archive/Illustrations": {
+    title: "İllüstrasyonlar",
     description:
-      "İllüstrasyon serisi: sınırlı baskıda palet, doku ve ritim.",
+      "Seçilmiş illüstrasyon çalışmaları—dizi, kompozisyon, renk ve anlatı tonu; baskı ve dijital için.",
     year: "2025",
   },
-  "2d-archive/light-studies": {
-    title: "Light Studies",
+  "2d-archive/Psychodelic Magazine": {
+    title: "Psychedelic Magazine",
     description:
-      "Doğal ışık, zaman ve sessiz anlatı anları üzerine editoryal illüstrasyon.",
-    year: "2024",
+      "Editoryal ve dergi sayfaları—cesur bir baskı kimliği için yerleşim, tipografi ve görsel işleme.",
+    year: "2025",
   },
 };
 
@@ -339,6 +288,7 @@ const en: TranslationMessages = {
   gallery: {
     exploreHint: "Drag to explore and choose",
     modalYear: "Year",
+    modalProjectFallback: "Project",
     backToGallery: "Back to gallery",
     close: "Close",
   },
@@ -399,6 +349,7 @@ const de: TranslationMessages = {
   gallery: {
     exploreHint: "Ziehen zum Erkunden und Auswählen",
     modalYear: "Jahr",
+    modalProjectFallback: "Projekt",
     backToGallery: "Zurück zur Galerie",
     close: "Schließen",
   },
@@ -459,6 +410,7 @@ const tr: TranslationMessages = {
   gallery: {
     exploreHint: "Keşfetmek ve seçmek için sürükleyin",
     modalYear: "Yıl",
+    modalProjectFallback: "Proje",
     backToGallery: "Galeriye dön",
     close: "Kapat",
   },
@@ -529,6 +481,7 @@ export function localizedCategory(
  * Detail modal title, description, and year for a gallery item.
  * Pass `messages` from `useLanguage()` so copy follows the selected locale (en / de / tr).
  * Keys are `categoryFolder/slug` — keep in sync with `gallery-manifest.json`.
+ * UI copy always comes from `messages.portfolio.projects`; never from raw folder paths.
  */
 export function portfolioProjectCopy(
   messages: TranslationMessages,
@@ -536,5 +489,9 @@ export function portfolioProjectCopy(
 ): PortfolioProjectCopy {
   const p = messages.portfolio.projects[projectKey];
   if (p) return p;
-  return { title: projectKey, description: "", year: "" };
+  return {
+    title: messages.gallery.modalProjectFallback,
+    description: "",
+    year: "",
+  };
 }

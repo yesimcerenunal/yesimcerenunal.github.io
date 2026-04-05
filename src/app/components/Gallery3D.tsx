@@ -1607,9 +1607,7 @@ export function Gallery3D({
                   ref={detailModalScrollRef}
                   key={`${selectedImage.projectKey}|${selectedImage.images.join("|")}`}
                   urls={selectedImage.images}
-                  heroAlt={
-                    selectedPortfolioCopy?.title ?? selectedImage.projectKey
-                  }
+                  heroAlt={selectedPortfolioCopy?.title ?? ""}
                 />
               </div>
 
@@ -1631,7 +1629,7 @@ export function Gallery3D({
                     className="mb-4 tracking-tight text-gray-900"
                     style={{ fontSize: "1.75rem", lineHeight: 1.25 }}
                   >
-                    {selectedPortfolioCopy?.title ?? selectedImage.projectKey}
+                    {selectedPortfolioCopy?.title ?? ""}
                   </h2>
                   <p className="text-[0.95rem] leading-relaxed text-gray-500">
                     {selectedPortfolioCopy?.description ?? ""}
