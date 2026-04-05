@@ -27,6 +27,7 @@ import { useLanguage } from "../context/LanguageContext";
 import {
   localizedCategory,
   portfolioProjectCopy,
+  translations,
 } from "../i18n/translations";
 import { publicAsset } from "../utils/publicAsset";
 import {
@@ -1367,6 +1368,18 @@ export function Gallery3D({
         : portfolioProjectCopy(messages, selectedImage.projectKey),
     [messages, selectedImage],
   );
+
+  useEffect(() => {
+    if (!import.meta.env.DEV || selectedImage == null) return;
+    const projectKey = selectedImage.projectKey;
+    console.log("RUNTIME KEY:", projectKey);
+    const localeKeys = Object.keys(messages.portfolio.projects);
+    console.log("Object.keys(messages.portfolio.projects):", localeKeys);
+    const enKeys = Object.keys(translations.en.portfolio.projects);
+    console.log("Object.keys(translations.en.portfolio.projects):", enKeys);
+    console.log("lookup hit (locale):", projectKey in messages.portfolio.projects);
+    console.log("lookup hit (en):", projectKey in translations.en.portfolio.projects);
+  }, [messages, selectedImage]);
 
   /** Full-opacity “flash”; false = resting soft style (low opacity + nudge) */
   const [exploreHintProminent, setExploreHintProminent] = useState(true);

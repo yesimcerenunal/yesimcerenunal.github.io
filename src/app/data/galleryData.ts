@@ -16,9 +16,22 @@ import galleryManifest from "./gallery-manifest.json";
  */
 export type GalleryManifestProject = (typeof galleryManifest.projects)[number];
 
-/** Canonical lookup key for `translations.*.portfolio.projects` — must match manifest exactly. */
+/**
+ * Canonical lookup key for `translations.*.portfolio.projects`.
+ * Must be byte-identical to keys in `translations.ts` (same string as `categoryFolder + "/" + slug` in manifest).
+ * Trims manifest fields so accidental whitespace in JSON cannot break lookup.
+ */
+export function projectKeyFromManifestEntry(entry: {
+  categoryFolder: string;
+  slug: string;
+}): string {
+  const folder = entry.categoryFolder.trim();
+  const slug = entry.slug.trim();
+  return `${folder}/${slug}`;
+}
+
 function projectKey(entry: { categoryFolder: string; slug: string }): string {
-  return `${entry.categoryFolder}/${entry.slug}`;
+  return projectKeyFromManifestEntry(entry);
 }
 
 function manifestEntryToGalleryImage(entry: GalleryManifestProject): GalleryImage {
@@ -42,6 +55,9 @@ if (import.meta.env?.DEV) {
   const enProjectKeys = new Set(
     Object.keys(translations.en.portfolio.projects),
   );
+  const manifestKeys = new Set(
+    galleryManifest.projects.map((p) => projectKey(p)),
+  );
   for (const p of galleryManifest.projects) {
     const cat = p.category as GalleryCategory;
     if (!GALLERY_CATEGORIES.includes(cat)) {
@@ -53,8 +69,29 @@ if (import.meta.env?.DEV) {
     byCategory.set(cat, (byCategory.get(cat) ?? 0) + 1);
     const k = projectKey(p);
     if (!enProjectKeys.has(k)) {
-      console.warn(
-        `[galleryData] Add portfolio copy in translations.ts (en.portfolio.projects): "${k}"`,
+      console.error(
+        `[galleryData] Manifest projectKey not in translations.en.portfolio.projects: ${JSON.stringify(k)}`,
+      );
+      console.error(
+        "[galleryData] Object.keys(messages.portfolio.projects) (en):",
+        [...enProjectKeys].sort(),
+      );
+    }
+  }
+  for (const k of enProjectKeys) {
+    if (!manifestKeys.has(k)) {
+      console.error(
+        `[galleryData] translations key not in manifest (orphan): ${JSON.stringify(k)}`,
+      );
+    }
+  }
+  const enSorted = [...enProjectKeys].sort();
+  for (const loc of ["de", "tr"] as const) {
+    const locKeys = Object.keys(translations[loc].portfolio.projects).sort();
+    if (JSON.stringify(enSorted) !== JSON.stringify(locKeys)) {
+      console.error(
+        `[galleryData] portfolio.projects keys differ between en and ${loc} (must match byte-for-byte).`,
+        { en: enSorted, [loc]: locKeys },
       );
     }
   }

@@ -484,11 +484,8 @@ export function localizedCategory(
 
 /**
  * Resolves portfolio copy for the current locale.
- * Lookup: `translations[locale].portfolio.projects[projectKey]` — same as
- * `messages.portfolio.projects[projectKey]` when `messages` comes from `useLanguage()`.
- *
- * `projectKey` must be exactly `categoryFolder + "/" + slug` (see `galleryData.ts` / manifest).
- * Never returns raw `projectKey` as title; missing keys use `gallery.modalProjectFallback` / `modalYearFallback`.
+ * Lookup is a plain object get: `messages.portfolio.projects[projectKey]` — must match
+ * `projectKeyFromManifestEntry` / `gallery-manifest.json` keys byte-for-byte (after trim in galleryData).
  */
 export function portfolioProjectCopy(
   messages: TranslationMessages,
@@ -503,12 +500,12 @@ export function portfolioProjectCopy(
     if (import.meta.env?.DEV) {
       if (!title) {
         console.warn(
-          `Missing translation for projectKey: ${projectKey} (empty title)`,
+          `[portfolio] Empty title for projectKey: ${JSON.stringify(projectKey)}`,
         );
       }
       if (!year) {
         console.warn(
-          `Missing translation for projectKey: ${projectKey} (empty year)`,
+          `[portfolio] Empty year for projectKey: ${JSON.stringify(projectKey)}`,
         );
       }
     }
@@ -519,7 +516,26 @@ export function portfolioProjectCopy(
     };
   }
   if (import.meta.env?.DEV) {
-    console.warn(`Missing translation for projectKey: ${projectKey}`);
+    const available = Object.keys(messages.portfolio.projects);
+    console.error("[portfolio] LOOKUP MISS — RUNTIME KEY:", JSON.stringify(projectKey));
+    console.error("[portfolio] Object.keys(messages.portfolio.projects):", available);
+    for (const candidate of available) {
+      if (candidate.length !== projectKey.length) continue;
+      if (candidate === projectKey) continue;
+      const diff: number[] = [];
+      for (let i = 0; i < projectKey.length; i++) {
+        if (candidate.charCodeAt(i) !== projectKey.charCodeAt(i)) {
+          diff.push(i);
+        }
+      }
+      if (diff.length <= 4 && diff.length > 0) {
+        console.error("[portfolio] Similar key (char diff at indices):", {
+          candidate,
+          projectKey,
+          indices: diff,
+        });
+      }
+    }
   }
   return {
     title: messages.gallery.modalProjectFallback,
