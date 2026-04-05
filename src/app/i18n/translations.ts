@@ -1,5 +1,5 @@
 import type { GalleryCategory } from "../context/WorksCategoryContext";
-import portfolioContentEn from "../data/portfolio-content.json";
+import portfolioContentEn from "../data/portfolio-content-en.json";
 import portfolioContentDe from "../data/portfolio-content-de.json";
 import portfolioContentTr from "../data/portfolio-content-tr.json";
 import { slugFromProjectKey } from "../utils/galleryProjectKey";
@@ -7,7 +7,7 @@ import { slugFromProjectKey } from "../utils/galleryProjectKey";
 /**
  * **Single source of truth for all user-visible UI strings** (nav, layout, gallery chrome,
  * About/Contact, aria labels, locale switcher labels).
- * Portfolio project copy (EN / DE / TR): `portfolio-content.json`, `portfolio-content-de.json`, `portfolio-content-tr.json`.
+ * Portfolio project copy (EN / DE / TR): `portfolio-content-en.json`, `portfolio-content-de.json`, `portfolio-content-tr.json`.
  * Project list and file paths come from `gallery-manifest.json` + `public/` (see `galleryData.ts`).
  */
 export type Locale = "en" | "de" | "tr";

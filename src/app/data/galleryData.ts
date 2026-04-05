@@ -16,7 +16,7 @@ import galleryManifest from "./gallery-manifest.json";
  *
  * **Sources of truth:**
  * - Which projects exist and their `images[]` paths → **`src/app/data/gallery-manifest.json`**
- * - Titles, descriptions, years → **`portfolio-content.json`**, **`portfolio-content-de.json`**, **`portfolio-content-tr.json`**
+ * - Titles, descriptions, years → **`portfolio-content-en.json`**, **`portfolio-content-de.json`**, **`portfolio-content-tr.json`**
  *
  * `projectKey` = `categoryFolder/slug` and must match translation keys exactly.
  *
