@@ -110,8 +110,8 @@ const portfolioProjectsEn: Record<string, PortfolioProjectCopy> = {
       "I worked on commercial projects for Western Union, producing animated promotional materials using Adobe After Effects. The content was developed in multiple languages including Greek, Georgian, Russian, and English, to effectively reach and engage diverse international audiences.",
     year: "2019",
   },
-  "3d-archive/Emberfall-Environment": {
-    title: "Realistic Short Film",
+  "3d-archive/Short Animation": {
+    title: "Short Animation",
     description:
       "End-to-end development of a large-scale, fantasy-inspired library environment for a realistic short film—at the intersection of design, storytelling, and real-time production. Set in the Emberfall Kingdom; the work covered environment assets, layout, optimized UV workflows, and the final trailer including video editing and sound design. Texturing, PBR materials, and the princess character were created by other artists.",
     year: "2024",
