@@ -1,13 +1,13 @@
 {
   "interactive-vr/Cozy Experience": {
-    "title": "Cozy Experience",
-    "description": "An intimate interactive study of comfort, scale, and presence—built as a small, warm space you can explore.",
-    "year": "2026"
+    "title": "Cozy Zen (Game)",
+    "description": "Cozy Experience is my thesis project that explores cozy game experiences through the concept of a Zen garden. The goal was to create a calming yet engaging interactive environment that offers players a sense of relaxation and presence. Within a very limited timeframe, I independently developed both the theoretical thesis and a fully playable prototype. I was responsible for the entire production process, including animation, visual design, and game development, bringing the concept to life using Unity and Blender. I also utilized Codex to support the coding process and gameplay implementation. Despite the tight schedule, this project became a highly rewarding and educational journey — from learning programming fundamentals to experimenting with mechanics and refining every detail from concept to playable prototype.",
+    "year": "2025"
   },
   "interactive-vr/VR Experience": {
     "title": "VR Experience",
     "description": "Immersive VR work combining spatial layout, real-time media, and guided focus across a sequence of scenes.",
-    "year": "2026"
+    "year": "2024"
   },
   "motion/Jazz Fest Commercial": {
     "title": "Jazz Fest Commercial",
