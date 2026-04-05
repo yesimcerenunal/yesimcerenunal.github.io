@@ -4,7 +4,9 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
+    "prebuild": "cp index.template.html index.html",
     "build": "vite build && cp index.html 404.html",
+    "predev": "cp index.template.html index.html",
     "dev": "vite",
     "typecheck": "tsc --noEmit",
     "gallery:placeholders": "node scripts/seed-gallery-placeholders.mjs"
