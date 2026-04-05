@@ -45,22 +45,22 @@ function manifestEntryToGalleryImage(entry: GalleryManifestProject): GalleryImag
 }
 
 /** Flat list for "All" and the gallery — order follows manifest (category order, then project). */
-export const galleryItems: GalleryImage[] = galleryManifest.projects.map(
-  manifestEntryToGalleryImage,
-);
+export const galleryItems: GalleryImage[] = Array.isArray(galleryManifest.projects)
+  ? galleryManifest.projects.map(manifestEntryToGalleryImage)
+  : [];
 
 if (import.meta.env?.DEV) {
   const byCategory = new Map<GalleryCategory, number>();
   for (const c of GALLERY_CATEGORIES) {
     byCategory.set(c, 0);
   }
-  const enProjectKeys = new Set(
-    Object.keys(translations.en.portfolio.projects),
-  );
-  const manifestKeys = new Set(
-    galleryManifest.projects.map((p) => projectKey(p)),
-  );
-  for (const p of galleryManifest.projects) {
+  const enProjects = translations.en.portfolio?.projects ?? {};
+  const enProjectKeys = new Set(Object.keys(enProjects));
+  const manifestProjects = Array.isArray(galleryManifest.projects)
+    ? galleryManifest.projects
+    : [];
+  const manifestKeys = new Set(manifestProjects.map((p) => projectKey(p)));
+  for (const p of manifestProjects) {
     const cat = p.category as GalleryCategory;
     const k = projectKey(p);
     console.log(
@@ -89,7 +89,9 @@ if (import.meta.env?.DEV) {
   }
   const enSorted = [...enProjectKeys].sort();
   for (const loc of ["de", "tr"] as const) {
-    const locKeys = Object.keys(translations[loc].portfolio.projects).sort();
+    const locKeys = Object.keys(
+      translations[loc].portfolio?.projects ?? {},
+    ).sort();
     if (JSON.stringify(enSorted) !== JSON.stringify(locKeys)) {
       console.error(
         `[galleryData] portfolio.projects keys differ between en and ${loc} (must match byte-for-byte).`,
@@ -109,4 +111,8 @@ if (import.meta.env?.DEV) {
     }
     seen.add(item.projectKey);
   }
+  console.log(
+    "[galleryData] valid projectKeys (manifest ↔ translations):",
+    [...manifestKeys].sort(),
+  );
 }

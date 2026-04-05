@@ -9,8 +9,10 @@ import {
 } from "react";
 import {
   LOCALE_STORAGE_KEY,
+  defaultLocale,
+  isLocale,
   readStoredLocale,
-  translations,
+  resolveMessagesForLocale,
   type Locale,
   type TranslationMessages,
 } from "../i18n/translations";
@@ -24,9 +26,15 @@ type LanguageContextValue = {
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(readStoredLocale);
+  const [locale, setLocaleState] = useState<Locale>(() => {
+    const initial = readStoredLocale();
+    return isLocale(initial) ? initial : defaultLocale;
+  });
 
   const setLocale = useCallback((next: Locale) => {
+    if (!isLocale(next)) {
+      return;
+    }
     setLocaleState(next);
     try {
       window.localStorage.setItem(LOCALE_STORAGE_KEY, next);
@@ -36,19 +44,25 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (typeof document !== "undefined") {
-      document.documentElement.lang = locale;
+    if (!isLocale(locale)) {
+      setLocaleState(defaultLocale);
     }
   }, [locale]);
 
-  const value = useMemo<LanguageContextValue>(
-    () => ({
-      locale,
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = isLocale(locale) ? locale : defaultLocale;
+    }
+  }, [locale]);
+
+  const value = useMemo<LanguageContextValue>(() => {
+    const safeLocale = isLocale(locale) ? locale : defaultLocale;
+    return {
+      locale: safeLocale,
       setLocale,
-      messages: translations[locale],
-    }),
-    [locale, setLocale],
-  );
+      messages: resolveMessagesForLocale(safeLocale),
+    };
+  }, [locale, setLocale]);
 
   return (
     <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>

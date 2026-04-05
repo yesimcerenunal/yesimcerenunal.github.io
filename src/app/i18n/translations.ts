@@ -134,7 +134,7 @@ const portfolioProjectsEn: Record<string, PortfolioProjectCopy> = {
     year: "2019",
   },
   "3d-archive/Emberfall-Environment": {
-    title: "🔥 TEST TITLE 12345",
+    title: "Realistic Short Film",
     description:
       "End-to-end development of a large-scale, fantasy-inspired library environment for a realistic short film—at the intersection of design, storytelling, and real-time production. Set in the Emberfall Kingdom; the work covered environment assets, layout, optimized UV workflows, and the final trailer including video editing and sound design. Texturing, PBR materials, and the princess character were created by other artists.",
     year: "2024",
@@ -545,6 +545,15 @@ export const translations: Record<Locale, TranslationMessages> = {
   tr,
 };
 
+/** Safe lookup for bootstrap / runtime; invalid or missing locale → English. */
+export function resolveMessagesForLocale(
+  locale: string | undefined | null,
+): TranslationMessages {
+  const loc = isLocale(locale) ? locale : defaultLocale;
+  const msgs = translations[loc] ?? translations[defaultLocale];
+  return msgs;
+}
+
 export function isLocale(value: string | null | undefined): value is Locale {
   return value === "en" || value === "de" || value === "tr";
 }
@@ -565,7 +574,7 @@ export function localizedCategory(
   messages: TranslationMessages,
   canonical: string,
 ): string {
-  const v = messages.categories[canonical as GalleryCategory];
+  const v = messages.categories?.[canonical as GalleryCategory];
   return v !== undefined ? v : canonical;
 }
 
@@ -579,9 +588,9 @@ export function portfolioProjectCopy(
   projectKey: string,
 ): PortfolioProjectCopy {
   const slug = slugFromProjectKey(projectKey);
-  const yearDash = messages.gallery.modalYearFallback;
+  const yearDash = messages.gallery?.modalYearFallback ?? "—";
 
-  const p = messages.portfolio.projects[projectKey];
+  const p = messages.portfolio?.projects?.[projectKey];
   if (p) {
     const title = p.title?.trim() ?? "";
     const year = String(p.year ?? "").trim();
@@ -606,7 +615,7 @@ export function portfolioProjectCopy(
     };
   }
   if (import.meta.env?.DEV) {
-    const available = Object.keys(messages.portfolio.projects);
+    const available = Object.keys(messages.portfolio?.projects ?? {});
     console.error(
       `[portfolio] PROJECT KEY MISMATCH: expected=${JSON.stringify(projectKey)} (portfolio.projects lookup) | actual=missing — no entry for this key.`,
     );
@@ -646,5 +655,5 @@ export function getPortfolioProjectCopy(
   locale: Locale,
   projectKey: string,
 ): PortfolioProjectCopy {
-  return portfolioProjectCopy(translations[locale], projectKey);
+  return portfolioProjectCopy(resolveMessagesForLocale(locale), projectKey);
 }
