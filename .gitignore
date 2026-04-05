@@ -1,4 +1,4 @@
 node_modules
 
-# Never commit a top-level gallery/ tree — canonical media is only under public/gallery/
-/gallery
+# Legacy Vite output (build writes to repo root; use /dist only if present)
+/dist
