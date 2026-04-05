@@ -1,5 +1,6 @@
 /**
- * Contact & form endpoints (Vite env).
+ * Contact integration (email + Formspree endpoint), not UI copy.
+ * User-visible strings live in `src/app/i18n/translations.ts` → `contact`.
  * Copy `.env.example` to `.env` and set values.
  */
 export const CONTACT_EMAIL =

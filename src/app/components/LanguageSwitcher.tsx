@@ -6,14 +6,8 @@ import {
 import { LOCALES, type Locale } from "../i18n/translations";
 import { useLanguage } from "../context/LanguageContext";
 
-const LABELS: Record<Locale, string> = {
-  en: "EN",
-  de: "DE",
-  tr: "TR",
-};
-
 export function LanguageSwitcher() {
-  const { locale, setLocale } = useLanguage();
+  const { locale, setLocale, messages } = useLanguage();
 
   const onKeyToggle = useCallback(
     (code: Locale, e: ReactKeyboardEvent) => {
@@ -28,7 +22,7 @@ export function LanguageSwitcher() {
   return (
     <nav
       className="flex items-center gap-x-2 text-[0.65rem] font-medium uppercase tracking-[0.14em] text-gray-900 sm:text-[0.68rem]"
-      aria-label="Language"
+      aria-label={messages.aria.languageSwitcher}
     >
       {LOCALES.map((code, index) => {
         const active = locale === code;
@@ -61,7 +55,7 @@ export function LanguageSwitcher() {
                     : undefined
                 }
               >
-                {LABELS[code]}
+                {messages.localeLabels[code]}
               </span>
             </span>
           </Fragment>

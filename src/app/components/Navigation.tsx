@@ -34,7 +34,10 @@ export function Navigation() {
       </div>
 
       {isWorks ? (
-        <nav className="flex flex-col gap-2" aria-label="Work categories">
+        <nav
+          className="flex flex-col gap-2"
+          aria-label={messages.aria.workCategoriesNavigation}
+        >
           <button
             type="button"
             onClick={() => setFilter("all")}

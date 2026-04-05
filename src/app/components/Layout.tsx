@@ -4,7 +4,7 @@ import {
   WorksCategoryProvider,
   useWorksCategory,
 } from "../context/WorksCategoryContext";
-import { LanguageProvider } from "../context/LanguageContext";
+import { LanguageProvider, useLanguage } from "../context/LanguageContext";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { Navigation } from "./Navigation";
 import { FooterNav } from "./FooterNav";
@@ -12,6 +12,11 @@ import { FooterNav } from "./FooterNav";
 function LayoutShell() {
   const location = useLocation();
   const { resetCategories } = useWorksCategory();
+  const { messages } = useLanguage();
+
+  useEffect(() => {
+    document.title = messages.layout.documentTitle;
+  }, [messages.layout.documentTitle]);
 
   useEffect(() => {
     if (location.pathname !== "/") resetCategories();
@@ -25,7 +30,7 @@ function LayoutShell() {
         <header className="flex shrink-0 items-baseline justify-end gap-5 px-7 pb-1 pt-5 sm:gap-6 sm:px-12 sm:pb-1.5 sm:pt-6 lg:px-14 lg:pt-7">
           <LanguageSwitcher />
           <p className="text-[0.75rem] font-semibold uppercase tracking-[0.22em] text-gray-900 sm:text-sm">
-            YESIM CEREN ÜNAL
+            {messages.layout.brandName}
           </p>
         </header>
 

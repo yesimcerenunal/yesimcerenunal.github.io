@@ -15,7 +15,10 @@ export function FooterNav() {
   return (
     <footer className="border-t border-gray-100/80 bg-[#fafafa] px-7 pb-6 pt-3.5 sm:px-12 sm:pb-7 sm:pt-4 lg:px-14 lg:pb-8">
       <div className="flex flex-wrap items-center justify-between gap-4 sm:gap-5">
-        <nav className="flex flex-wrap gap-5" aria-label="Primary">
+        <nav
+          className="flex flex-wrap gap-5"
+          aria-label={messages.aria.primaryNavigation}
+        >
           {links.map((link) => {
             const active = location.pathname === link.path;
 

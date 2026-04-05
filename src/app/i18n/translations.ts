@@ -2,8 +2,9 @@ import type { GalleryCategory } from "../context/WorksCategoryContext";
 import { slugFromProjectKey } from "../utils/galleryProjectKey";
 
 /**
- * **Portfolio text (title, description, year)** — sole source for UI copy.
- * Project list and media paths come from hand-maintained `gallery-manifest.json` (see `galleryData.ts`).
+ * **Single source of truth for all user-visible UI strings** (nav, layout, gallery chrome,
+ * About/Contact, aria labels, locale switcher labels, portfolio project copy).
+ * Project list and file paths come from `gallery-manifest.json` + `public/` (see `galleryData.ts`).
  */
 export type Locale = "en" | "de" | "tr";
 
@@ -24,6 +25,20 @@ export type PortfolioProjectCopy = {
 };
 
 export type TranslationMessages = {
+  /** Shell: document title, header brand, optional non-route UI. */
+  layout: {
+    documentTitle: string;
+    brandName: string;
+    gestureControlOff: string;
+  };
+  /** Accessibility labels (not visible copy). */
+  aria: {
+    primaryNavigation: string;
+    workCategoriesNavigation: string;
+    languageSwitcher: string;
+  };
+  /** Short labels for the locale switcher (EN / DE / TR). */
+  localeLabels: Record<Locale, string>;
   nav: {
     gallery: string;
     about: string;
@@ -44,6 +59,8 @@ export type TranslationMessages = {
     modalYearFallback: string;
     backToGallery: string;
     close: string;
+    /** Alt text when an image fails to load (fallback UI). */
+    imageErrorAlt: string;
   };
   about: {
     title: string;
@@ -51,6 +68,8 @@ export type TranslationMessages = {
     p2: string;
     p3: string;
     skillsHeading: string;
+    /** Skill / tool names shown as chips (localized where it makes sense). */
+    skills: readonly string[];
   };
   contact: {
     title: string;
@@ -274,7 +293,35 @@ const categoryEn: Record<GalleryCategory, string> = {
   "2D Archive": "2D Archive",
 };
 
+/** About page skill chips — tool names; shared across locales. */
+const ABOUT_SKILLS: readonly string[] = [
+  "Figma",
+  "Blender",
+  "Unity",
+  "AI-assisted Design",
+  "TouchDesigner",
+  "WebGL",
+  "Three.js",
+  "Cursor",
+  "Substance Painter",
+];
+
 const en: TranslationMessages = {
+  layout: {
+    documentTitle: "YESIM CEREN ÜNAL Portfolio",
+    brandName: "YESIM CEREN ÜNAL",
+    gestureControlOff: "Turn off gesture control",
+  },
+  aria: {
+    primaryNavigation: "Primary",
+    workCategoriesNavigation: "Work categories",
+    languageSwitcher: "Language",
+  },
+  localeLabels: {
+    en: "EN",
+    de: "DE",
+    tr: "TR",
+  },
   nav: {
     gallery: "GALLERY",
     about: "ABOUT",
@@ -298,6 +345,7 @@ const en: TranslationMessages = {
     modalYearFallback: "—",
     backToGallery: "Back to gallery",
     close: "Close",
+    imageErrorAlt: "Error loading image",
   },
   about: {
     title: "ABOUT",
@@ -308,6 +356,7 @@ const en: TranslationMessages = {
     p3:
       "I am particularly interested in emerging technologies such as creative coding, real-time rendering, and AI-assisted design as tools for building new types of experiences rather than traditional outputs.",
     skillsHeading: "Skills & Tools",
+    skills: ABOUT_SKILLS,
   },
   contact: {
     title: "CONTACT",
@@ -333,6 +382,21 @@ const en: TranslationMessages = {
 };
 
 const de: TranslationMessages = {
+  layout: {
+    documentTitle: "YESIM CEREN ÜNAL Portfolio",
+    brandName: "YESIM CEREN ÜNAL",
+    gestureControlOff: "Gestensteuerung ausschalten",
+  },
+  aria: {
+    primaryNavigation: "Hauptnavigation",
+    workCategoriesNavigation: "Werkkategorien",
+    languageSwitcher: "Sprache",
+  },
+  localeLabels: {
+    en: "EN",
+    de: "DE",
+    tr: "TR",
+  },
   nav: {
     gallery: "GALERIE",
     about: "ÜBER MICH",
@@ -360,6 +424,7 @@ const de: TranslationMessages = {
     modalYearFallback: "—",
     backToGallery: "Zurück zur Galerie",
     close: "Schließen",
+    imageErrorAlt: "Bild konnte nicht geladen werden",
   },
   about: {
     title: "ÜBER MICH",
@@ -370,6 +435,7 @@ const de: TranslationMessages = {
     p3:
       "Meine Arbeit verbindet klassische Designprinzipien mit Technologien wie KI, Echtzeit-Rendering und gestenbasierter Interaktion, um einzigartige visuelle Erlebnisse zu schaffen.",
     skillsHeading: "Skills & Tools",
+    skills: ABOUT_SKILLS,
   },
   contact: {
     title: "KONTAKT",
@@ -395,6 +461,21 @@ const de: TranslationMessages = {
 };
 
 const tr: TranslationMessages = {
+  layout: {
+    documentTitle: "YESIM CEREN ÜNAL Portfolio",
+    brandName: "YESIM CEREN ÜNAL",
+    gestureControlOff: "Jest kontrolünü kapat",
+  },
+  aria: {
+    primaryNavigation: "Birincil gezinme",
+    workCategoriesNavigation: "Çalışma kategorileri",
+    languageSwitcher: "Dil",
+  },
+  localeLabels: {
+    en: "EN",
+    de: "DE",
+    tr: "TR",
+  },
   nav: {
     gallery: "GALERİ",
     about: "HAKKINDA",
@@ -422,6 +503,7 @@ const tr: TranslationMessages = {
     modalYearFallback: "—",
     backToGallery: "Galeriye dön",
     close: "Kapat",
+    imageErrorAlt: "Görüntü yüklenemedi",
   },
   about: {
     title: "HAKKINDA",
@@ -432,6 +514,7 @@ const tr: TranslationMessages = {
     p3:
       "Çalışmalarım geleneksel tasarım ilkelerini yapay zekâ, gerçek zamanlı görüntüleme ve jest tabanlı arayüzler gibi gelişen teknolojilerle birleştirerek özgün görsel deneyimler üretiyor.",
     skillsHeading: "Yetenekler ve araçlar",
+    skills: ABOUT_SKILLS,
   },
   contact: {
     title: "İLETİŞİM",

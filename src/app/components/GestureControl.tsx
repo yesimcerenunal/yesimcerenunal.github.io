@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { X } from "lucide-react";
+import { useLanguage } from "../context/LanguageContext";
 
 export function GestureControl() {
+  const { messages } = useLanguage();
   const [isGestureEnabled, setIsGestureEnabled] = useState(true);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -56,7 +58,7 @@ export function GestureControl() {
         className="bg-white border border-gray-200 rounded-lg px-4 py-2 shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
       >
         <X className="w-4 h-4" />
-        Turn off gesture control
+        {messages.layout.gestureControlOff}
       </button>
     </div>
   );

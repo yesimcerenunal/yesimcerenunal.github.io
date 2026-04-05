@@ -1,18 +1,6 @@
 import { motion } from "motion/react";
 import { useLanguage } from "../context/LanguageContext";
 
-const SKILLS = [
-  "Figma",
-  "Blender",
-  "Unity",
-  "AI-assisted Design",
-  "TouchDesigner",
-  "WebGL",
-  "Three.js",
-  "Cursor",
-  "Substance Painter",
-] as const;
-
 export function About() {
   const { messages } = useLanguage();
   const { about: a } = messages;
@@ -40,7 +28,7 @@ export function About() {
             {a.skillsHeading}
           </h2>
           <div className="flex flex-wrap gap-2">
-            {SKILLS.map((skill) => (
+            {a.skills.map((skill) => (
               <span
                 key={skill}
                 className="rounded-full bg-gray-50 px-4 py-2 text-sm text-gray-700"
