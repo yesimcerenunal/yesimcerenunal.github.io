@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
  * Reads src/app/data/gallery-manifest.json (manually maintained), then writes a minimal
- * valid JPEG into every image path listed there plus public/fallback.jpg.
- * Does not scan public/gallery or modify the manifest.
+ * valid JPEG under public/ only (paths like public/gallery/...) plus public/fallback.jpg.
+ * Never writes to a top-level gallery/ folder — only public/.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -32,6 +32,9 @@ for (const project of manifest.projects) {
   for (const rel of project.images) {
     if (VIDEO_RE.test(rel)) continue;
     const dest = path.join(publicRoot, rel);
+    if (!dest.startsWith(publicRoot + path.sep) && dest !== publicRoot) {
+      throw new Error(`Refusing to write outside public/: ${rel}`);
+    }
     fs.mkdirSync(path.dirname(dest), { recursive: true });
     fs.writeFileSync(dest, JPEG);
     count += 1;

@@ -36,6 +36,30 @@ jobs:
       - name: Build
         run: npm run build
 
+      # Fail fast if gallery assets are missing (e.g. public/gallery not in git).
+      # upload-pages-artifact packs the entire `dist/` folder; deploy-pages deploys that artifact only (no stale cache from prior runs).
+      - name: Verify dist/gallery before deploy
+        run: |
+          set -eu
+          echo "=== dist top-level ==="
+          ls -la dist/
+          echo ""
+          if [ ! -d dist/gallery ]; then
+            echo "::error::dist/gallery is missing after build. Ensure public/gallery is committed and copied by Vite."
+            exit 1
+          fi
+          echo "=== dist/gallery: total files ==="
+          find dist/gallery -type f | wc -l
+          echo ""
+          echo "=== sample image paths (raster) ==="
+          find dist/gallery -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) | sort | head -20
+          echo ""
+          echo "=== first 30 files (any type) ==="
+          find dist/gallery -type f | sort | head -30
+          echo ""
+          echo "=== dist/gallery size ==="
+          du -sh dist/gallery
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

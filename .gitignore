@@ -1,1 +1,4 @@
 node_modules
+
+# Never commit a top-level gallery/ tree — canonical media is only under public/gallery/
+/gallery

@@ -685,8 +685,7 @@ function GalleryCardMesh({
 
   const finalImageUrl = primaryGalleryImageUrl(image);
   useLayoutEffect(() => {
-    console.log("BASE URL:", import.meta.env.BASE_URL);
-    console.log("FINAL IMAGE URL:", finalImageUrl);
+    console.log("PROD IMAGE URL:", finalImageUrl);
   }, [finalImageUrl]);
   const texture = useResilientTexture(finalImageUrl);
 

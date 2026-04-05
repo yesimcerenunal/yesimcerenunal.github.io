@@ -1,5 +1,7 @@
 # Gallery media (`public/gallery/`)
 
+**Do not** create a **`gallery/`** directory at the **repository root**. The only media tree is here under **`public/gallery/`**; Vite copies it to **`dist/gallery/`** on `npm run build`.
+
 ## Single source of truth
 
 | What | Where |

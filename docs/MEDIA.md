@@ -2,6 +2,7 @@
 
 ## Local assets
 
+- **Do not** create a **`gallery/`** directory at the project root. The only gallery media tree is **`public/gallery/`** (Vite copies it to **`dist/gallery/`** on build).
 - **Gallery images**: `public/gallery/` — paths referenced from **`src/app/data/gallery-manifest.json`** (manually edited; not auto-generated). See [`public/gallery/README.md`](../public/gallery/README.md). Per project, name files **`0.*`** (hero + cover), **`1.*`**, **`2.*`**, … as needed.
 - **Gallery index**: **`src/app/data/gallery-manifest.json`** — **manual source of truth** for project list and `images[]`. Nothing in `npm run dev` / `npm run build` rewrites it.
 - **Runtime code**: `src/app/data/galleryData.ts` imports the manifest and wraps paths with **`publicAsset()`** from **`src/app/utils/publicAsset.ts`** so URLs respect Vite `base`.
