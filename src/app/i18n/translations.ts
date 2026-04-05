@@ -88,7 +88,7 @@ const portfolioProjectsEn: Record<string, PortfolioProjectCopy> = {
     year: "2025",
   },
   "2d-archive/Spotify Canvas Design": {
-    title: "Abstract Reality",
+    title: "Spotify Canvas Design",
     description:
       "Exploring the boundary between physical and digital space through systems, type, and composition.",
     year: "2025",
