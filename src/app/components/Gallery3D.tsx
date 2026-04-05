@@ -1360,10 +1360,13 @@ export function Gallery3D({
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
 
-  const selectedPortfolioCopy =
-    selectedImage != null
-      ? portfolioProjectCopy(messages, selectedImage.projectKey)
-      : null;
+  const selectedPortfolioCopy = useMemo(
+    () =>
+      selectedImage == null
+        ? null
+        : portfolioProjectCopy(messages, selectedImage.projectKey),
+    [messages, selectedImage],
+  );
 
   /** Full-opacity “flash”; false = resting soft style (low opacity + nudge) */
   const [exploreHintProminent, setExploreHintProminent] = useState(true);
@@ -1573,7 +1576,7 @@ export function Gallery3D({
       </div>
 
       <AnimatePresence>
-        {selectedImage && (
+        {selectedImage && selectedPortfolioCopy ? (
           <motion.div
             key="modal-backdrop"
             initial={{ opacity: 1 }}
@@ -1607,7 +1610,7 @@ export function Gallery3D({
                   ref={detailModalScrollRef}
                   key={`${selectedImage.projectKey}|${selectedImage.images.join("|")}`}
                   urls={selectedImage.images}
-                  heroAlt={selectedPortfolioCopy?.title ?? ""}
+                  heroAlt={selectedPortfolioCopy.title}
                 />
               </div>
 
@@ -1629,10 +1632,10 @@ export function Gallery3D({
                     className="mb-4 tracking-tight text-gray-900"
                     style={{ fontSize: "1.75rem", lineHeight: 1.25 }}
                   >
-                    {selectedPortfolioCopy?.title ?? ""}
+                    {selectedPortfolioCopy.title}
                   </h2>
                   <p className="text-[0.95rem] leading-relaxed text-gray-500">
-                    {selectedPortfolioCopy?.description ?? ""}
+                    {selectedPortfolioCopy.description}
                   </p>
                 </div>
 
@@ -1641,7 +1644,7 @@ export function Gallery3D({
                     {galleryCopy.modalYear}
                   </span>
                   <span className="tabular-nums text-gray-800">
-                    {selectedPortfolioCopy?.year ?? ""}
+                    {selectedPortfolioCopy.year}
                   </span>
                 </div>
 
@@ -1669,7 +1672,7 @@ export function Gallery3D({
             </motion.div>
             </div>
           </motion.div>
-        )}
+        ) : null}
       </AnimatePresence>
     </div>
   );

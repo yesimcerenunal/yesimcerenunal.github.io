@@ -16,6 +16,7 @@ import galleryManifest from "./gallery-manifest.json";
  */
 export type GalleryManifestProject = (typeof galleryManifest.projects)[number];
 
+/** Canonical lookup key for `translations.*.portfolio.projects` — must match manifest exactly. */
 function projectKey(entry: { categoryFolder: string; slug: string }): string {
   return `${entry.categoryFolder}/${entry.slug}`;
 }

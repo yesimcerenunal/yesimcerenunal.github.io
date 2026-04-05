@@ -33,8 +33,10 @@ export type TranslationMessages = {
   gallery: {
     exploreHint: string;
     modalYear: string;
-    /** Shown only if a manifest project has no `portfolio.projects` entry (should not happen when translations are complete). */
+    /** Title when no `portfolio.projects[projectKey]` entry exists (never show raw `projectKey`). */
     modalProjectFallback: string;
+    /** Year line when entry is missing or `year` is empty in copy (never use manifest). */
+    modalYearFallback: string;
     backToGallery: string;
     close: string;
   };
@@ -289,6 +291,7 @@ const en: TranslationMessages = {
     exploreHint: "Drag to explore and choose",
     modalYear: "Year",
     modalProjectFallback: "Project",
+    modalYearFallback: "—",
     backToGallery: "Back to gallery",
     close: "Close",
   },
@@ -350,6 +353,7 @@ const de: TranslationMessages = {
     exploreHint: "Ziehen zum Erkunden und Auswählen",
     modalYear: "Jahr",
     modalProjectFallback: "Projekt",
+    modalYearFallback: "—",
     backToGallery: "Zurück zur Galerie",
     close: "Schließen",
   },
@@ -411,6 +415,7 @@ const tr: TranslationMessages = {
     exploreHint: "Keşfetmek ve seçmek için sürükleyin",
     modalYear: "Yıl",
     modalProjectFallback: "Proje",
+    modalYearFallback: "—",
     backToGallery: "Galeriye dön",
     close: "Kapat",
   },
@@ -478,20 +483,55 @@ export function localizedCategory(
 }
 
 /**
- * Detail modal title, description, and year for a gallery item.
- * Pass `messages` from `useLanguage()` so copy follows the selected locale (en / de / tr).
- * Keys are `categoryFolder/slug` — keep in sync with `gallery-manifest.json`.
- * UI copy always comes from `messages.portfolio.projects`; never from raw folder paths.
+ * Resolves portfolio copy for the current locale.
+ * Lookup: `translations[locale].portfolio.projects[projectKey]` — same as
+ * `messages.portfolio.projects[projectKey]` when `messages` comes from `useLanguage()`.
+ *
+ * `projectKey` must be exactly `categoryFolder + "/" + slug` (see `galleryData.ts` / manifest).
+ * Never returns raw `projectKey` as title; missing keys use `gallery.modalProjectFallback` / `modalYearFallback`.
  */
 export function portfolioProjectCopy(
   messages: TranslationMessages,
   projectKey: string,
 ): PortfolioProjectCopy {
   const p = messages.portfolio.projects[projectKey];
-  if (p) return p;
+  if (p) {
+    const title = p.title?.trim() ?? "";
+    const year = String(p.year ?? "").trim();
+    const titleOut = title || messages.gallery.modalProjectFallback;
+    const yearOut = year || messages.gallery.modalYearFallback;
+    if (import.meta.env?.DEV) {
+      if (!title) {
+        console.warn(
+          `Missing translation for projectKey: ${projectKey} (empty title)`,
+        );
+      }
+      if (!year) {
+        console.warn(
+          `Missing translation for projectKey: ${projectKey} (empty year)`,
+        );
+      }
+    }
+    return {
+      title: titleOut,
+      description: p.description ?? "",
+      year: yearOut,
+    };
+  }
+  if (import.meta.env?.DEV) {
+    console.warn(`Missing translation for projectKey: ${projectKey}`);
+  }
   return {
     title: messages.gallery.modalProjectFallback,
     description: "",
-    year: "",
+    year: messages.gallery.modalYearFallback,
   };
+}
+
+/** Explicit locale + key lookup (same data as `portfolioProjectCopy(translations[locale], projectKey)`). */
+export function getPortfolioProjectCopy(
+  locale: Locale,
+  projectKey: string,
+): PortfolioProjectCopy {
+  return portfolioProjectCopy(translations[locale], projectKey);
 }
