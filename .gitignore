@@ -1,11 +1,4 @@
 node_modules
 
-# Production build (deployed by GitHub Actions from artifact)
+# Legacy Vite output (build writes to repo root; use /dist only if present)
 /dist
-
-# Generated at dev/build time — use index.template.html as source of truth
-/index.html
-/404.html
-
-# Old Vite root output (do not commit; use CI build → dist/ instead)
-/assets/
