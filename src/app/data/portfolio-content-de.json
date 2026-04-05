@@ -1,0 +1,52 @@
+{
+  "interactive-vr/Cozy Experience": {
+    "title": "Cozy Experience",
+    "description": "Eine intime interaktive Studie zu Komfort, Maßstab und Präsenz—als kleiner, warmer Raum zum Erkunden.",
+    "year": "2026"
+  },
+  "interactive-vr/VR Experience": {
+    "title": "VR Experience",
+    "description": "Immersive VR-Arbeit mit räumlichem Layout, Echtzeit-Medien und geführtem Fokus über eine Sequenz von Szenen.",
+    "year": "2026"
+  },
+  "motion/Jazz Fest Commercial": {
+    "title": "Jazz Fest Commercial",
+    "description": "Kommerzieller Motion-Spot für ein Jazzfestival—Rhythmus, Typografie und Bildschnitt auf Musik und Markenton.",
+    "year": "2025"
+  },
+  "motion/Spotify Canvas Design": {
+    "title": "Spotify Canvas Design",
+    "description": "Daten als Choreografie und markenstarke Motion—ein Hero-Spot für Launch und Festival-Screens.",
+    "year": "2025"
+  },
+  "campaigns/JusteDebout": {
+    "title": "Juste Debout",
+    "description": "Kampagnen- und Motion-Arbeit für Juste Debout—Rhythmus, Framing und Social-taugliche Visuals für die Bühne.",
+    "year": "2025"
+  },
+  "campaigns/Western Union": {
+    "title": "Western Union",
+    "description": "Für Western Union habe ich kommerzielle Projekte umgesetzt und mit Adobe After Effects animierte Werbematerialien produziert. Die Inhalte entstanden in mehreren Sprachen – darunter Griechisch, Georgisch, Russisch und Englisch – um internationale Zielgruppen zu erreichen.",
+    "year": "2019"
+  },
+  "3d-archive/Emberfall-Environment": {
+    "title": "Realistischer Kurzfilm",
+    "description": "Durchgängige Entwicklung einer groß angelegten, fantasy-inspirierten Bibliotheksumgebung für einen realistischen Kurzfilm—an der Schnittstelle von Design, Storytelling und Echtzeit-Produktion. Im Königreich Emberfall; Schwerpunkt auf Umgebungs-Assets, Layout, optimierten UV-Workflows und dem finalen Trailer inklusive Videoschnitt und Sounddesign. Texturierung, PBR-Materialien und die Prinzessin-Figur wurden von anderen Künstler:innen umgesetzt.",
+    "year": "2024"
+  },
+  "3d-archive/FB": {
+    "title": "Fashion Battle",
+    "description": "3D-Mode-Visualisierung—Umgebung, Licht und kinematische Inszenierung für einen modischen Wettbewerbskontext.",
+    "year": "2025"
+  },
+  "2d-archive/Illustrations": {
+    "title": "Illustrationen",
+    "description": "Ausgewählte Illustrationsarbeit—Serie, Komposition, Farbe und Erzähltempo für Print und Digital.",
+    "year": "2025"
+  },
+  "2d-archive/Psychodelic Magazine": {
+    "title": "Psychedelic Magazine",
+    "description": "Editorial- und Magazin-Spreads—Layout, Typografie und Bildbehandlung für eine markante Print-Identität.",
+    "year": "2025"
+  }
+}

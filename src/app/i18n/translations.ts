@@ -1,11 +1,13 @@
 import type { GalleryCategory } from "../context/WorksCategoryContext";
-import portfolioContentJson from "../data/portfolio-content.json";
+import portfolioContentEn from "../data/portfolio-content.json";
+import portfolioContentDe from "../data/portfolio-content-de.json";
+import portfolioContentTr from "../data/portfolio-content-tr.json";
 import { slugFromProjectKey } from "../utils/galleryProjectKey";
 
 /**
  * **Single source of truth for all user-visible UI strings** (nav, layout, gallery chrome,
- * About/Contact, aria labels, locale switcher labels, portfolio project copy).
- * English project titles/descriptions/years: `src/app/data/portfolio-content.json`.
+ * About/Contact, aria labels, locale switcher labels).
+ * Portfolio project copy (EN / DE / TR): `portfolio-content.json`, `portfolio-content-de.json`, `portfolio-content-tr.json`.
  * Project list and file paths come from `gallery-manifest.json` + `public/` (see `galleryData.ts`).
  */
 export type Locale = "en" | "de" | "tr";
@@ -94,10 +96,7 @@ export type TranslationMessages = {
   };
 };
 
-/**
- * English project copy: edit `src/app/data/portfolio-content.json` only (keys = `categoryFolder/slug`).
- * Same keys required in DE and TR objects below.
- */
+/** Keys = `categoryFolder/slug` (see gallery-manifest). Same keys in all three JSON files. */
 function normalizePortfolioContentJson(
   raw: unknown,
 ): Record<string, PortfolioProjectCopy> {
@@ -118,133 +117,9 @@ function normalizePortfolioContentJson(
   return out;
 }
 
-const portfolioContent = normalizePortfolioContentJson(portfolioContentJson);
-
-const portfolioProjectsDe: Record<string, PortfolioProjectCopy> = {
-  "interactive-vr/Cozy Experience": {
-    title: "Cozy Experience",
-    description:
-      "Eine intime interaktive Studie zu Komfort, Maßstab und Präsenz—als kleiner, warmer Raum zum Erkunden.",
-    year: "2026",
-  },
-  "interactive-vr/VR Experience": {
-    title: "VR Experience",
-    description:
-      "Immersive VR-Arbeit mit räumlichem Layout, Echtzeit-Medien und geführtem Fokus über eine Sequenz von Szenen.",
-    year: "2026",
-  },
-  "motion/Jazz Fest Commercial": {
-    title: "Jazz Fest Commercial",
-    description:
-      "Kommerzieller Motion-Spot für ein Jazzfestival—Rhythmus, Typografie und Bildschnitt auf Musik und Markenton.",
-    year: "2025",
-  },
-  "motion/Spotify Canvas Design": {
-    title: "Spotify Canvas Design",
-    description:
-      "Daten als Choreografie und markenstarke Motion—ein Hero-Spot für Launch und Festival-Screens.",
-    year: "2025",
-  },
-  "campaigns/JusteDebout": {
-    title: "Juste Debout",
-    description:
-      "Kampagnen- und Motion-Arbeit für Juste Debout—Rhythmus, Framing und Social-taugliche Visuals für die Bühne.",
-    year: "2025",
-  },
-  "campaigns/Western Union": {
-    title: "Western Union",
-    description:
-      "Für Western Union habe ich kommerzielle Projekte umgesetzt und mit Adobe After Effects animierte Werbematerialien produziert. Die Inhalte entstanden in mehreren Sprachen – darunter Griechisch, Georgisch, Russisch und Englisch – um internationale Zielgruppen zu erreichen.",
-    year: "2019",
-  },
-  "3d-archive/Emberfall-Environment": {
-    title: "Realistischer Kurzfilm",
-    description:
-      "Durchgängige Entwicklung einer groß angelegten, fantasy-inspirierten Bibliotheksumgebung für einen realistischen Kurzfilm—an der Schnittstelle von Design, Storytelling und Echtzeit-Produktion. Im Königreich Emberfall; Schwerpunkt auf Umgebungs-Assets, Layout, optimierten UV-Workflows und dem finalen Trailer inklusive Videoschnitt und Sounddesign. Texturierung, PBR-Materialien und die Prinzessin-Figur wurden von anderen Künstler:innen umgesetzt.",
-    year: "2024",
-  },
-  "3d-archive/FB": {
-    title: "Fashion Battle",
-    description:
-      "3D-Mode-Visualisierung—Umgebung, Licht und kinematische Inszenierung für einen modischen Wettbewerbskontext.",
-    year: "2025",
-  },
-  "2d-archive/Illustrations": {
-    title: "Illustrationen",
-    description:
-      "Ausgewählte Illustrationsarbeit—Serie, Komposition, Farbe und Erzähltempo für Print und Digital.",
-    year: "2025",
-  },
-  "2d-archive/Psychodelic Magazine": {
-    title: "Psychedelic Magazine",
-    description:
-      "Editorial- und Magazin-Spreads—Layout, Typografie und Bildbehandlung für eine markante Print-Identität.",
-    year: "2025",
-  },
-};
-
-const portfolioProjectsTr: Record<string, PortfolioProjectCopy> = {
-  "interactive-vr/Cozy Experience": {
-    title: "Cozy Experience",
-    description:
-      "Konfor, ölçek ve varlık üzerine samimi bir etkileşim çalışması—keşfedilebilir küçük, sıcak bir alan olarak.",
-    year: "2026",
-  },
-  "interactive-vr/VR Experience": {
-    title: "VR Experience",
-    description:
-      "Mekânsal yerleşim, gerçek zamanlı medya ve sahne dizisinde yönlü odağı birleştiren sürükleyici VR çalışması.",
-    year: "2026",
-  },
-  "motion/Jazz Fest Commercial": {
-    title: "Jazz Fest Commercial",
-    description:
-      "Bir caz festivali için ticari motion parçası—ritim, tipografi ve müzik ile marka tonuna göre kurgu.",
-    year: "2025",
-  },
-  "motion/Spotify Canvas Design": {
-    title: "Spotify Canvas Design",
-    description:
-      "Veriyi koreografi gibi kullanan, markaya uygun motion; lansman ve festival ekranları için hero çalışma.",
-    year: "2025",
-  },
-  "campaigns/JusteDebout": {
-    title: "Juste Debout",
-    description:
-      "Juste Debout için kampanya ve motion çalışması—ritim, kadraj ve sahneye uygun, sosyal medyaya hazır görseller.",
-    year: "2025",
-  },
-  "campaigns/Western Union": {
-    title: "Western Union",
-    description:
-      "Western Union için ticari projelerde çalıştım; Adobe After Effects ile animasyonlu tanıtım materyalleri ürettim. İçerikler Yunanca, Gürcüce, Rusça ve İngilizce dahil birden çok dilde hazırlanarak çeşitli uluslararası kitlelere ulaşmayı hedefledi.",
-    year: "2019",
-  },
-  "3d-archive/Emberfall-Environment": {
-    title: "Gerçekçi Kısa Film",
-    description:
-      "Gerçekçi bir kısa film için büyük ölçekli, fantezi esintili kütüphane ortamının uçtan uca geliştirilmesi—tasarım, hikâye anlatımı ve gerçek zamanlı üretimin kesişiminde. Emberfall Krallığı’nda geçen sahne; ortam varlıkları, yerleşim, optimize UV iş akışları ve video kurgusu ile ses tasarımını içeren nihai fragman üzerinde çalışıldı. Dokulama, PBR materyaller ve prenses karakteri diğer sanatçılara aittir.",
-    year: "2024",
-  },
-  "3d-archive/FB": {
-    title: "Fashion Battle",
-    description:
-      "3D moda görselleri—rekabetçi bir moda bağlamında ortam, ışık ve sinematik sunum.",
-    year: "2025",
-  },
-  "2d-archive/Illustrations": {
-    title: "İllüstrasyonlar",
-    description:
-      "Seçilmiş illüstrasyon çalışmaları—dizi, kompozisyon, renk ve anlatı tonu; baskı ve dijital için.",
-    year: "2025",
-  },
-  "2d-archive/Psychodelic Magazine": {
-    title: "Psychedelic Magazine",
-    description:
-      "Editoryal ve dergi sayfaları—cesur bir baskı kimliği için yerleşim, tipografi ve görsel işleme.",
-    year: "2025",
-  },
-};
+const portfolioEn = normalizePortfolioContentJson(portfolioContentEn);
+const portfolioDe = normalizePortfolioContentJson(portfolioContentDe);
+const portfolioTr = normalizePortfolioContentJson(portfolioContentTr);
 
 const categoryEn: Record<GalleryCategory, string> = {
   "Interactive / VR": "Interactive / VR",
@@ -338,7 +213,7 @@ const en: TranslationMessages = {
       "For now, email is the quickest way to get in touch. Use Email Me above.",
   },
   portfolio: {
-    projects: portfolioContent,
+    projects: portfolioEn,
   },
 };
 
@@ -417,7 +292,7 @@ const de: TranslationMessages = {
       "Vorerst ist E-Mail der schnellste Weg. Nutzen Sie oben E-Mail schreiben.",
   },
   portfolio: {
-    projects: portfolioProjectsDe,
+    projects: portfolioDe,
   },
 };
 
@@ -496,7 +371,7 @@ const tr: TranslationMessages = {
       "Şimdilik en hızlı yol e-posta. Yukarıdaki E-posta gönder bağlantısını kullanın.",
   },
   portfolio: {
-    projects: portfolioProjectsTr,
+    projects: portfolioTr,
   },
 };
 

@@ -1,0 +1,52 @@
+{
+  "interactive-vr/Cozy Experience": {
+    "title": "Cozy Experience",
+    "description": "Konfor, ölçek ve varlık üzerine samimi bir etkileşim çalışması—keşfedilebilir küçük, sıcak bir alan olarak.",
+    "year": "2026"
+  },
+  "interactive-vr/VR Experience": {
+    "title": "VR Experience",
+    "description": "Mekânsal yerleşim, gerçek zamanlı medya ve sahne dizisinde yönlü odağı birleştiren sürükleyici VR çalışması.",
+    "year": "2026"
+  },
+  "motion/Jazz Fest Commercial": {
+    "title": "Jazz Fest Commercial",
+    "description": "Bir caz festivali için ticari motion parçası—ritim, tipografi ve müzik ile marka tonuna göre kurgu.",
+    "year": "2025"
+  },
+  "motion/Spotify Canvas Design": {
+    "title": "Spotify Canvas Design",
+    "description": "Veriyi koreografi gibi kullanan, markaya uygun motion; lansman ve festival ekranları için hero çalışma.",
+    "year": "2025"
+  },
+  "campaigns/JusteDebout": {
+    "title": "Juste Debout",
+    "description": "Juste Debout için kampanya ve motion çalışması—ritim, kadraj ve sahneye uygun, sosyal medyaya hazır görseller.",
+    "year": "2025"
+  },
+  "campaigns/Western Union": {
+    "title": "Western Union",
+    "description": "Western Union için ticari projelerde çalıştım; Adobe After Effects ile animasyonlu tanıtım materyalleri ürettim. İçerikler Yunanca, Gürcüce, Rusça ve İngilizce dahil birden çok dilde hazırlanarak çeşitli uluslararası kitlelere ulaşmayı hedefledi.",
+    "year": "2019"
+  },
+  "3d-archive/Emberfall-Environment": {
+    "title": "Gerçekçi Kısa Film",
+    "description": "Gerçekçi bir kısa film için büyük ölçekli, fantezi esintili kütüphane ortamının uçtan uca geliştirilmesi—tasarım, hikâye anlatımı ve gerçek zamanlı üretimin kesişiminde. Emberfall Krallığı’nda geçen sahne; ortam varlıkları, yerleşim, optimize UV iş akışları ve video kurgusu ile ses tasarımını içeren nihai fragman üzerinde çalışıldı. Dokulama, PBR materyaller ve prenses karakteri diğer sanatçılara aittir.",
+    "year": "2024"
+  },
+  "3d-archive/FB": {
+    "title": "Fashion Battle",
+    "description": "3D moda görselleri—rekabetçi bir moda bağlamında ortam, ışık ve sinematik sunum.",
+    "year": "2025"
+  },
+  "2d-archive/Illustrations": {
+    "title": "İllüstrasyonlar",
+    "description": "Seçilmiş illüstrasyon çalışmaları—dizi, kompozisyon, renk ve anlatı tonu; baskı ve dijital için.",
+    "year": "2025"
+  },
+  "2d-archive/Psychodelic Magazine": {
+    "title": "Psychedelic Magazine",
+    "description": "Editoryal ve dergi sayfaları—cesur bir baskı kimliği için yerleşim, tipografi ve görsel işleme.",
+    "year": "2025"
+  }
+}
