@@ -331,7 +331,7 @@ const ALL_CLOUD_LAYOUT_SCALE = 0.94;
 /** Son görsel boyutu (~%10 küçültme). */
 const GALLERY_COVER_GLOBAL_SCALE = 0.9;
 /**
- * Tek kategori + tam 2 veya 4 öğe: daha küçük kabuk (kameraya yakın), daha büyük yuvarlak kapaklar.
+ * Tek kategori + tam 2 öğe: daha küçük kabuk (kameraya yakın), daha büyük yuvarlak kapaklar.
  */
 const SPARSE_FILTERED_RING_SHELL_SCALE = 0.58;
 const SPARSE_FILTERED_RING_MIN = 1.55;
@@ -866,23 +866,36 @@ function ZoomFrameSync({
 
 const PLACEHOLDER_GRAY = new THREE.Color(0x5c5c66);
 
+/** Multiplies map RGB on gallery cover thumbnails (disc + box front). Slightly dimmer, less cool push than before. */
+const COVER_PHOTO_TINT = new THREE.Color(0.89, 0.89, 0.905);
+
+/**
+ * After map: pull RGB a hair toward mid-gray to soften contrast (0.93 = subtle).
+ * Same block is used on satellite discs (with feather) and filtered box front.
+ */
+const COVER_PHOTO_TONE_POST_MAP = `
+{
+	vec3 _mid = vec3(0.52, 0.52, 0.53);
+	diffuseColor.rgb = mix(_mid, diffuseColor.rgb, 0.93);
+}`;
+
 /** Soft disc edge: radial alpha in fragment shader (same UVs as the map). */
 const DISC_FEATHER_MAP_FRAGMENT_PATCH = `#include <map_fragment>
 #ifdef USE_MAP
 {
 	vec2 _hub = vMapUv - vec2(0.5);
 	float _rr = length(_hub) * 2.0;
-	diffuseColor.a *= 1.0 - smoothstep(0.48, 0.995, _rr);
+	diffuseColor.a *= 1.0 - smoothstep(0.75, 0.995, _rr);
 }
 #else
 #ifdef USE_UV
 {
 	vec2 _hub = vUv - vec2(0.5);
 	float _rr = length(_hub) * 2.0;
-	diffuseColor.a *= 1.0 - smoothstep(0.48, 0.995, _rr);
+	diffuseColor.a *= 1.0 - smoothstep(0.75, 0.995, _rr);
 }
 #endif
-#endif`;
+#endif${COVER_PHOTO_TONE_POST_MAP}`;
 
 function usePrefersReducedMotion(): boolean {
   const [reduced, setReduced] = useState(false);
@@ -908,7 +921,10 @@ interface GallerySceneProps {
   cardScaleMul: number;
   /** Initial orbit distance lerp (RingCameraSync + Canvas open frame). */
   orbitDefaultDistanceT: number;
-  /** “All” seçiliyken daha yatay + rastgele dağılım. */
+  /**
+   * Fibonacci kabuk + “All” jitter’ı: `activeFilter === "All"` veya filtrede 3+ öğe
+   * (tek/çift öğeli sparse hariç aynı matematik).
+   */
   allCategoryLayout: boolean;
   hoveredIndex: number | null;
   setHoveredIndex: (i: number | null) => void;
@@ -1009,13 +1025,13 @@ function GalleryCardMesh({
     const hasMap = Boolean(texture);
     const mat = new THREE.MeshBasicMaterial({
       map: texture ?? undefined,
-      color: hasMap ? new THREE.Color(0.96, 0.96, 0.98) : PLACEHOLDER_GRAY,
+      color: hasMap ? COVER_PHOTO_TINT.clone() : PLACEHOLDER_GRAY,
       transparent: true,
       opacity: 1,
       depthWrite: false,
       side: THREE.DoubleSide,
     });
-    mat.customProgramCacheKey = () => "galleryDiscFeather:v1";
+    mat.customProgramCacheKey = () => "galleryDiscFeather:v4";
     mat.onBeforeCompile = (shader) => {
       shader.fragmentShader = shader.fragmentShader.replace(
         "#include <map_fragment>",
@@ -1028,7 +1044,7 @@ function GalleryCardMesh({
   const boxMaterials = useMemo(() => {
     if (satelliteFloat) return null;
     const hasMap = Boolean(texture);
-    const frontTint = hasMap ? new THREE.Color(0.96, 0.96, 0.98) : PLACEHOLDER_GRAY;
+    const frontTint = hasMap ? COVER_PHOTO_TINT.clone() : PLACEHOLDER_GRAY;
 
     const edgeGray = new THREE.MeshStandardMaterial({
       color: new THREE.Color(0x9a9ca8),
@@ -1045,6 +1061,13 @@ function GalleryCardMesh({
       opacity: 1,
       depthWrite: true,
     });
+    front.customProgramCacheKey = () => "galleryCoverFront:v1";
+    front.onBeforeCompile = (shader) => {
+      shader.fragmentShader = shader.fragmentShader.replace(
+        "#include <map_fragment>",
+        `#include <map_fragment>${COVER_PHOTO_TONE_POST_MAP}`,
+      );
+    };
     const back = new THREE.MeshStandardMaterial({
       map: backMap ?? texture ?? undefined,
       color: hasMap ? new THREE.Color(0.78, 0.78, 0.82) : PLACEHOLDER_GRAY,
@@ -1933,11 +1956,12 @@ export function Gallery3D({
       .filter((i): i is number => i >= 0);
   }, [images, activeFilter]);
 
-  /** Tek kategori seçili + tam 2 veya 4 proje: daha büyük disk, daha yakın kamera. */
+  /**
+   * Sadece filtrede **tam 2** proje: daha sıkı kabuk + büyük kapak + yakın açılış.
+   * (4 öğe — örn. Motion — artık All ile aynı kabuk ölçeği ve fibonacci matematiği kullanır.)
+   */
   const isSparseFilteredCategory = useMemo(
-    () =>
-      activeFilter !== "All" &&
-      (visibleIndices.length === 2 || visibleIndices.length === 4),
+    () => activeFilter !== "All" && visibleIndices.length === 2,
     [activeFilter, visibleIndices.length],
   );
 
@@ -1945,14 +1969,14 @@ export function Gallery3D({
     const base = ringRadiusWorld(
       visibleIndices.length,
       ORBIT_MIN_RADIUS_ALL,
-      false,
+      activeFilter !== "All",
     );
     if (!isSparseFilteredCategory) return base;
     return Math.max(
       base * SPARSE_FILTERED_RING_SHELL_SCALE,
       SPARSE_FILTERED_RING_MIN,
     );
-  }, [visibleIndices.length, isSparseFilteredCategory]);
+  }, [visibleIndices.length, isSparseFilteredCategory, activeFilter]);
 
   const orbitFramingRadius = useMemo(
     () => ringRadius * ALL_CLOUD_FRAMING_RADIUS_MULT,
@@ -2051,6 +2075,12 @@ export function Gallery3D({
     };
   }, [detailModalOpen]);
 
+  /** All sekmesi veya 3+ öğeli filtre: All ile aynı fibonacci / derinlik ölçeği. */
+  const allFibonacciShellLayout = useMemo(
+    () => activeFilter === "All" || visibleIndices.length >= 3,
+    [activeFilter, visibleIndices.length],
+  );
+
   return (
     <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col">
       <div className="flex min-h-0 w-full flex-1 flex-col px-2 pb-0 pt-0 sm:px-4">
@@ -2103,7 +2133,7 @@ export function Gallery3D({
               orbitFramingRadius={orbitFramingRadius}
               cardScaleMul={galleryCardScaleMul}
               orbitDefaultDistanceT={orbitDefaultDistanceT}
-              allCategoryLayout={activeFilter === "All"}
+              allCategoryLayout={allFibonacciShellLayout}
               hoveredIndex={hoveredIndex}
               setHoveredIndex={setHoveredIndex}
               modalOpen={detailModalOpen}
