@@ -1,31 +1,19 @@
 import { useEffect } from "react";
 import { Outlet, useLocation } from "react-router";
-import {
-  WorksCategoryProvider,
-  useWorksCategory,
-} from "../context/WorksCategoryContext";
 import { LanguageProvider, useLanguage } from "../context/LanguageContext";
 import { LanguageSwitcher } from "./LanguageSwitcher";
-import { Navigation } from "./Navigation";
 import { FooterNav } from "./FooterNav";
 
 function LayoutShell() {
   const location = useLocation();
-  const { resetCategories } = useWorksCategory();
   const { messages } = useLanguage();
 
   useEffect(() => {
     document.title = messages.layout.documentTitle;
   }, [messages.layout.documentTitle]);
 
-  useEffect(() => {
-    if (location.pathname !== "/") resetCategories();
-  }, [location.pathname, resetCategories]);
-
   return (
-    <div className="flex h-dvh max-h-dvh min-h-0 overflow-hidden bg-transparent">
-      <Navigation />
-
+    <div className="flex h-dvh max-h-dvh min-h-0 overflow-hidden bg-background">
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <header className="flex shrink-0 items-baseline justify-end gap-5 px-7 pb-1 pt-5 sm:gap-6 sm:px-12 sm:pb-1.5 sm:pt-6 lg:px-14 lg:pt-7">
           <LanguageSwitcher />
@@ -55,9 +43,7 @@ function LayoutShell() {
 export function Layout() {
   return (
     <LanguageProvider>
-      <WorksCategoryProvider>
-        <LayoutShell />
-      </WorksCategoryProvider>
+      <LayoutShell />
     </LanguageProvider>
   );
 }

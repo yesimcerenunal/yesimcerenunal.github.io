@@ -19,7 +19,8 @@ import {
   useThree,
   type ThreeEvent,
 } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { OrbitControls as DreiOrbitControls } from "@react-three/drei";
+import type { OrbitControls as StdOrbitControls } from "three-stdlib";
 import { motion, AnimatePresence } from "motion/react";
 import { X } from "lucide-react";
 import * as THREE from "three";
@@ -40,7 +41,7 @@ import {
   primaryGalleryTextureUrl,
 } from "../utils/galleryMedia";
 
-/** Gallery hint: full visibility, then fade to soft after this (ms) on load / category change */
+/** Gallery hint: full visibility, then fade to soft after this (ms) on load */
 const EXPLORE_HINT_FLASH_MS = 2000;
 
 /** Detail modal: allow first-row video at top; others only when vertically centered in the scroller. */
@@ -122,9 +123,6 @@ export interface GalleryImage {
 
 interface Gallery3DProps {
   images: GalleryImage[];
-  /** "All" shows every card; otherwise must match `image.category` */
-  activeFilter?: "All" | string;
-  onHoverCategory?: (category: string | null) => void;
   onOpenImage?: (image: GalleryImage) => void;
   onCloseModal?: () => void;
 }
@@ -308,9 +306,9 @@ function useResilientTexture(imageUrl: string | undefined): THREE.Texture | null
 }
 
 /** Arc length (world units) between adjacent cards — lower = denser ring, more overlap */
-const ORBIT_CARD_SPACING = 1.12;
+const ORBIT_CARD_SPACING = 1.28;
 /** Minimum shell radius for the Fibonacci cloud (All + filtered categories). */
-const ORBIT_MIN_RADIUS_ALL = 3.55;
+const ORBIT_MIN_RADIUS_ALL = 5.05;
 /** When exactly two pieces are on the ring, enforce a wider radius so they do not overlap */
 const ORBIT_TWO_ITEM_MIN_RADIUS = 0.78;
 /**
@@ -327,26 +325,17 @@ const FILTERED_RING_SPACING_MULT_4PLUS = 1.52;
  * Cloud gallery: circular covers on a Fibonacci shell + drift.
  * Raised well above the original 0.46 so covers read clearly on screen.
  */
-const ALL_CLOUD_LAYOUT_SCALE = 0.94;
-/** Son görsel boyutu (~%10 küçültme). */
-const GALLERY_COVER_GLOBAL_SCALE = 0.9;
-/**
- * Tek kategori + tam 2 öğe: daha küçük kabuk (kameraya yakın), daha büyük yuvarlak kapaklar.
- */
-const SPARSE_FILTERED_RING_SHELL_SCALE = 0.58;
-const SPARSE_FILTERED_RING_MIN = 1.55;
-const SPARSE_FILTERED_EXTRA_CARD_SCALE = 1.2;
-const SPARSE_FILTERED_ORBIT_DEFAULT_T = 0.36;
+const ALL_CLOUD_LAYOUT_SCALE = 1.08;
+/** Global cover scale on the shell (1 = nominal). */
+const GALLERY_COVER_GLOBAL_SCALE = 1;
 /** Extra radius for orbit / FOV framing so the 3D shell doesn’t clip. */
 const ALL_CLOUD_FRAMING_RADIUS_MULT = 1.52;
-/** Organic motion — düşük amp + yavaş frekans; radyal bileşen ayrıca sönümlenir. */
-const ALL_CLOUD_DRIFT_AMP = 0.062;
-/** Uzun periyotlu yörünge süzülmesi. */
-const ALL_CLOUD_GLIDE_AMP = 0.052;
+/** Organic motion — keep very subtle so orbit around the hub reads as the main motion. */
+const ALL_CLOUD_DRIFT_AMP = 0.024;
+/** Long-period glide — low amp vs drift. */
+const ALL_CLOUD_GLIDE_AMP = 0.018;
 /** Radial drift’in ne kadarı kesilsin (0 = hepsi tangential, 1 = olduğu gibi). */
 const ALL_CLOUD_DRIFT_RADIAL_DAMP = 0.72;
-/** Subtle tilt wobble on the mesh (radians). */
-const ALL_CLOUD_WOBBLE_AMP = 0.038;
 /** “All” view: circular disc — segment count for smooth outline. */
 const ALL_CLOUD_CIRCLE_SEGMENTS = 72;
 /**
@@ -359,15 +348,15 @@ const ALL_CLOUD_DEPTH_SMOOTH_SPEED = 9.5;
 /**
  * Dikey eksene (xz) minimum uzaklık / yerel kabuk yarıçapı — ortada “görünmez gezegen” boşluğu.
  */
-const CLOUD_HUB_VOID_MIN_XZ_FRAC = 0.38;
+const CLOUD_HUB_VOID_MIN_XZ_FRAC = 0.44;
 /**
  * “All”: ortadaki görünmez çekirdeğe daha geniş boşluk (yörünge halkası daha dışta).
  */
-const CLOUD_HUB_VOID_MIN_XZ_FRAC_ALL = 0.52;
+const CLOUD_HUB_VOID_MIN_XZ_FRAC_ALL = 0.6;
 /**
  * “All”da öğeleri merkeze göre aynı oranda büyüt — birbirlerinden uzaklaşır; açılar / hash’ler aynı kalır.
  */
-const ALL_CATEGORY_PAIRWISE_SPREAD = 1.2;
+const ALL_CATEGORY_PAIRWISE_SPREAD = 1.42;
 
 /**
  * Front/back faces match hero artwork aspect: 1080×1080 (square).
@@ -453,14 +442,14 @@ function allCloudBasePosition(
   let thetaJitter = (h2 - 0.5) * 1.05;
   let yJitter = (h3 - 0.5) * 0.52;
   if (allCategoryLayout) {
-    radialJitter = 0.44 + h1 * 0.66;
+    radialJitter = 0.36 + h1 * 0.78;
     thetaJitter = (h2 - 0.5) * 1.75;
     yJitter = (h3 - 0.5) * 0.3;
   }
   /** Ek yarıçap katmanı (deterministik, slot başına sabit). */
   let shellRadiusMul = 0.8 + h4 * 0.36;
   if (allCategoryLayout) {
-    shellRadiusMul = 0.73 + h4 * 0.46;
+    shellRadiusMul = 0.76 + h4 * 0.58;
   }
   let t = theta + thetaJitter;
   if (allCategoryLayout) {
@@ -476,7 +465,7 @@ function allCloudBasePosition(
   let yW = yClamped * R;
   if (allCategoryLayout) {
     yW *= 0.78;
-    const spread = 0.34 * R;
+    const spread = 0.46 * R;
     const xz = (slotHash01(slot, 7) - 0.5) * spread;
     const xz2 = (slotHash01(slot, 8) - 0.5) * spread;
     const h9 = slotHash01(slot, 9);
@@ -521,8 +510,8 @@ function ringRadiusWorld(
 /** Used by camera framing math (must sit before carouselFramingExtents) */
 const HOVER_SCALE = 1.06;
 const HOVER_LIFT = 0.16;
-/** Uniform mesh scale — larger cards; hover/zoom multiply on top (textures unchanged) */
-const CARD_MESH_BASE_SCALE = 1.45;
+/** Uniform mesh scale — slightly smaller vs before so spread + black space read like the reference. */
+const CARD_MESH_BASE_SCALE = 1.52;
 /** Pull ring positions toward center for a tighter circle (after parallax) */
 const RING_RADIAL_COMPACT = 0.8;
 /**
@@ -544,8 +533,8 @@ const CAMERA_FOV = 60;
 const CAMERA_NEAR = 0.05;
 const CAMERA_FAR = 2000;
 
-/** Frustum slack vs scaled carousel bounds (slightly tighter → closer allowed min orbit) */
-const FRAMING_MARGIN = 0.88;
+/** Frustum slack vs scaled carousel bounds (>1 = extra padding so thumbnails stay in view). */
+const FRAMING_MARGIN = 1.06;
 
 /** Uniform scale for the carousel group (larger on screen without shrinking orbit min) */
 const GALLERY_GROUP_WORLD_SCALE = 1.22;
@@ -556,15 +545,15 @@ const ADAPTIVE_FOV_AT_MAX_DISTANCE = 57;
 const ADAPTIVE_FOV_ABSOLUTE_CAP = 72;
 /** Exponential smoothing for FOV follow (~0.08–0.12 effective step at 60fps) */
 const ADAPTIVE_FOV_SMOOTHING = 9.5;
-/** Closer than pure geometric min; floorFov in AdaptiveFovSync widens FOV if needed to avoid clipping */
-const ORBIT_MIN_DISTANCE_RELAX = 0.76;
+/** Keep close to geometric min so zoom-in cannot clip the cloud (Fibonacci + spread extends past ring math). */
+const ORBIT_MIN_DISTANCE_RELAX = 0.94;
 /** Max orbit distance as a multiple of min (wider zoom-out; min = closest zoom unchanged) */
 const ORBIT_MAX_DISTANCE_RATIO = 1.62;
 /**
  * Initial camera distance between min and max (0 = closest zoom, 1 = farthest).
  * Higher = calmer opening frame; scroll still reaches `min`.
  */
-const DEFAULT_ORBIT_DISTANCE_T = 0.58;
+const DEFAULT_ORBIT_DISTANCE_T = 0.72;
 
 /**
  * Orbit pivot + ring anchor (world Y). Lifts the layout so framing is balanced
@@ -587,7 +576,10 @@ function cameraElevationAngle(): number {
 /**
  * Worst-case carousel bounds (hover + zoom parallax on ring) for framing math.
  * Scaled by `GALLERY_GROUP_WORLD_SCALE` so orbit limits match the scaled group.
+ * `FRAMING_CLOUD_EXTENT_PAD`: Fibonacci shell + spread extend past nominal ring radius.
  */
+const FRAMING_CLOUD_EXTENT_PAD = 1.22;
+
 function carouselFramingExtents(ringRadius: number): {
   radialMax: number;
   verticalHalf: number;
@@ -598,10 +590,12 @@ function carouselFramingExtents(ringRadius: number): {
     ringRadius * (1 + ZOOM_RING_EXPAND) * RING_RADIAL_COMPACT;
   const radialMax =
     (rRing + (CARD_W * sMax) * 0.52 + ZOOM_DEPTH_PULL * 0.34) *
-    GALLERY_GROUP_WORLD_SCALE;
+    GALLERY_GROUP_WORLD_SCALE *
+    FRAMING_CLOUD_EXTENT_PAD;
   const verticalHalf =
     ((CARD_H * sMax) * 0.52 + HOVER_LIFT + ZOOM_PARALLAX_Y * 0.48) *
-    GALLERY_GROUP_WORLD_SCALE;
+    GALLERY_GROUP_WORLD_SCALE *
+    FRAMING_CLOUD_EXTENT_PAD;
   return { radialMax, verticalHalf };
 }
 
@@ -625,7 +619,7 @@ function minSafeOrbitDistance(
   return Math.max(
     dVert,
     dHorz,
-    ringRadius * GALLERY_GROUP_WORLD_SCALE * 0.28,
+    ringRadius * GALLERY_GROUP_WORLD_SCALE * 0.34 * FRAMING_CLOUD_EXTENT_PAD,
   );
 }
 
@@ -657,7 +651,7 @@ function orbitZoomLimits(
   /** Allow noticeably closer zoom; stay above a small ring-relative floor */
   const min = Math.max(
     geometricMin * ORBIT_MIN_DISTANCE_RELAX,
-    ringRadius * GALLERY_GROUP_WORLD_SCALE * 0.2,
+    ringRadius * GALLERY_GROUP_WORLD_SCALE * 0.26 * FRAMING_CLOUD_EXTENT_PAD,
   );
   const max = min * ORBIT_MAX_DISTANCE_RATIO;
   return { min, max };
@@ -784,13 +778,11 @@ function AdaptiveFovSync({
   return null;
 }
 
-const AUTO_ROTATE_SPEED = 0.45;
-/**
- * Slightly faster auto-rotate: (a) exactly two cards on the ring, or (b) a filtered category
- * with 3+ cards — same “satellites around a hub” energy as the two-card case.
- */
-const AUTO_ROTATE_SPEED_ORBITAL = 0.68;
 const HOVER_LERP = 10;
+
+/** Slow camera orbit — invisible hub; primary motion (paused on hover / modal). */
+const AUTO_ROTATE_SPEED = 0.32;
+const AUTO_ROTATE_SPEED_MANY = 0.48;
 
 /** Zoom-driven layout/parallax (smoothed in useFrame) */
 const ZOOM_LERP = 7;
@@ -831,18 +823,8 @@ function ZoomFrameSync({
 
 const PLACEHOLDER_GRAY = new THREE.Color(0x5c5c66);
 
-/** Multiplies map RGB on gallery cover thumbnails (disc + box front). Slightly dimmer, less cool push than before. */
-const COVER_PHOTO_TINT = new THREE.Color(0.89, 0.89, 0.905);
-
-/**
- * After map: pull RGB a hair toward mid-gray to soften contrast (0.93 = subtle).
- * Same block is used on satellite discs (with feather) and filtered box front.
- */
-const COVER_PHOTO_TONE_POST_MAP = `
-{
-	vec3 _mid = vec3(0.52, 0.52, 0.53);
-	diffuseColor.rgb = mix(_mid, diffuseColor.rgb, 0.93);
-}`;
+/** Neutral map multiply — standard brightness/contrast on hero thumbnails. */
+const COVER_PHOTO_NEUTRAL = new THREE.Color(1, 1, 1);
 
 /** Soft disc edge: radial alpha in fragment shader (same UVs as the map). */
 const DISC_FEATHER_MAP_FRAGMENT_PATCH = `#include <map_fragment>
@@ -860,7 +842,7 @@ const DISC_FEATHER_MAP_FRAGMENT_PATCH = `#include <map_fragment>
 	diffuseColor.a *= 1.0 - smoothstep(0.75, 0.995, _rr);
 }
 #endif
-#endif${COVER_PHOTO_TONE_POST_MAP}`;
+#endif`;
 
 function usePrefersReducedMotion(): boolean {
   const [reduced, setReduced] = useState(false);
@@ -886,15 +868,12 @@ interface GallerySceneProps {
   cardScaleMul: number;
   /** Initial orbit distance lerp (RingCameraSync + Canvas open frame). */
   orbitDefaultDistanceT: number;
-  /**
-   * Fibonacci kabuk + “All” jitter’ı: `activeFilter === "All"` veya filtrede 3+ öğe
-   * (tek/çift öğeli sparse hariç aynı matematik).
-   */
+  /** Fibonacci shell + drift (full gallery always uses this layout). */
   allCategoryLayout: boolean;
+  orbitControlsRef: MutableRefObject<StdOrbitControls | null>;
   hoveredIndex: number | null;
   setHoveredIndex: (i: number | null) => void;
   modalOpen: boolean;
-  onHoverCategory?: (category: string | null) => void;
   onPick: (image: GalleryImage) => void;
   onSoftGalleryHint: () => void;
 }
@@ -985,13 +964,13 @@ function GalleryCardMesh({
     const hasMap = Boolean(texture);
     const mat = new THREE.MeshBasicMaterial({
       map: texture ?? undefined,
-      color: hasMap ? COVER_PHOTO_TINT.clone() : PLACEHOLDER_GRAY,
+      color: hasMap ? COVER_PHOTO_NEUTRAL.clone() : PLACEHOLDER_GRAY,
       transparent: true,
       opacity: 1,
       depthWrite: false,
       side: THREE.DoubleSide,
     });
-    mat.customProgramCacheKey = () => "galleryDiscFeather:v4";
+    mat.customProgramCacheKey = () => "galleryDiscFeather:v5";
     mat.onBeforeCompile = (shader) => {
       shader.fragmentShader = shader.fragmentShader.replace(
         "#include <map_fragment>",
@@ -1004,7 +983,7 @@ function GalleryCardMesh({
   const boxMaterials = useMemo(() => {
     if (satelliteFloat) return null;
     const hasMap = Boolean(texture);
-    const frontTint = hasMap ? COVER_PHOTO_TINT.clone() : PLACEHOLDER_GRAY;
+    const frontTint = hasMap ? COVER_PHOTO_NEUTRAL.clone() : PLACEHOLDER_GRAY;
 
     const edgeGray = new THREE.MeshStandardMaterial({
       color: new THREE.Color(0x9a9ca8),
@@ -1021,13 +1000,6 @@ function GalleryCardMesh({
       opacity: 1,
       depthWrite: true,
     });
-    front.customProgramCacheKey = () => "galleryCoverFront:v1";
-    front.onBeforeCompile = (shader) => {
-      shader.fragmentShader = shader.fragmentShader.replace(
-        "#include <map_fragment>",
-        `#include <map_fragment>${COVER_PHOTO_TONE_POST_MAP}`,
-      );
-    };
     const back = new THREE.MeshStandardMaterial({
       map: backMap ?? texture ?? undefined,
       color: hasMap ? new THREE.Color(0.78, 0.78, 0.82) : PLACEHOLDER_GRAY,
@@ -1129,11 +1101,9 @@ function GalleryCardMesh({
     let dx: number;
     let dz: number;
     let yaw: number;
-    let wobbleX = 0;
-    let wobbleZ = 0;
 
     if (satelliteFloat) {
-      const shellR = radius * (1 + ZOOM_RING_EXPAND * zi) * 1.1;
+      const shellR = radius * (1 + ZOOM_RING_EXPAND * zi) * 1.2;
       const [cx, cy, cz] = allCloudBasePosition(slot, n, shellR, allCategoryLayout);
 
       _toCamera.subVectors(
@@ -1148,7 +1118,7 @@ function GalleryCardMesh({
       let basePx = cx + _toCamera.x * depth;
       let basePy = cy + _toCamera.y * depth * ZOOM_TO_CAM_Y_DAMP;
       let basePz = cz + _toCamera.z * depth;
-      const cloudCompact = 0.86;
+      const cloudCompact = 0.98;
       basePx *= cloudCompact;
       basePy *= cloudCompact;
       basePz *= cloudCompact;
@@ -1171,8 +1141,6 @@ function GalleryCardMesh({
           ALL_CLOUD_DRIFT_AMP * Math.sin(slow * 0.91 + phase * 0.88) +
           ALL_CLOUD_GLIDE_AMP * Math.cos(glide + phase * 1.12) +
           ALL_CLOUD_GLIDE_AMP * 0.38 * Math.sin(glide * 0.79 + phase * 0.66);
-        wobbleX = ALL_CLOUD_WOBBLE_AMP * Math.sin(floatT * 0.55 + phase * 2.1);
-        wobbleZ = ALL_CLOUD_WOBBLE_AMP * Math.sin(floatT * 0.48 + phase * 1.6);
       }
 
       /** Kabuk üzerinde: drift’in merkeze doğru bileşenini kes (içe/dışa zıplama + ani ölçek azalır). */
@@ -1225,7 +1193,8 @@ function GalleryCardMesh({
       }
 
       g.rotation.set(0, 0, 0);
-      mesh.rotation.set(wobbleX, yaw, wobbleZ);
+      /** Billboards toward camera — no local-axis spin (no pitch/roll wobble). */
+      mesh.rotation.set(0, yaw, 0);
     } else {
       const R = radius * (1 + ZOOM_RING_EXPAND * zi);
       const bx = Math.sin(angle) * R;
@@ -1508,18 +1477,18 @@ function GalleryScene({
   cardScaleMul,
   orbitDefaultDistanceT,
   allCategoryLayout,
+  orbitControlsRef,
   hoveredIndex,
   setHoveredIndex,
   modalOpen,
-  onHoverCategory,
   onPick,
   onSoftGalleryHint,
 }: GallerySceneProps) {
   const visibleCount = visibleIndices.length;
   const satelliteFloat = true;
-
   const autoRotateSpeed =
-    visibleCount >= 2 ? AUTO_ROTATE_SPEED_ORBITAL : AUTO_ROTATE_SPEED;
+    visibleCount >= 2 ? AUTO_ROTATE_SPEED_MANY : AUTO_ROTATE_SPEED;
+
   const { size } = useThree();
   const aspect = Math.max(size.width / Math.max(size.height, 1), 0.25);
   const { min: minZoomDistance, max: maxZoomDistance } = useMemo(
@@ -1540,14 +1509,15 @@ function GalleryScene({
       <directionalLight position={[4.5, 8, 6]} intensity={1.02} />
       <directionalLight position={[-3, 2, -2]} intensity={0.32} />
 
-      <OrbitControls
+      <DreiOrbitControls
+        ref={orbitControlsRef}
         makeDefault
         enabled={!modalOpen}
         enablePan={false}
         enableZoom={!modalOpen}
+        zoomSpeed={0.55}
         enableDamping
-        dampingFactor={0.065}
-        zoomSpeed={0.46}
+        dampingFactor={0.052}
         minDistance={minZoomDistance}
         maxDistance={maxZoomDistance}
         autoRotate={!modalOpen && hoveredIndex === null}
@@ -1597,11 +1567,9 @@ function GalleryScene({
               modalOpen={modalOpen}
               onHoverStart={() => {
                 setHoveredIndex(imageIndex);
-                onHoverCategory?.(image.category);
               }}
               onHoverEnd={() => {
                 setHoveredIndex(null);
-                onHoverCategory?.(null);
               }}
               onPick={() => onPick(image)}
               onSoftGalleryHint={onSoftGalleryHint}
@@ -1858,8 +1826,6 @@ ProjectImageScroll.displayName = "ProjectImageScroll";
 
 export function Gallery3D({
   images,
-  activeFilter = "All",
-  onHoverCategory,
   onOpenImage,
   onCloseModal,
 }: Gallery3DProps) {
@@ -1905,56 +1871,30 @@ export function Gallery3D({
     return () => {
       window.clearTimeout(id);
     };
-  }, [activeFilter]);
+  }, [images.length]);
 
-  const visibleIndices = useMemo(() => {
-    return images
-      .map((img, i) =>
-        activeFilter === "All" || img.category === activeFilter ? i : -1,
-      )
-      .filter((i): i is number => i >= 0);
-  }, [images, activeFilter]);
+  const orbitControlsRef = useRef<StdOrbitControls | null>(null);
 
-  /**
-   * Sadece filtrede **tam 2** proje: daha sıkı kabuk + büyük kapak + yakın açılış.
-   * (4 öğe — örn. Motion — artık All ile aynı kabuk ölçeği ve fibonacci matematiği kullanır.)
-   */
-  const isSparseFilteredCategory = useMemo(
-    () => activeFilter !== "All" && visibleIndices.length === 2,
-    [activeFilter, visibleIndices.length],
+  const visibleIndices = useMemo(
+    () => images.map((_, i) => i),
+    [images],
   );
 
   const ringRadius = useMemo(() => {
-    const base = ringRadiusWorld(
-      visibleIndices.length,
-      ORBIT_MIN_RADIUS_ALL,
-      activeFilter !== "All",
-    );
-    if (!isSparseFilteredCategory) return base;
-    return Math.max(
-      base * SPARSE_FILTERED_RING_SHELL_SCALE,
-      SPARSE_FILTERED_RING_MIN,
-    );
-  }, [visibleIndices.length, isSparseFilteredCategory, activeFilter]);
+    return ringRadiusWorld(visibleIndices.length, ORBIT_MIN_RADIUS_ALL, false);
+  }, [visibleIndices.length]);
 
   const orbitFramingRadius = useMemo(
     () => ringRadius * ALL_CLOUD_FRAMING_RADIUS_MULT,
     [ringRadius],
   );
 
-  const orbitDefaultDistanceT = useMemo(
-    () =>
-      isSparseFilteredCategory
-        ? SPARSE_FILTERED_ORBIT_DEFAULT_T
-        : DEFAULT_ORBIT_DISTANCE_T,
-    [isSparseFilteredCategory],
-  );
+  const orbitDefaultDistanceT = DEFAULT_ORBIT_DISTANCE_T;
 
-  const galleryCardScaleMul = useMemo(() => {
-    let m = ALL_CLOUD_LAYOUT_SCALE * GALLERY_COVER_GLOBAL_SCALE;
-    if (isSparseFilteredCategory) m *= SPARSE_FILTERED_EXTRA_CARD_SCALE;
-    return m;
-  }, [isSparseFilteredCategory]);
+  const galleryCardScaleMul = useMemo(
+    () => ALL_CLOUD_LAYOUT_SCALE * GALLERY_COVER_GLOBAL_SCALE,
+    [],
+  );
 
   const cameraWorldPos = useMemo((): [number, number, number] => {
     const aspect = defaultViewportAspect();
@@ -2034,18 +1974,19 @@ export function Gallery3D({
     };
   }, [detailModalOpen]);
 
-  /** All sekmesi veya 3+ öğeli filtre: All ile aynı fibonacci / derinlik ölçeği. */
-  const allFibonacciShellLayout = useMemo(
-    () => activeFilter === "All" || visibleIndices.length >= 3,
-    [activeFilter, visibleIndices.length],
-  );
+  /** Full gallery: Fibonacci cloud shell + drift. */
+  const allFibonacciShellLayout = true;
 
   return (
     <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col">
       <div className="flex min-h-0 w-full flex-1 flex-col px-2 pb-0 pt-0 sm:px-4">
         <div
-          className="relative min-h-[220px] w-full min-w-0 flex-1 basis-0 select-none sm:min-h-[240px]"
-          style={{ touchAction: "none" }}
+          className="relative min-h-[220px] w-full min-w-0 flex-1 basis-0 select-none bg-background sm:min-h-[240px]"
+          style={{
+            touchAction: "none",
+            backgroundImage: "var(--app-shell-gradient)",
+            backgroundAttachment: "fixed",
+          }}
           onWheelCapture={softenExploreHintFromInteraction}
           onPointerDownCapture={softenExploreHintFromInteraction}
         >
@@ -2054,6 +1995,7 @@ export function Gallery3D({
             gl={{
               antialias: true,
               alpha: true,
+              premultipliedAlpha: false,
               preserveDrawingBuffer: true,
               powerPreference: "high-performance",
             }}
@@ -2093,31 +2035,14 @@ export function Gallery3D({
               cardScaleMul={galleryCardScaleMul}
               orbitDefaultDistanceT={orbitDefaultDistanceT}
               allCategoryLayout={allFibonacciShellLayout}
+              orbitControlsRef={orbitControlsRef}
               hoveredIndex={hoveredIndex}
               setHoveredIndex={setHoveredIndex}
               modalOpen={detailModalOpen}
-              onHoverCategory={onHoverCategory}
               onPick={handlePick}
               onSoftGalleryHint={softenExploreHintFromInteraction}
             />
           </Canvas>
-
-          <div
-            className="pointer-events-none absolute inset-0 flex items-center justify-center"
-          aria-hidden
-        >
-          <div
-            className="rounded-full"
-            style={{
-                width: "min(42vw, 380px)",
-                height: "min(42vw, 380px)",
-              background:
-                  "radial-gradient(ellipse at center, rgba(130,150,255,0.14) 0%, rgba(55,65,120,0.08) 38%, transparent 72%)",
-                filter: "blur(48px)",
-                opacity: 0.75,
-            }}
-          />
-          </div>
         </div>
 
         <p
