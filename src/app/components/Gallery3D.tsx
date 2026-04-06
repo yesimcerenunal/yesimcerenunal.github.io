@@ -327,19 +327,22 @@ const ALL_CLOUD_LAYOUT_SCALE = 1.08;
 const GALLERY_COVER_GLOBAL_SCALE = 1;
 /** Extra radius for orbit / FOV framing so the 3D shell doesn’t clip. */
 const ALL_CLOUD_FRAMING_RADIUS_MULT = 1.52;
-/** Organic motion — keep very subtle so orbit around the hub reads as the main motion. */
-const ALL_CLOUD_DRIFT_AMP = 0.024;
+/** Organic motion on the shell (visible gentle bob vs “frozen” discs). */
+const ALL_CLOUD_DRIFT_AMP = 0.048;
 /** Long-period glide — low amp vs drift. */
-const ALL_CLOUD_GLIDE_AMP = 0.018;
+const ALL_CLOUD_GLIDE_AMP = 0.03;
 /** Radial drift’in ne kadarı kesilsin (0 = hepsi tangential, 1 = olduğu gibi). */
 const ALL_CLOUD_DRIFT_RADIAL_DAMP = 0.72;
 /** “All” view: circular disc — segment count for smooth outline. */
 const ALL_CLOUD_CIRCLE_SEGMENTS = 72;
 /**
- * Perspektif ölçeği: `refD / distCam` (ref = kamera→orbit hedefi). Yakın kapak büyük, uzak küçük.
+ * Perspektif ölçeği: `refD / distCam` (ref = kamera→orbit hedefi). Yakın büyük, uzak küçük;
+ * min = uzaktaki taban (önceki “en küçük” boyut), max = yakındaki üst sınır.
  */
 const ALL_CLOUD_PERSPECTIVE_CLAMP_MIN = 0.58;
-const ALL_CLOUD_PERSPECTIVE_CLAMP_MAX = 1.48;
+const ALL_CLOUD_PERSPECTIVE_CLAMP_MAX = 1.74;
+/** Slot başına deterministik boyut jitter’ı (oranın etrafında ±). */
+const PLANET_SLOT_SCALE_JITTER = 0.14;
 /** depthScale hedefini takip (orbit sürüklerken daha çevik). */
 const ALL_CLOUD_DEPTH_SMOOTH_SPEED = 9.5;
 /**
@@ -374,6 +377,49 @@ function slotHash01(slot: number, salt: number): number {
 }
 
 /**
+ * Seçili projeler: kırpma / hizalama için Y ve ölçek (grup uzayı; diğer gezegenlere dokunmaz).
+ * `ringRadius` ile ölçeklenir — sabit ~0.1 ofset, kabukta görünür değişim yapmıyordu.
+ * VR Experience: ekranda aşağı (Y−). Emberfall: yukarı (Y+) + hafif büyütme.
+ */
+function galleryProjectLayoutTweak(
+  projectKey: string,
+  depthScaleMul: number,
+  ringRadiusLocal: number,
+): { dy: number; scaleMul: number } {
+  const k = Math.max(ringRadiusLocal, 0.35);
+  const spread =
+    ALL_CLOUD_PERSPECTIVE_CLAMP_MAX - ALL_CLOUD_PERSPECTIVE_CLAMP_MIN;
+  const near01 = THREE.MathUtils.clamp(
+    (depthScaleMul - ALL_CLOUD_PERSPECTIVE_CLAMP_MIN) / Math.max(spread, 1e-6),
+    0,
+    1,
+  );
+
+  if (projectKey === "interactive-vr/VR Experience") {
+    /** Yakın perspektifte güçlü; uzakta hafif — üstten kırpmayı azaltır */
+    const t = 0.22 + 0.78 * near01;
+    return { dy: -k * 0.26 * t, scaleMul: 1 };
+  }
+  if (projectKey === "3d-archive/Emberfall-Environment") {
+    return { dy: k * 0.2, scaleMul: 1.09 };
+  }
+  return { dy: 0, scaleMul: 1 };
+}
+
+/**
+ * Kabukta merkeze doğru çekme (0–1): kopuk duran projeleri küme ile hizalar; diğer gezegenlere dokunmaz.
+ */
+function galleryProjectRadialPull(projectKey: string): number {
+  if (projectKey === "interactive-vr/VR Experience") {
+    return 0.13;
+  }
+  if (projectKey === "3d-archive/Emberfall-Environment") {
+    return 0.13;
+  }
+  return 0;
+}
+
+/**
  * Orta boşluğu koru: xz’de eksene çok yakın noktaları dışarı iter (hepsi aynı yerel R ölçeğine göre).
  */
 function pushCloudOntoHubRing(
@@ -395,6 +441,70 @@ function pushCloudOntoHubRing(
     return [x * s, yW, z * s];
   }
   return [x, yW, z];
+}
+
+type OrbitDeformState = { r: number; az: number; py: number };
+
+/**
+ * Kabuk yarıçapı (r), azimut (az) ve düşey düzlem (py) — önceki kare baz pozisyondan impuls.
+ */
+function integrateOrbitDeform(
+  dt: number,
+  api: OrbitDragPhysicsApi,
+  deltaZoom: number,
+  camera: THREE.Camera,
+  last: { x: number; y: number; z: number },
+  radius: number,
+  slot: number,
+  groupScale: number,
+  d: OrbitDeformState,
+  v: OrbitDeformState,
+): void {
+  const rh = Math.hypot(last.x, last.z);
+  if (rh > 1e-5) {
+    const om = api.omegaSmoothed;
+    if (api.isDragging && Math.abs(om) > 1e-7) {
+      v.az += om * DEFORM_AZ_COUPLE * dt;
+      v.r +=
+        om *
+        DEFORM_R_DRAG_COUPLE *
+        dt *
+        ((slotHash01(slot, 51) - 0.5) * 2);
+      v.py +=
+        om *
+        DEFORM_PY_COUPLE *
+        dt *
+        ((slotHash01(slot, 52) - 0.5) * 2);
+    }
+    if (!api.isDragging && Math.abs(api.orbitMomentum) > 0.02) {
+      v.az += api.orbitMomentum * DEFORM_MOM_AZ_COUPLE * dt;
+    }
+  }
+  if (!api.isDragging && Math.abs(deltaZoom) > 0.0008) {
+    v.r += deltaZoom * DEFORM_SCROLL_R_COUPLE;
+    v.py += deltaZoom * DEFORM_SCROLL_PY_COUPLE;
+    v.az +=
+      deltaZoom *
+      DEFORM_SCROLL_AZ_COUPLE *
+      ((slotHash01(slot, 61) - 0.5) * 2);
+  }
+
+  const ar = -DEFORM_SPRING_K * d.r - DEFORM_DAMP * v.r;
+  const aaz = -DEFORM_SPRING_K * d.az - DEFORM_DAMP * v.az;
+  const apy = -DEFORM_SPRING_K * d.py - DEFORM_DAMP * v.py;
+  v.r += ar * dt;
+  v.az += aaz * dt;
+  v.py += apy * dt;
+  d.r += v.r * dt;
+  d.az += v.az * dt;
+  d.py += v.py * dt;
+
+  d.r = THREE.MathUtils.clamp(d.r, -DEFORM_R_MAX, DEFORM_R_MAX);
+  d.az = THREE.MathUtils.clamp(d.az, -DEFORM_AZ_MAX, DEFORM_AZ_MAX);
+  d.py = THREE.MathUtils.clamp(d.py, -DEFORM_PY_MAX, DEFORM_PY_MAX);
+  if (Math.abs(d.r) >= DEFORM_R_MAX * 0.995) v.r *= 0.58;
+  if (Math.abs(d.az) >= DEFORM_AZ_MAX * 0.995) v.az *= 0.58;
+  if (Math.abs(d.py) >= DEFORM_PY_MAX * 0.995) v.py *= 0.58;
 }
 
 /**
@@ -531,19 +641,20 @@ const CAMERA_NEAR = 0.05;
 const CAMERA_FAR = 2000;
 
 /** Frustum slack vs scaled carousel bounds (>1 = extra padding so thumbnails stay in view). */
-const FRAMING_MARGIN = 1.06;
+const FRAMING_MARGIN = 1.035;
 
 /** Uniform scale for the carousel group (larger on screen without shrinking orbit min) */
 const GALLERY_GROUP_WORLD_SCALE = 1.22;
 
 /** Cinematic FOV at min vs max orbit distance (deg); clamped up by geometry */
-const ADAPTIVE_FOV_AT_MIN_DISTANCE = 50;
-const ADAPTIVE_FOV_AT_MAX_DISTANCE = 57;
-const ADAPTIVE_FOV_ABSOLUTE_CAP = 72;
+/** Yakın zoom’da biraz daha geniş taban — detay çerçevesi + floorFov ile uyum. */
+const ADAPTIVE_FOV_AT_MIN_DISTANCE = 54;
+const ADAPTIVE_FOV_AT_MAX_DISTANCE = 58;
+const ADAPTIVE_FOV_ABSOLUTE_CAP = 76;
 /** Exponential smoothing for FOV follow (~0.08–0.12 effective step at 60fps) */
 const ADAPTIVE_FOV_SMOOTHING = 9.5;
-/** Keep close to geometric min so zoom-in cannot clip the cloud (Fibonacci + spread extends past ring math). */
-const ORBIT_MIN_DISTANCE_RELAX = 0.94;
+/** Geometrik min’in altı — daha yakın zoom; clipping’e AdaptiveFov + floor karşılık gelir. */
+const ORBIT_MIN_DISTANCE_RELAX = 0.64;
 /** Max orbit distance as a multiple of min (wider zoom-out; min = closest zoom unchanged) */
 const ORBIT_MAX_DISTANCE_RATIO = 1.62;
 /**
@@ -616,7 +727,7 @@ function minSafeOrbitDistance(
   return Math.max(
     dVert,
     dHorz,
-    ringRadius * GALLERY_GROUP_WORLD_SCALE * 0.34 * FRAMING_CLOUD_EXTENT_PAD,
+    ringRadius * GALLERY_GROUP_WORLD_SCALE * 0.27 * FRAMING_CLOUD_EXTENT_PAD,
   );
 }
 
@@ -648,7 +759,7 @@ function orbitZoomLimits(
   /** Allow noticeably closer zoom; stay above a small ring-relative floor */
   const min = Math.max(
     geometricMin * ORBIT_MIN_DISTANCE_RELAX,
-    ringRadius * GALLERY_GROUP_WORLD_SCALE * 0.26 * FRAMING_CLOUD_EXTENT_PAD,
+    ringRadius * GALLERY_GROUP_WORLD_SCALE * 0.17 * FRAMING_CLOUD_EXTENT_PAD,
   );
   const max = min * ORBIT_MAX_DISTANCE_RATIO;
   return { min, max };
@@ -791,6 +902,10 @@ const _scratchA = new THREE.Vector3();
 const _scratchB = new THREE.Vector3();
 const _toCamera = new THREE.Vector3();
 const _frontNormal = new THREE.Vector3();
+const _shuffleHub = new THREE.Vector3();
+const _shuffleTangent = new THREE.Vector3();
+const _shuffleTan2 = new THREE.Vector3();
+const _shuffleTarget = new THREE.Vector3();
 
 type ZoomFxRef = React.MutableRefObject<{
   zoomIn: number;
@@ -798,6 +913,147 @@ type ZoomFxRef = React.MutableRefObject<{
 }>;
 
 const ZoomFxContext = createContext<ZoomFxRef | null>(null);
+
+/**
+ * Orbit drag — ortak momentum (emergent faz); gezegenler aynı alanı paylaşır, hash gürültüsü yok.
+ */
+type OrbitDragPhysicsApi = {
+  omegaSmoothed: number;
+  isDragging: boolean;
+  /** Kamera azimuth (rad) — itme yönü kabukla ilişkilendirilir. */
+  camAzimuth: number;
+  /** Sürüklemeyle biriken açısal momentum; idle’da sönümlenir, faz uyumunda kullanılır. */
+  orbitMomentum: number;
+};
+
+const OrbitDragPhysicsContext =
+  createContext<MutableRefObject<OrbitDragPhysicsApi> | null>(null);
+
+const ORBIT_DRAG_SPIN_COUPLE = 0.095;
+const ORBIT_DRAG_RADIAL_COUPLE = 0.038;
+const ORBIT_DRAG_CROSS_COUPLE = 0.03;
+const ORBIT_DRAG_Y_COUPLE = 0.026;
+const ORBIT_COHERENCE_AMP = 0.16;
+const ORBIT_MOMENTUM_INTEGRATE = 0.92;
+const ORBIT_MOMENTUM_DECAY = 3.1;
+const ORBIT_MOMENTUM_RESIDUAL = 0.014;
+const ORBIT_DRAG_OMEGA_SMOOTH_IN = 14;
+const ORBIT_DRAG_OMEGA_SMOOTH_OUT = 5;
+const ORBIT_SPRING_K = 3.05;
+const ORBIT_SPRING_C = 1.35;
+const ORBIT_OFFSET_MAX = 0.72;
+const REST_BIAS_MAX = 0.26;
+const REST_BIAS_DECAY = 0.009;
+const REST_FROM_VEL_SCALE = 0.32;
+/** Per-slot nudge on drag release (world-ish; scaled by ring radius in useFrame). */
+const DRAG_END_JITTER_MUL = 0.045;
+const IDLE_FLOAT_FREQ = 0.42;
+/** Vertical / horizontal idle bob — multiplied by `radius` in useFrame (reduced vs scripted “swim”). */
+const IDLE_FLOAT_Y_MUL = 0.026;
+const IDLE_FLOAT_Y2_MUL = 0.013;
+const IDLE_FLOAT_XZ_MUL = 0.011;
+/**
+ * Kabuk yörüngesi deformasyonu (r / az / py) — kütle–yay; input → hız → parametre, 0’a gevşer.
+ * Düşük yay + agresif impuls = uzun süre okunur “yörünge değişti” hissi (abartılı olabilir).
+ */
+const DEFORM_SPRING_K = 1.45;
+const DEFORM_DAMP = 3.85;
+const DEFORM_AZ_COUPLE = 2.75;
+const DEFORM_R_DRAG_COUPLE = 0.38;
+const DEFORM_PY_COUPLE = 1.25;
+const DEFORM_MOM_AZ_COUPLE = 0.48;
+const DEFORM_MOM_R_COUPLE = 0.11;
+const DEFORM_MOM_PY_COUPLE = 0.09;
+const DEFORM_SCROLL_R_COUPLE = 4.6;
+const DEFORM_SCROLL_PY_COUPLE = 2.15;
+const DEFORM_SCROLL_AZ_COUPLE = 1.25;
+const DEFORM_R_MAX = 0.52;
+const DEFORM_AZ_MAX = 1.95;
+const DEFORM_PY_MAX = 1.45;
+/** `cy` kayması: py × radius × bu katsayı */
+const DEFORM_PY_RADIUS_MUL = 1.28;
+
+function OrbitDragPhysicsSync({
+  orbitControlsRef,
+  apiRef,
+}: {
+  orbitControlsRef: MutableRefObject<StdOrbitControls | null>;
+  apiRef: MutableRefObject<OrbitDragPhysicsApi>;
+}) {
+  const { camera } = useThree();
+  const lastAzimuthRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    let cleanup: (() => void) | undefined;
+    let attempts = 0;
+    const id = window.setInterval(() => {
+      attempts += 1;
+      const c = orbitControlsRef.current;
+      if (!c) {
+        if (attempts > 240) window.clearInterval(id);
+        return;
+      }
+      window.clearInterval(id);
+      const onStart = () => {
+        apiRef.current.isDragging = true;
+      };
+      const onEnd = () => {
+        apiRef.current.isDragging = false;
+      };
+      c.addEventListener("start", onStart);
+      c.addEventListener("end", onEnd);
+      cleanup = () => {
+        c.removeEventListener("start", onStart);
+        c.removeEventListener("end", onEnd);
+      };
+    }, 24);
+    return () => {
+      window.clearInterval(id);
+      cleanup?.();
+    };
+  }, [orbitControlsRef, apiRef]);
+
+  useFrame((_, delta) => {
+    const d = Math.min(delta, 0.055);
+    const az = Math.atan2(camera.position.x, camera.position.z);
+    if (lastAzimuthRef.current === null) {
+      lastAzimuthRef.current = az;
+      return;
+    }
+    let dAz = az - lastAzimuthRef.current;
+    dAz = Math.atan2(Math.sin(dAz), Math.cos(dAz));
+    lastAzimuthRef.current = az;
+    const omegaRaw = dAz / Math.max(d, 1e-6);
+    const omegaClamped = THREE.MathUtils.clamp(omegaRaw, -20, 20);
+    const targetOmega = apiRef.current.isDragging ? omegaClamped : 0;
+    apiRef.current.omegaSmoothed = THREE.MathUtils.lerp(
+      apiRef.current.omegaSmoothed,
+      targetOmega,
+      Math.min(
+        1,
+        d *
+          (apiRef.current.isDragging
+            ? ORBIT_DRAG_OMEGA_SMOOTH_IN
+            : ORBIT_DRAG_OMEGA_SMOOTH_OUT),
+      ),
+    );
+
+    apiRef.current.camAzimuth = az;
+    const om = apiRef.current.omegaSmoothed;
+    if (apiRef.current.isDragging && Math.abs(om) > 1e-7) {
+      apiRef.current.orbitMomentum += om * d * ORBIT_MOMENTUM_INTEGRATE;
+    } else {
+      apiRef.current.orbitMomentum *= Math.exp(-d * ORBIT_MOMENTUM_DECAY);
+    }
+    apiRef.current.orbitMomentum = THREE.MathUtils.clamp(
+      apiRef.current.orbitMomentum,
+      -9,
+      9,
+    );
+  });
+
+  return null;
+}
 
 function ZoomFrameSync({
   minDistance,
@@ -908,17 +1164,35 @@ function GalleryCardMesh({
   onSoftGalleryHint: () => void;
 }) {
   const zoomFxRef = useContext(ZoomFxContext);
+  const orbitPhysicsApiRef = useContext(OrbitDragPhysicsContext);
   const prefersReducedMotion = usePrefersReducedMotion();
   const groupRef = useRef<THREE.Group>(null);
   const meshRef = useRef<THREE.Mesh>(null);
+  /** Orbit drag: yay + gecikme — hedef konuma göre offset (grup uzayında). */
+  const orbitOffRef = useRef(new THREE.Vector3());
+  const orbitVelRef = useRef(new THREE.Vector3());
+  /** Yayın denge noktası (0 değil); bırakınca güncellenir → simetrik dönüş yok. */
+  const restBiasRef = useRef(new THREE.Vector3());
+  const prevDragRef = useRef(false);
   const pointerDown = useRef<{ x: number; y: number } | null>(null);
   const smoothZoomRef = useRef(0);
+  /** Previous smoothed zoom (0–1) — zoom wheel gives a small impulse to satellites. */
+  const prevZoomZiRef = useRef<number | null>(null);
+  /**
+   * Layout-only zoom: lags behind `zi` while orbit-dragging so shell radius / parallax
+   * don’t chase tiny camera-distance jitter (was a visible snap-back).
+   */
+  const smoothLayoutZoomRef = useRef(0);
   const smoothOpacityRef = useRef(1);
   const smoothMeshScaleRef = useRef(CARD_MESH_BASE_SCALE);
   /** Smoothed distance-based scale in “All” (near = larger, far = smaller). */
   const smoothDepthScaleRef = useRef(1);
   /** Hover lift only — kept separate so “All” satellite float does not fight the hover lerp. */
   const smoothHoverYRef = useRef(0);
+  /** Kabuk: r (yarıçap), az (yaw), py (düzlem) — önceki kare bazına impuls. */
+  const orbitDeformRef = useRef<OrbitDeformState>({ r: 0, az: 0, py: 0 });
+  const orbitDeformVelRef = useRef<OrbitDeformState>({ r: 0, az: 0, py: 0 });
+  const lastBaseLocalRef = useRef({ x: 0, y: 0, z: 0 });
 
   const finalImageUrl = primaryGalleryImageUrl(image);
   const texture = useResilientTexture(finalImageUrl);
@@ -939,6 +1213,17 @@ function GalleryCardMesh({
       if (backMap) backMap.dispose();
     };
   }, [backMap]);
+
+  useEffect(() => {
+    if (!modalOpen) return;
+    orbitOffRef.current.set(0, 0, 0);
+    orbitVelRef.current.set(0, 0, 0);
+    restBiasRef.current.set(0, 0, 0);
+    prevDragRef.current = false;
+    orbitDeformRef.current = { r: 0, az: 0, py: 0 };
+    orbitDeformVelRef.current = { r: 0, az: 0, py: 0 };
+    lastBaseLocalRef.current = { x: 0, y: 0, z: 0 };
+  }, [modalOpen]);
 
   const geometry = useMemo(() => {
     if (satelliteFloat) {
@@ -1073,9 +1358,22 @@ function GalleryCardMesh({
       zk,
     );
     const zi = smoothZoomRef.current;
+    const prevZi = prevZoomZiRef.current;
+    const deltaZoom =
+      prevZi === null ? 0 : THREE.MathUtils.clamp(zi - prevZi, -0.22, 0.22);
+    prevZoomZiRef.current = zi;
+
+    const api = orbitPhysicsApiRef?.current ?? null;
+    const layoutZoomLerp = api?.isDragging === true ? 1.75 : 11;
+    smoothLayoutZoomRef.current = THREE.MathUtils.lerp(
+      smoothLayoutZoomRef.current,
+      zi,
+      Math.min(1, delta * layoutZoomLerp),
+    );
+    const ziLayout = smoothLayoutZoomRef.current;
 
     const t = Math.min(1, delta * HOVER_LERP);
-    const zoomScale = 1 + ZOOM_SCALE_BOOST * zi;
+    const zoomScale = 1 + ZOOM_SCALE_BOOST * ziLayout;
     const targetS =
       CARD_MESH_BASE_SCALE *
       cardScaleMul *
@@ -1090,7 +1388,7 @@ function GalleryCardMesh({
     const yHover = THREE.MathUtils.lerp(smoothHoverYRef.current, targetY, t);
     smoothHoverYRef.current = yHover;
 
-    const depth = ZOOM_DEPTH_PULL * zi;
+    const depth = ZOOM_DEPTH_PULL * ziLayout;
 
     let px: number;
     let pz: number;
@@ -1100,8 +1398,47 @@ function GalleryCardMesh({
     let yaw: number;
 
     if (satelliteFloat) {
-      const shellR = radius * (1 + ZOOM_RING_EXPAND * zi) * 1.2;
-      const [cx, cy, cz] = allCloudBasePosition(slot, n, shellR, allCategoryLayout);
+      const allowDeformIntegrate =
+        !prefersReducedMotion && !modalOpen && api !== null;
+      if (allowDeformIntegrate) {
+        integrateOrbitDeform(
+          Math.min(delta, 0.055),
+          api!,
+          deltaZoom,
+          camera,
+          lastBaseLocalRef.current,
+          radius,
+          slot,
+          GALLERY_GROUP_WORLD_SCALE,
+          orbitDeformRef.current,
+          orbitDeformVelRef.current,
+        );
+      }
+      const d = orbitDeformRef.current;
+      const shellR =
+        radius *
+        (1 + ZOOM_RING_EXPAND * ziLayout) *
+        1.2 *
+        (1 + THREE.MathUtils.clamp(d.r, -DEFORM_R_MAX, DEFORM_R_MAX));
+      const [cx0, cy0, cz0] = allCloudBasePosition(
+        slot,
+        n,
+        shellR,
+        allCategoryLayout,
+      );
+      const az = THREE.MathUtils.clamp(d.az, -DEFORM_AZ_MAX, DEFORM_AZ_MAX);
+      const ca = Math.cos(az);
+      const sa = Math.sin(az);
+      let cx = cx0 * ca - cz0 * sa;
+      let cz = cx0 * sa + cz0 * ca;
+      let cy = cy0 + d.py * radius * DEFORM_PY_RADIUS_MUL;
+      const radialPull = galleryProjectRadialPull(image.projectKey);
+      if (radialPull > 0) {
+        const f = 1 - radialPull;
+        cx *= f;
+        cy *= f;
+        cz *= f;
+      }
 
       _toCamera.subVectors(
         camera.position,
@@ -1174,6 +1511,10 @@ function GalleryCardMesh({
       pz = basePz + inwardZ * inwardPull + driftZ;
       localY = py + yHover;
 
+      lastBaseLocalRef.current.x = px;
+      lastBaseLocalRef.current.y = localY;
+      lastBaseLocalRef.current.z = pz;
+
       dx = -basePx;
       dz = -basePz;
 
@@ -1193,7 +1534,7 @@ function GalleryCardMesh({
       /** Billboards toward camera — no local-axis spin (no pitch/roll wobble). */
       mesh.rotation.set(0, yaw, 0);
     } else {
-      const R = radius * (1 + ZOOM_RING_EXPAND * zi);
+      const R = radius * (1 + ZOOM_RING_EXPAND * ziLayout);
       const bx = Math.sin(angle) * R;
       const bz = Math.cos(angle) * R;
 
@@ -1240,29 +1581,173 @@ function GalleryCardMesh({
       mesh.rotation.set(0, yaw, 0);
     }
 
-    g.position.set(px, localY, pz);
+    const allowMotion =
+      satelliteFloat && !prefersReducedMotion && !modalOpen;
+
+    let fx = px;
+    let fy = localY;
+    let fz = pz;
+    if (allowMotion && api) {
+      const dt = Math.min(delta, 0.055);
+      const off = orbitOffRef.current;
+      const vel = orbitVelRef.current;
+      const rest = restBiasRef.current;
+      const omega = api.omegaSmoothed;
+      const mom = api.orbitMomentum;
+      const camAz = api.camAzimuth;
+
+      const rh = Math.hypot(px, pz);
+      const theta = rh > 1e-6 ? Math.atan2(px, pz) : 0;
+      const coherence =
+        1 + ORBIT_COHERENCE_AMP * Math.cos(2 * theta + mom * 2.45);
+      const camPhase = camAz - theta;
+      const radialMod = 0.72 + 0.28 * Math.cos(2 * camPhase + mom * 0.8);
+
+      const mass = 0.86 + 0.13 * Math.sin(4 * theta + mom * 1.05);
+      const kSpring =
+        ORBIT_SPRING_K * (0.9 + 0.1 * Math.cos(3 * theta + mom * 0.9));
+      const cDamp =
+        ORBIT_SPRING_C * (0.88 + 0.12 * Math.sin(2 * theta + camAz * 0.5));
+      const invM = 1 / mass;
+
+      const wasDrag = prevDragRef.current;
+      prevDragRef.current = api.isDragging;
+      if (wasDrag && !api.isDragging) {
+        const j = radius * DRAG_END_JITTER_MUL;
+        rest.x = THREE.MathUtils.clamp(
+          vel.x * REST_FROM_VEL_SCALE +
+            (slotHash01(slot, 201) - 0.5) * 2 * j,
+          -REST_BIAS_MAX,
+          REST_BIAS_MAX,
+        );
+        rest.y = THREE.MathUtils.clamp(
+          vel.y * REST_FROM_VEL_SCALE * 0.65 +
+            (slotHash01(slot, 202) - 0.5) * 2 * j * 0.75,
+          -REST_BIAS_MAX * 0.55,
+          REST_BIAS_MAX * 0.55,
+        );
+        rest.z = THREE.MathUtils.clamp(
+          vel.z * REST_FROM_VEL_SCALE +
+            (slotHash01(slot, 203) - 0.5) * 2 * j,
+          -REST_BIAS_MAX,
+          REST_BIAS_MAX,
+        );
+      }
+
+      if (!api.isDragging) {
+        const decay = Math.min(1, REST_BIAS_DECAY * dt);
+        rest.lerp(_scratchA.set(0, 0, 0), decay);
+      }
+
+      if (rh > 1e-5) {
+        const tx = -pz / rh;
+        const tz = px / rh;
+        const rx = px / rh;
+        const rz = pz / rh;
+        const orthX = -tz;
+        const orthZ = tx;
+
+        const drive = omega * dt * invM;
+        if (api.isDragging && Math.abs(omega) > 1e-6) {
+          vel.x +=
+            tx * drive * ORBIT_DRAG_SPIN_COUPLE * coherence +
+            rx * drive * ORBIT_DRAG_RADIAL_COUPLE * coherence * radialMod +
+            orthX * drive * ORBIT_DRAG_CROSS_COUPLE * coherence;
+          vel.z +=
+            tz * drive * ORBIT_DRAG_SPIN_COUPLE * coherence +
+            rz * drive * ORBIT_DRAG_RADIAL_COUPLE * coherence * radialMod +
+            orthZ * drive * ORBIT_DRAG_CROSS_COUPLE * coherence;
+          vel.y +=
+            omega *
+            rh *
+            ORBIT_DRAG_Y_COUPLE *
+            Math.sin(theta + camAz) *
+            dt *
+            invM;
+        } else if (!api.isDragging && Math.abs(mom) > 0.012) {
+          const residual = mom * ORBIT_MOMENTUM_RESIDUAL * dt * invM;
+          vel.x += tx * residual * coherence;
+          vel.z += tz * residual * coherence;
+        }
+      }
+
+      const ax = (-kSpring * (off.x - rest.x) - cDamp * vel.x) / mass;
+      const ay = (-kSpring * (off.y - rest.y) - cDamp * vel.y) / mass;
+      const az = (-kSpring * (off.z - rest.z) - cDamp * vel.z) / mass;
+      vel.x += ax * dt;
+      vel.y += ay * dt;
+      vel.z += az * dt;
+      off.x += vel.x * dt;
+      off.y += vel.y * dt;
+      off.z += vel.z * dt;
+      const oLen = off.length();
+      if (oLen > ORBIT_OFFSET_MAX) {
+        off.multiplyScalar(ORBIT_OFFSET_MAX / oLen);
+      }
+
+      fx = px + off.x;
+      fy = localY + off.y;
+      fz = pz + off.z;
+    }
+
+    if (allowMotion) {
+      const rh0 = Math.hypot(px, pz);
+      const theta0 = rh0 > 1e-6 ? Math.atan2(px, pz) : 0;
+      const mom0 = api?.orbitMomentum ?? 0;
+      const camAz0 = api?.camAzimuth ?? 0;
+      const idlePhase = theta0 * 2 + mom0 * 1.85 + camAz0 * 0.35;
+      const ft = floatT;
+      const ampBase = Math.max(radius, 1.2);
+      const iy =
+        ampBase * IDLE_FLOAT_Y_MUL *
+          Math.sin(ft * IDLE_FLOAT_FREQ + idlePhase) +
+        ampBase *
+          IDLE_FLOAT_Y2_MUL *
+          Math.sin(ft * IDLE_FLOAT_FREQ * 1.29 + idlePhase * 1.07);
+      const ampXZ = ampBase * IDLE_FLOAT_XZ_MUL;
+      const ix =
+        ampXZ * Math.sin(ft * IDLE_FLOAT_FREQ * 0.81 + idlePhase * 1.25);
+      const iz =
+        ampXZ * Math.cos(ft * IDLE_FLOAT_FREQ * 0.74 + idlePhase * 1.18);
+      fx += ix;
+      fy += iy;
+      fz += iz;
+    }
 
     let depthScaleMul = 1;
+    let layoutScaleMul = 1;
     if (satelliteFloat) {
       const S = GALLERY_GROUP_WORLD_SCALE;
       _scratchB.set(
-        px * S,
-        ORBIT_TARGET_Y + localY * S,
-        pz * S,
+        fx * S,
+        ORBIT_TARGET_Y + fy * S,
+        fz * S,
       );
       const distCam = camera.position.distanceTo(_scratchB);
       const refD = camera.position.distanceTo(_orbitTarget);
+      const ratio = refD / Math.max(distCam, 0.01);
+      const slotJitter =
+        1 + (slotHash01(slot, 81) - 0.5) * 2 * PLANET_SLOT_SCALE_JITTER;
       const perspectiveTarget = THREE.MathUtils.clamp(
-        refD / Math.max(distCam, 0.01),
+        ratio * slotJitter,
         ALL_CLOUD_PERSPECTIVE_CLAMP_MIN,
         ALL_CLOUD_PERSPECTIVE_CLAMP_MAX,
       );
+      const depthSmooth =
+        api?.isDragging === true ? 4.8 : ALL_CLOUD_DEPTH_SMOOTH_SPEED;
       smoothDepthScaleRef.current = THREE.MathUtils.lerp(
         smoothDepthScaleRef.current,
         perspectiveTarget,
-        Math.min(1, delta * ALL_CLOUD_DEPTH_SMOOTH_SPEED),
+        Math.min(1, delta * depthSmooth),
       );
       depthScaleMul = smoothDepthScaleRef.current;
+      const tw = galleryProjectLayoutTweak(
+        image.projectKey,
+        depthScaleMul,
+        radius,
+      );
+      fy += tw.dy;
+      layoutScaleMul = tw.scaleMul;
     } else {
       smoothDepthScaleRef.current = THREE.MathUtils.lerp(
         smoothDepthScaleRef.current,
@@ -1271,7 +1756,10 @@ function GalleryCardMesh({
       );
       depthScaleMul = smoothDepthScaleRef.current;
     }
-    mesh.scale.setScalar(s * depthScaleMul);
+
+    g.position.set(fx, fy, fz);
+
+    mesh.scale.setScalar(s * depthScaleMul * layoutScaleMul);
 
     _frontNormal.set(0, 0, 1).applyAxisAngle(
       THREE.Object3D.DEFAULT_UP,
@@ -1279,7 +1767,7 @@ function GalleryCardMesh({
     );
     _toCamera.subVectors(
       camera.position,
-      _scratchA.set(px, ORBIT_TARGET_Y + localY, pz),
+      _scratchA.set(fx, ORBIT_TARGET_Y + fy, fz),
     );
     const dCam = _toCamera.length();
     if (dCam > 1e-6) _toCamera.multiplyScalar(1 / dCam);
@@ -1493,9 +1981,25 @@ function GalleryScene({
     [orbitFramingRadius, aspect],
   );
   const zoomFxRef = useRef({ zoomIn: 0, camAzimuth: 0 });
+  const orbitPhysicsApiRef = useRef<OrbitDragPhysicsApi>({
+    omegaSmoothed: 0,
+    isDragging: false,
+    camAzimuth: 0,
+    orbitMomentum: 0,
+  });
+
+  useEffect(() => {
+    if (!modalOpen) return;
+    orbitPhysicsApiRef.current.orbitMomentum = 0;
+  }, [modalOpen]);
 
   return (
     <ZoomFxContext.Provider value={zoomFxRef}>
+      <OrbitDragPhysicsContext.Provider value={orbitPhysicsApiRef}>
+        <OrbitDragPhysicsSync
+          orbitControlsRef={orbitControlsRef}
+          apiRef={orbitPhysicsApiRef}
+        />
       <ZoomFrameSync
         minDistance={minZoomDistance}
         maxDistance={maxZoomDistance}
@@ -1512,7 +2016,7 @@ function GalleryScene({
         enabled={!modalOpen}
         enablePan={false}
         enableZoom={!modalOpen}
-        zoomSpeed={0.55}
+        zoomSpeed={0.72}
         enableDamping
         dampingFactor={0.052}
         minDistance={minZoomDistance}
@@ -1574,6 +2078,7 @@ function GalleryScene({
           );
         })}
       </group>
+      </OrbitDragPhysicsContext.Provider>
     </ZoomFxContext.Provider>
   );
 }
