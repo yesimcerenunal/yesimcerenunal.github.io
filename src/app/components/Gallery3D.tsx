@@ -350,13 +350,12 @@ const ALL_CLOUD_WOBBLE_AMP = 0.038;
 /** “All” view: circular disc — segment count for smooth outline. */
 const ALL_CLOUD_CIRCLE_SEGMENTS = 72;
 /**
- * Distance-based scale — dar aralık; drift + kamera ile ani küçülmeyi azaltır.
+ * Perspektif ölçeği: `refD / distCam` (ref = kamera→orbit hedefi). Yakın kapak büyük, uzak küçük.
  */
-const ALL_CLOUD_DEPTH_NEAR_SCALE = 1.22;
-const ALL_CLOUD_DEPTH_MID_SCALE = 1.0;
-const ALL_CLOUD_DEPTH_FAR_SCALE = 0.94;
-/** depthScale hedefini takip hızı (düşük = daha yumuşak). */
-const ALL_CLOUD_DEPTH_SMOOTH_SPEED = 5.2;
+const ALL_CLOUD_PERSPECTIVE_CLAMP_MIN = 0.58;
+const ALL_CLOUD_PERSPECTIVE_CLAMP_MAX = 1.48;
+/** depthScale hedefini takip (orbit sürüklerken daha çevik). */
+const ALL_CLOUD_DEPTH_SMOOTH_SPEED = 9.5;
 /**
  * Dikey eksene (xz) minimum uzaklık / yerel kabuk yarıçapı — ortada “görünmez gezegen” boşluğu.
  */
@@ -493,40 +492,6 @@ function allCloudBasePosition(
     ? CLOUD_HUB_VOID_MIN_XZ_FRAC_ALL
     : CLOUD_HUB_VOID_MIN_XZ_FRAC;
   return pushCloudOntoHubRing(slot, x, yW, z, R, hubFrac);
-}
-
-/**
- * Camera–card distance → scale. Smaller `dist` = closer to camera = “front” (1.5).
- * Breakpoints are fractions of [orbitMin, orbitMax] so the shell keeps a front/mid/back read while zooming.
- */
-function allCloudDistanceScale(
-  dist: number,
-  orbitMin: number,
-  orbitMax: number,
-): number {
-  const span = Math.max(orbitMax - orbitMin, 1e-5);
-  /** Daha geniş bantlar: küçük mesafe oynamalarında ölçek zıplaması azalır. */
-  const d0 = orbitMin + span * 0.2;
-  const d1 = orbitMin + span * 0.52;
-  const d2 = orbitMin + span * 0.82;
-  if (dist <= d0) return ALL_CLOUD_DEPTH_NEAR_SCALE;
-  if (dist >= d2) return ALL_CLOUD_DEPTH_FAR_SCALE;
-  if (dist <= d1) {
-    const t = THREE.MathUtils.clamp((dist - d0) / Math.max(d1 - d0, 1e-5), 0, 1);
-    const st = t * t * (3 - 2 * t);
-    return THREE.MathUtils.lerp(
-      ALL_CLOUD_DEPTH_NEAR_SCALE,
-      ALL_CLOUD_DEPTH_MID_SCALE,
-      st,
-    );
-  }
-  const t = THREE.MathUtils.clamp((dist - d1) / Math.max(d2 - d1, 1e-5), 0, 1);
-  const st = t * t * (3 - 2 * t);
-  return THREE.MathUtils.lerp(
-    ALL_CLOUD_DEPTH_MID_SCALE,
-    ALL_CLOUD_DEPTH_FAR_SCALE,
-    st,
-  );
 }
 
 /** Circumference = n × spacing → radius = n×spacing / (2π); never below minRadius */
@@ -941,8 +906,6 @@ function GalleryCardMesh({
   radius,
   cardScaleMul,
   satelliteFloat,
-  orbitMinDistance,
-  orbitMaxDistance,
   allCategoryLayout,
   hovered,
   modalOpen,
@@ -961,9 +924,6 @@ function GalleryCardMesh({
   satelliteFloat: boolean;
   /** “All” kategorisi: yatay / rastgele dağılım. */
   allCategoryLayout: boolean;
-  /** Orbit zoom limits (world units) — depth scale bands for “All” cloud. */
-  orbitMinDistance: number;
-  orbitMaxDistance: number;
   hovered: boolean;
   modalOpen: boolean;
   onHoverStart: () => void;
@@ -1325,14 +1285,15 @@ function GalleryCardMesh({
         pz * S,
       );
       const distCam = camera.position.distanceTo(_scratchB);
-      const targetDepth = allCloudDistanceScale(
-        distCam,
-        orbitMinDistance,
-        orbitMaxDistance,
+      const refD = camera.position.distanceTo(_orbitTarget);
+      const perspectiveTarget = THREE.MathUtils.clamp(
+        refD / Math.max(distCam, 0.01),
+        ALL_CLOUD_PERSPECTIVE_CLAMP_MIN,
+        ALL_CLOUD_PERSPECTIVE_CLAMP_MAX,
       );
       smoothDepthScaleRef.current = THREE.MathUtils.lerp(
         smoothDepthScaleRef.current,
-        targetDepth,
+        perspectiveTarget,
         Math.min(1, delta * ALL_CLOUD_DEPTH_SMOOTH_SPEED),
       );
       depthScaleMul = smoothDepthScaleRef.current;
@@ -1631,8 +1592,6 @@ function GalleryScene({
               radius={ringRadius}
               cardScaleMul={cardScaleMul}
               satelliteFloat={satelliteFloat}
-              orbitMinDistance={minZoomDistance}
-              orbitMaxDistance={maxZoomDistance}
               allCategoryLayout={allCategoryLayout}
               hovered={hoveredIndex === imageIndex}
               modalOpen={modalOpen}
