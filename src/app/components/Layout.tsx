@@ -20,15 +20,24 @@ function LayoutShell() {
     <div className="flex h-dvh max-h-dvh min-h-0 overflow-hidden bg-background">
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <header className="flex shrink-0 items-start justify-between gap-5 px-7 pb-1 pt-5 sm:items-baseline sm:gap-6 sm:px-12 sm:pb-1.5 sm:pt-6 lg:px-14 lg:pt-7">
-          <div className="flex min-w-0 flex-col gap-0.5">
-            <p className="text-[0.75rem] font-semibold uppercase tracking-[0.22em] text-foreground sm:text-sm">
+          <div className="flex min-w-0 flex-1 flex-col gap-0.5 pr-2">
+            {/*
+              `lang="en"`: when the document is `lang="tr"`, CSS `uppercase` uses Turkish
+              casing and can corrupt Latin `I` in the name and the EN locale label.
+            */}
+            <p
+              lang="en"
+              className="text-[0.75rem] font-semibold uppercase tracking-[0.22em] text-foreground sm:text-sm"
+            >
               {messages.layout.brandName}
             </p>
             <p className="text-[0.62rem] font-medium uppercase tracking-[0.2em] text-muted-foreground sm:text-[0.68rem]">
               {messages.sidebar.portfolio}
             </p>
           </div>
-          <LanguageSwitcher />
+          <div className="shrink-0">
+            <LanguageSwitcher />
+          </div>
         </header>
 
         <main

@@ -25,7 +25,8 @@ export function LanguageSwitcher() {
 
   return (
     <nav
-      className="flex items-center gap-x-2 text-[0.65rem] font-medium uppercase tracking-[0.14em] text-foreground sm:text-[0.68rem]"
+      lang="en"
+      className="flex shrink-0 items-center gap-x-2 text-[0.65rem] font-medium uppercase tracking-[0.14em] text-foreground sm:text-[0.68rem]"
       aria-label={messages.aria.languageSwitcher}
     >
       {LOCALES.map((code, index) => {
