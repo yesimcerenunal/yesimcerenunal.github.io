@@ -179,7 +179,7 @@ const en: TranslationMessages = {
     ...categoryEn,
   },
   gallery: {
-    exploreHint: "You're in control",
+    exploreHint: "Drag, scroll or click.. You're in control!",
     modalYear: "Year",
     modalToolsLabel: "Tools",
     modalProjectFallback: "Project",
@@ -258,7 +258,7 @@ const de: TranslationMessages = {
     "2D Archive": "2D-Archiv",
   },
   gallery: {
-    exploreHint: "Du hast die Kontrolle",
+    exploreHint: "Ziehen, scrollen oder klicken.. Du hast die Kontrolle!",
     modalYear: "Jahr",
     modalToolsLabel: "Tools",
     modalProjectFallback: "Projekt",
@@ -337,7 +337,7 @@ const tr: TranslationMessages = {
     "2D Archive": "2D arşiv",
   },
   gallery: {
-    exploreHint: "Kontrol sende",
+    exploreHint: "Sürükle, kaydır veya tıkla.. Kontrol sende!",
     modalYear: "Yıl",
     modalToolsLabel: "Araçlar",
     modalProjectFallback: "Proje",

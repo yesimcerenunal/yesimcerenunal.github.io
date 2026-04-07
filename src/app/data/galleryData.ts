@@ -44,9 +44,15 @@ function manifestEntryToGalleryImage(entry: GalleryManifestProject): GalleryImag
   };
 }
 
+function manifestProjectVisible(entry: GalleryManifestProject): boolean {
+  return !("hidden" in entry && entry.hidden === true);
+}
+
 /** Flat list for "All" and the gallery — order follows manifest (category order, then project). */
 export const galleryItems: GalleryImage[] = Array.isArray(galleryManifest.projects)
-  ? galleryManifest.projects.map(manifestEntryToGalleryImage)
+  ? galleryManifest.projects
+      .filter(manifestProjectVisible)
+      .map(manifestEntryToGalleryImage)
   : [];
 
 if (import.meta.env?.DEV) {
@@ -61,6 +67,7 @@ if (import.meta.env?.DEV) {
     : [];
   const manifestKeys = new Set(manifestProjects.map((p) => projectKey(p)));
   for (const p of manifestProjects) {
+    if (!manifestProjectVisible(p)) continue;
     const cat = p.category as GalleryCategory;
     const k = projectKey(p);
     console.log(

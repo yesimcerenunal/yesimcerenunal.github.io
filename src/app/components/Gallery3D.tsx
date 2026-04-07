@@ -39,7 +39,12 @@ import {
   isVideoUrl,
   prefetchDetailModalMedia,
   primaryGalleryTextureUrl,
+  withGalleryAssetCacheBust,
 } from "../utils/galleryMedia";
+
+if (import.meta.env.DEV) {
+  THREE.Cache.enabled = false;
+}
 
 /** Detail modal: allow first-row video at top; others only when vertically centered in the scroller. */
 const DETAIL_FIRST_VIDEO_SCROLL_TOP_MAX = 56;
@@ -135,6 +140,50 @@ export function primaryGalleryImageUrl(item: GalleryImage): string {
 
 const sharedTextureLoader = new THREE.TextureLoader();
 sharedTextureLoader.setCrossOrigin("anonymous");
+
+/**
+ * Card textures: bust cache + dev `fetch` no-store (see `withGalleryAssetCacheBust`).
+ */
+function loadGalleryTextureUrl(
+  url: string,
+  onLoad: (tex: THREE.Texture) => void,
+  onError: () => void,
+): void {
+  const loadUrl = withGalleryAssetCacheBust(url);
+  const loadWithTextureLoader = () => {
+    sharedTextureLoader.load(loadUrl, onLoad, undefined, onError);
+  };
+
+  if (import.meta.env.DEV) {
+    const absolute =
+      loadUrl.startsWith("http://") || loadUrl.startsWith("https://")
+        ? loadUrl
+        : new URL(loadUrl, window.location.origin).href;
+    fetch(absolute, { cache: "no-store" })
+      .then((res) => {
+        if (!res.ok) throw new Error(String(res.status));
+        return res.blob();
+      })
+      .then((blob) => {
+        const objectUrl = URL.createObjectURL(blob);
+        sharedTextureLoader.load(
+          objectUrl,
+          (tex) => {
+            URL.revokeObjectURL(objectUrl);
+            onLoad(tex);
+          },
+          undefined,
+          () => {
+            URL.revokeObjectURL(objectUrl);
+            loadWithTextureLoader();
+          },
+        );
+      })
+      .catch(loadWithTextureLoader);
+    return;
+  }
+  loadWithTextureLoader();
+}
 
 function configureTexture(t: THREE.Texture): void {
   t.colorSpace = THREE.SRGBColorSpace;
@@ -238,7 +287,7 @@ function useResilientTexture(imageUrl: string | undefined): THREE.Texture | null
 
     const loadFallbackAsset = () => {
       const url = fallbackImageUrl();
-      sharedTextureLoader.load(
+      loadGalleryTextureUrl(
         url,
         (loaded) => {
           if (cancelled) {
@@ -248,20 +297,15 @@ function useResilientTexture(imageUrl: string | undefined): THREE.Texture | null
           applySquareFaceTextureUV(loaded);
           commit(loaded);
         },
-        undefined,
-        (err) => {
-          console.error(
-            "[Gallery3D] Fallback asset failed to load:",
-            url,
-            err,
-          );
+        () => {
+          console.error("[Gallery3D] Fallback asset failed to load:", url);
           loadSolid();
         },
       );
     };
 
     const loadPrimary = (url: string) => {
-      sharedTextureLoader.load(
+      loadGalleryTextureUrl(
         url,
         (loaded) => {
           if (cancelled) {
@@ -271,8 +315,7 @@ function useResilientTexture(imageUrl: string | undefined): THREE.Texture | null
           applySquareFaceTextureUV(loaded);
           commit(loaded);
         },
-        undefined,
-        (_err) => {
+        () => {
           console.error(
             "[Gallery3D] Image failed to load (using fallback asset):",
             url,
@@ -2115,6 +2158,10 @@ const ProjectImageScroll = forwardRef(function ProjectImageScroll(
 
   const detailUrlsKey = useMemo(() => detailUrls.join("\0"), [detailUrls]);
   const heroUrl = useMemo(() => primaryGalleryTextureUrl(urls), [urls]);
+  const heroSrc = useMemo(
+    () => withGalleryAssetCacheBust(heroUrl),
+    [heroUrl, detailUrlsKey],
+  );
   const [readyUrls, setReadyUrls] = useState<Set<string>>(() => new Set());
 
   useEffect(() => {
@@ -2214,7 +2261,7 @@ const ProjectImageScroll = forwardRef(function ProjectImageScroll(
         aria-label={heroAlt}
       >
         <img
-          src={heroUrl}
+          src={heroSrc}
           alt={heroAlt}
           className="block h-auto max-w-full w-full select-none object-contain"
           draggable={false}

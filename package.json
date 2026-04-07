@@ -4,12 +4,13 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "prebuild": "cp index.template.html index.html",
+    "prebuild": "cp index.template.html index.html && node scripts/sync-gallery-from-root.mjs",
     "build": "vite build && cp index.html 404.html",
-    "predev": "cp index.template.html index.html",
+    "predev": "cp index.template.html index.html && node scripts/sync-gallery-from-root.mjs",
     "dev": "vite",
     "typecheck": "tsc --noEmit",
-    "gallery:placeholders": "node scripts/seed-gallery-placeholders.mjs"
+    "gallery:placeholders": "node scripts/seed-gallery-placeholders.mjs",
+    "gallery:sync": "node scripts/sync-gallery-from-root.mjs"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",

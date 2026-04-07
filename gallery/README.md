@@ -1,16 +1,16 @@
-# Gallery media (`public/gallery/`)
+# Gallery media
 
-**Do not** create a **`gallery/`** directory at the **repository root**. The only media tree is here under **`public/gallery/`**; Vite copies it to **`dist/gallery/`** on `npm run build`.
+Kaynak dosyalar repo kökündeki **`gallery/`** altında tutulur; **`npm run gallery:sync`** bunları **`public/gallery/`** ile eşitler. Vite build sırasında **`public/gallery/`** → **`dist/gallery/`** olarak çıkar.
 
 ## Single source of truth
 
 | What | Where |
 |------|--------|
-| **Which projects exist and in what order** | **`src/app/data/gallery-manifest.json`** — **edit manually**. Dev and build do **not** overwrite it. |
-| **Media files on disk** | `public/gallery/...` — paths in the manifest must match real files (e.g. `gallery/3d-archive/FB/0.jpg`). |
+| **Which projects exist and in what order** | **`src/app/data/gallery-manifest.json`** — proje listesi elle; `gallery:sync` yalnızca her proje için `images[]` dosya listesini ve `lastUpdated` alanını diske göre günceller. |
+| **Media files on disk** | `gallery/` (kök) ve `public/gallery/` — `npm run gallery:sync` ile hizalanır. Kapak: `00.jpg` (veya `00.png` / `00.webp`), `0.*` kullanılmaz. |
 | **Titles, descriptions, years (EN / DE / TR)** | **`src/app/i18n/translations.ts`** → `portfolioProjectsEn` / `De` / `Tr` → `portfolio.projects` |
 
-There is **no** automatic scan of `public/gallery/` and **no** `gallery:sync` step. Add or change projects by editing **`gallery-manifest.json`**, then add matching **`categoryFolder/slug`** entries in all three language blocks in **`translations.ts`**. Put or rename files under **`public/gallery/`** so every path in `images[]` resolves.
+Yeni klasörler için önce **`gallery-manifest.json`** ve **`translations.ts`** güncellenir; dosyalar genelde **`gallery/`** köküne konur, sonra **`npm run gallery:sync`** `public/gallery/` ile eşitler ve manifest’teki `images[]` listesini diske göre yeniler.
 
 ## Manifest format
 
@@ -29,8 +29,8 @@ Category folders typically used:
 
 Each **project** is a subfolder; file naming for the 3D card and detail view:
 
-- **`0.*`** = gallery thumbnail + 3D card face (prefer a raster image for the card).
-- **`1`**, **`2`**, … = detail order (numeric base names). Gaps are allowed (e.g. `0`, `1`, `3`).
+- **`00.*`** = kapak + 3D kart yüzü (tercihen raster görsel).
+- **`1`**, **`2`**, … = detay sırası. `0.*` kullanılmaz (kapak için yalnızca **`00`**).
 
 ## Placeholder JPEGs
 

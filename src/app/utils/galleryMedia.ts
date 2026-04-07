@@ -1,4 +1,5 @@
 import { publicAsset } from "./publicAsset";
+import galleryManifest from "../data/gallery-manifest.json";
 
 /** Video extensions for detail / texture detection */
 const VIDEO_RE = /\.(mp4|webm)(\?.*)?$/i;
@@ -9,12 +10,15 @@ function pathOnly(url: string): string {
   return url.split(/[?#]/)[0] ?? url;
 }
 
-/** Numeric index from `0.jpg`, `12.webp`, etc.; non-numeric basenames → `null`. */
+/** Numeric index from `1.jpg`, `12.webp`, etc.; non-numeric basenames → `null`. */
 export function galleryFilenameIndex(url: string): number | null {
   const file = pathOnly(url).split("/").pop() ?? "";
   const base = file.replace(/\.[^.]+$/, "");
   if (!/^\d+$/.test(base)) return null;
-  return parseInt(base, 10);
+  const n = parseInt(base, 10);
+  /** Card cover is `00.*` only; `0.*` is ignored here so labels stay 1-based in the detail list. */
+  if (base === "00" || base === "0") return null;
+  return n;
 }
 
 export function isVideoUrl(url: string): boolean {
@@ -26,7 +30,7 @@ export function isRasterImageUrl(url: string): boolean {
 }
 
 /**
- * Detail modal: indices `1`, `2`, `3`, … only (excludes `0` = hero/thumbnail).
+ * Detail modal: indices `1`, `2`, `3`, … only (excludes `00.*` cover and legacy `0.*`).
  * Sorted by numeric index; gaps in numbering are fine — only existing files are listed.
  */
 export function detailPageMediaUrls(urls: readonly string[]): string[] {
@@ -101,17 +105,37 @@ export function clearGalleryDetailVideoPreload(): void {
     .forEach((el) => el.remove());
 }
 
-/** WebGL card texture: only `0` raster (jpg/png/webp); `0` video or missing → global fallback. */
+/**
+ * Aynı URL tarayıcı önbelleğinde eski bayt olarak kalabiliyor. Sorgu parametresi ekler:
+ * dev’de her çağrıda benzersiz; prod’da `gallery-manifest.json` `lastUpdated` (medya değişince `gallery:sync`).
+ */
+export function withGalleryAssetCacheBust(url: string): string {
+  const sep = url.includes("?") ? "&" : "?";
+  const tag = import.meta.env.DEV
+    ? `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
+    : galleryManifest.lastUpdated;
+  return `${url}${sep}g=${encodeURIComponent(tag)}`;
+}
+
+function coverBasename(url: string): string | null {
+  const file = pathOnly(url).split("/").pop() ?? "";
+  const base = file.replace(/\.[^.]+$/, "");
+  return base === "00" ? base : null;
+}
+
+/** WebGL card texture: only `00.*` raster (jpg/png/webp); missing or non-raster → global fallback. */
 export function primaryGalleryTextureUrl(urls: readonly string[]): string {
   for (const raw of urls) {
     const u = raw?.trim();
     if (!u) continue;
-    if (galleryFilenameIndex(u) === 0 && isRasterImageUrl(u)) return u;
+    if (coverBasename(u) && isRasterImageUrl(u)) {
+      return publicAsset(u);
+    }
   }
   const fb = publicAsset("fallback.jpg");
   if (import.meta.env.DEV && urls.length > 0) {
     console.error(
-      "[gallery] ERROR: no 0.jpg/png/webp for card — using fallback.jpg. urls=",
+      "[gallery] ERROR: no 00.jpg/png/webp for card — using fallback.jpg. urls=",
       urls,
     );
   }
