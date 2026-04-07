@@ -17,6 +17,9 @@ import {
   type TranslationMessages,
 } from "../i18n/translations";
 
+/** @see translations.ts — cleared when saving so old `portfolio-locale` cannot override v2 */
+const LEGACY_LOCALE_STORAGE_KEY = "portfolio-locale";
+
 type LanguageContextValue = {
   locale: Locale;
   setLocale: (next: Locale) => void;
@@ -31,6 +34,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     return isLocale(initial) ? initial : defaultLocale;
   });
 
+  useEffect(() => {
+    try {
+      window.localStorage.removeItem(LEGACY_LOCALE_STORAGE_KEY);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
   const setLocale = useCallback((next: Locale) => {
     if (!isLocale(next)) {
       return;
@@ -38,6 +49,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     setLocaleState(next);
     try {
       window.localStorage.setItem(LOCALE_STORAGE_KEY, next);
+      window.localStorage.removeItem(LEGACY_LOCALE_STORAGE_KEY);
     } catch {
       /* ignore */
     }

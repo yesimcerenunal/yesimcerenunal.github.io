@@ -27,7 +27,11 @@ export const LOCALE_DISPLAY_LABELS: Record<Locale, string> = {
 
 export const defaultLocale: Locale = "en";
 
-export const LOCALE_STORAGE_KEY = "portfolio-locale";
+/**
+ * Bumped when we need a one-time reset of persisted language (e.g. old key stuck on `tr`).
+ * Not migrated from previous keys — first visit after deploy uses {@link defaultLocale}.
+ */
+export const LOCALE_STORAGE_KEY = "portfolio-locale-v2";
 
 export type CategoryMessages = { all: string } & Record<GalleryCategory, string>;
 
