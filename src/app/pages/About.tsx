@@ -12,12 +12,8 @@ export function About() {
       transition={{ duration: 0.6 }}
       className="max-w-3xl"
     >
-      <h1 className="mb-8 text-[0.7rem] font-medium uppercase tracking-[0.12em] text-muted-foreground">
-        {a.title}
-      </h1>
-
       <div className="space-y-6 leading-relaxed text-muted-foreground">
-        <p className="text-xl text-foreground">{a.lead}</p>
+        <h1 className="text-xl font-normal text-foreground">{a.lead}</h1>
 
         <p>{a.p2}</p>
 

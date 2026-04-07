@@ -258,7 +258,7 @@ const de: TranslationMessages = {
     "2D Archive": "2D-Archiv",
   },
   gallery: {
-    exploreHint: "You're in control",
+    exploreHint: "Du hast die Kontrolle",
     modalYear: "Jahr",
     modalToolsLabel: "Tools",
     modalProjectFallback: "Projekt",
@@ -319,7 +319,7 @@ const tr: TranslationMessages = {
   },
   nav: {
     gallery: "GALERİ",
-    about: "HAKKINDA",
+    about: "HAKKIMDA",
     contact: "İLETİŞİM",
   },
   sidebar: {
@@ -337,7 +337,7 @@ const tr: TranslationMessages = {
     "2D Archive": "2D arşiv",
   },
   gallery: {
-    exploreHint: "You're in control",
+    exploreHint: "Kontrol sende",
     modalYear: "Yıl",
     modalToolsLabel: "Araçlar",
     modalProjectFallback: "Proje",
@@ -347,7 +347,7 @@ const tr: TranslationMessages = {
     imageErrorAlt: "Görüntü yüklenemedi",
   },
   about: {
-    title: "HAKKINDA",
+    title: "HAKKIMDA",
     lead:
       "3D görselleştirme, etkileşimli deneyimler ve deneysel tasarım üzerine çalışan çok disiplinli bir tasarımcı ve yaratıcı teknologum.",
     p2:

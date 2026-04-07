@@ -22,13 +22,9 @@ export function Contact() {
       transition={{ duration: 0.6 }}
       className="max-w-3xl"
     >
-      <h1 className="mb-8 text-[0.7rem] font-medium uppercase tracking-[0.12em] text-muted-foreground">
-        {c.title}
-      </h1>
-
       <div className="space-y-8 leading-relaxed text-muted-foreground">
         <div className="space-y-5">
-          <p className="text-xl text-foreground">{c.headline}</p>
+          <h1 className="text-xl font-normal text-foreground">{c.headline}</h1>
           <p>{c.description}</p>
         </div>
 
