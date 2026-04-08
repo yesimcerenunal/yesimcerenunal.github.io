@@ -720,6 +720,15 @@ const ORBIT_TARGET_Y = 0.28;
 const _orbitTarget = new THREE.Vector3(0, ORBIT_TARGET_Y, 0);
 
 /**
+ * Dikey orbit: polar açı φ, +Y ekseninden (0° = tam tepeden, 90° ≈ yatay).
+ * φ küçülürse kamera daha “yukarıda” (kuş bakışı); φ büyürse daha alçak.
+ * Dar aralık (ör. 100–110) = toplam ~10° hareket + düşük min kuş bakışını kilitler.
+ * Eski dar varsayılan: 78 / 88.
+ */
+const ORBIT_POLAR_MIN_DEG = 38;
+const ORBIT_POLAR_MAX_DEG = 100;
+
+/**
  * Baseline elevation in the YZ plane (from +Z toward +Y). atan(ratio) matches
  * the old CAMERA_YZ_RATIO line; bias nudges the ring slightly higher on screen.
  */
@@ -951,6 +960,11 @@ const _scratchA = new THREE.Vector3();
 const _scratchB = new THREE.Vector3();
 const _toCamera = new THREE.Vector3();
 const _frontNormal = new THREE.Vector3();
+/** Stabilized billboard: roll is fixed by world up (avoids twist from `setFromUnitVectors` alone). */
+const _bbWorldUp = new THREE.Vector3(0, 1, 0);
+const _bbRight = new THREE.Vector3();
+const _bbUp = new THREE.Vector3();
+const _bbMatrix = new THREE.Matrix4();
 const _shuffleHub = new THREE.Vector3();
 const _shuffleTangent = new THREE.Vector3();
 const _shuffleTan2 = new THREE.Vector3();
@@ -1625,7 +1639,8 @@ uniform vec3 uCoverGlow;`,
     let localY: number;
     let dx: number;
     let dz: number;
-    let yaw: number;
+    /** Ring layout only; satellite discs use quaternion billboard instead. */
+    let yaw = 0;
 
     if (satelliteFloat) {
       const allowDeformIntegrate =
@@ -1745,24 +1760,7 @@ uniform vec3 uCoverGlow;`,
       lastBaseLocalRef.current.y = localY;
       lastBaseLocalRef.current.z = pz;
 
-      dx = -basePx;
-      dz = -basePz;
-
-      _toCamera.subVectors(
-        camera.position,
-        _scratchA.set(px, ORBIT_TARGET_Y + localY, pz),
-      );
-      _toCamera.y = 0;
-      const hLen = Math.hypot(_toCamera.x, _toCamera.z);
-      if (hLen > 1e-6) {
-        yaw = Math.atan2(_toCamera.x, _toCamera.z);
-      } else {
-        yaw = Math.atan2(dx, dz) - Math.PI / 2;
-      }
-
       g.rotation.set(0, 0, 0);
-      /** Billboards toward camera — no local-axis spin (no pitch/roll wobble). */
-      mesh.rotation.set(0, yaw, 0);
     } else {
       const R = radius * (1 + ZOOM_RING_EXPAND * ziLayout);
       const bx = Math.sin(angle) * R;
@@ -1808,7 +1806,6 @@ uniform vec3 uCoverGlow;`,
         yaw = Math.atan2(dx, dz) - Math.PI / 2;
       }
       g.rotation.set(0, 0, 0);
-      mesh.rotation.set(0, yaw, 0);
     }
 
     const allowMotion =
@@ -1997,16 +1994,38 @@ uniform vec3 uCoverGlow;`,
 
     mesh.scale.setScalar(s * depthScaleMul * layoutScaleMul);
 
-    _frontNormal.set(0, 0, 1).applyAxisAngle(
-      THREE.Object3D.DEFAULT_UP,
-      yaw,
-    );
-    _toCamera.subVectors(
-      camera.position,
-      _scratchA.set(fx, ORBIT_TARGET_Y + fy, fz),
-    );
+    const Sw = GALLERY_GROUP_WORLD_SCALE;
+    _scratchB.set(fx * Sw, ORBIT_TARGET_Y + fy * Sw, fz * Sw);
+    _toCamera.subVectors(camera.position, _scratchB);
     const dCam = _toCamera.length();
-    if (dCam > 1e-6) _toCamera.multiplyScalar(1 / dCam);
+
+    if (satelliteFloat) {
+      if (dCam > 1e-7) {
+        _toCamera.multiplyScalar(1 / dCam);
+        const z = _toCamera;
+        _bbRight.crossVectors(_bbWorldUp, z);
+        if (_bbRight.lengthSq() < 1e-10) {
+          _bbRight.set(1, 0, 0).cross(z);
+        }
+        if (_bbRight.lengthSq() < 1e-10) {
+          mesh.quaternion.identity();
+        } else {
+          _bbRight.normalize();
+          _bbUp.crossVectors(z, _bbRight).normalize();
+          _bbMatrix.makeBasis(_bbRight, _bbUp, z);
+          mesh.quaternion.setFromRotationMatrix(_bbMatrix);
+        }
+      }
+      _frontNormal.set(0, 0, 1).applyQuaternion(mesh.quaternion);
+    } else {
+      mesh.rotation.set(0, yaw, 0);
+      _frontNormal.set(0, 0, 1).applyAxisAngle(
+        THREE.Object3D.DEFAULT_UP,
+        yaw,
+      );
+      if (dCam > 1e-6) _toCamera.multiplyScalar(1 / dCam);
+    }
+
     const facing = THREE.MathUtils.clamp(_frontNormal.dot(_toCamera), 0, 1);
     const targetOp = THREE.MathUtils.lerp(
       FACING_OPACITY_MIN,
@@ -2267,14 +2286,15 @@ function GalleryScene({
         enablePan={false}
         enableZoom={!modalOpen}
         zoomSpeed={0.72}
+        rotateSpeed={1.05}
         enableDamping
         dampingFactor={0.052}
         minDistance={minZoomDistance}
         maxDistance={maxZoomDistance}
         autoRotate={!modalOpen && hoveredIndex === null}
         autoRotateSpeed={autoRotateSpeed}
-        minPolarAngle={THREE.MathUtils.degToRad(78)}
-        maxPolarAngle={THREE.MathUtils.degToRad(88)}
+        minPolarAngle={THREE.MathUtils.degToRad(ORBIT_POLAR_MIN_DEG)}
+        maxPolarAngle={THREE.MathUtils.degToRad(ORBIT_POLAR_MAX_DEG)}
         target={[0, ORBIT_TARGET_Y, 0]}
         onStart={onSoftGalleryHint}
       />
