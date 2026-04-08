@@ -8,7 +8,7 @@ import { cn } from "./ui/utils";
 function LayoutShell() {
   const location = useLocation();
   const { pathname } = location;
-  const { messages } = useLanguage();
+  const { messages, locale } = useLanguage();
   const isGallery = pathname === "/";
   const isAboutOrContact = pathname === "/about" || pathname === "/contact";
 
@@ -22,8 +22,7 @@ function LayoutShell() {
         <header className="flex shrink-0 items-start justify-between gap-5 px-7 pb-1 pt-5 sm:items-baseline sm:gap-6 sm:px-12 sm:pb-1.5 sm:pt-6 lg:px-14 lg:pt-7">
           <div className="flex min-w-0 flex-1 flex-col gap-0.5 pr-2">
             {/*
-              `lang="en"` + no `uppercase`: document `lang="tr"` + CSS uppercase can mangle Latin I.
-              Brand copy in translations is already uppercase.
+              `lang="en"`: root `<html>` stays `lang="en"` for typography; Latin brand stays stable.
             */}
             <p
               lang="en"
@@ -41,6 +40,7 @@ function LayoutShell() {
         </header>
 
         <main
+          lang={locale}
           className={cn(
             "flex min-h-0 flex-1 flex-col",
             isGallery && "overflow-hidden px-6 sm:px-10 lg:px-12",

@@ -18,16 +18,9 @@ Each project has `category`, `categoryFolder`, `slug`, and `images[]` (paths rel
 
 ## Layout (folder conventions)
 
-Category folders typically used:
+Numaralı slotlar doğrudan **`gallery/<n>/`**. Manifest’te `categoryFolder` **`work`**, `projectKey` **`work/<n>`**.
 
-| App label (EN)     | Folder              |
-|--------------------|---------------------|
-| Interactive / VR   | `interactive-vr/`   |
-| Motion             | `motion/`           |
-| 3D Archive         | `3d-archive/`       |
-| 2D Archive         | `2d-archive/`       |
-
-Each **project** is a subfolder; file naming for the 3D card and detail view:
+Her slot için dosya adlandırma:
 
 - **`00.*`** = kapak + 3D kart yüzü (tercihen raster görsel).
 - **`1`**, **`2`**, … = detay sırası. `0.*` kullanılmaz (kapak için yalnızca **`00`**).

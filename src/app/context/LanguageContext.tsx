@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import {
+  LEGACY_LOCALE_STORAGE_KEY,
   LOCALE_STORAGE_KEY,
   defaultLocale,
   isLocale,
@@ -16,9 +17,6 @@ import {
   type Locale,
   type TranslationMessages,
 } from "../i18n/translations";
-
-/** @see translations.ts — cleared when saving so old `portfolio-locale` cannot override v2 */
-const LEGACY_LOCALE_STORAGE_KEY = "portfolio-locale";
 
 type LanguageContextValue = {
   locale: Locale;
@@ -33,14 +31,6 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     const initial = readStoredLocale();
     return isLocale(initial) ? initial : defaultLocale;
   });
-
-  useEffect(() => {
-    try {
-      window.localStorage.removeItem(LEGACY_LOCALE_STORAGE_KEY);
-    } catch {
-      /* ignore */
-    }
-  }, []);
 
   const setLocale = useCallback((next: Locale) => {
     if (!isLocale(next)) {
@@ -61,10 +51,18 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }
   }, [locale]);
 
+  /**
+   * Keep `<html lang="en">` for typography/CSS (Turkish `text-transform` + `lang=tr` on the root
+   * caused a flash: correct glyphs, then wrong after `lang` was set to `tr` in an effect).
+   * Screen readers / content language: `data-locale` + `lang` on `<main>` in Layout.
+   */
   useEffect(() => {
-    if (typeof document !== "undefined") {
-      document.documentElement.lang = isLocale(locale) ? locale : defaultLocale;
-    }
+    if (typeof document === "undefined") return;
+    document.documentElement.lang = "en";
+    document.documentElement.setAttribute(
+      "data-locale",
+      isLocale(locale) ? locale : defaultLocale,
+    );
   }, [locale]);
 
   const value = useMemo<LanguageContextValue>(() => {

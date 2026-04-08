@@ -20,3 +20,14 @@ export function slugFromProjectKey(projectKey: string): string {
   const i = k.lastIndexOf("/");
   return i >= 0 ? k.slice(i + 1) : k;
 }
+
+/** Manifest `categoryFolder` for flat disk layout: `gallery/<slug>/` and keys `work/<slug>`. */
+export const GALLERY_FLAT_CATEGORY_FOLDER = "work";
+
+/**
+ * Slug `--` or `--*` is not published (draft). Applies to `work` slots (`gallery/<slug>/`).
+ */
+export function isDraftGallerySlugHidden(slug: string): boolean {
+  const s = slug.trim();
+  return s === "--" || s.startsWith("--");
+}

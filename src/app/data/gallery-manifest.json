@@ -1,130 +1,170 @@
 {
-  "sourceOfTruth": "MANUAL FILE — edit this JSON to define gallery projects and media paths. Optional \"hidden\": true skips a project in the 3D gallery (keep folder + portfolio JSON for later). Titles: portfolio-content-*.json. gallery:sync refreshes images[] + lastUpdated.",
+  "sourceOfTruth": "Flat layout: disk gallery/<n>/ for numbered slots; manifest projectKey work/<n>. Taslak: slug -- veya --* (gallery/--/). gallery:sync images[] + lastUpdated.",
   "version": 1,
-  "lastUpdated": "2026-04-07T10:09:41.467Z",
+  "lastUpdated": "2026-04-08T20:43:59.092Z",
   "projects": [
     {
-      "category": "Interactive / VR",
-      "categoryFolder": "interactive-vr",
-      "slug": "Cozy Experience",
+      "category": "3D Archive",
+      "categoryFolder": "work",
+      "slug": "1",
       "images": [
-        "gallery/interactive-vr/Cozy Experience/00.jpg",
-        "gallery/interactive-vr/Cozy Experience/1.mp4",
-        "gallery/interactive-vr/Cozy Experience/2.jpg",
-        "gallery/interactive-vr/Cozy Experience/3.jpg",
-        "gallery/interactive-vr/Cozy Experience/4.jpg",
-        "gallery/interactive-vr/Cozy Experience/5.jpg",
-        "gallery/interactive-vr/Cozy Experience/6.jpg",
-        "gallery/interactive-vr/Cozy Experience/7.jpg"
-      ]
-    },
-    {
-      "category": "Interactive / VR",
-      "categoryFolder": "interactive-vr",
-      "slug": "VR Experience",
-      "images": [
-        "gallery/interactive-vr/VR Experience/00.jpg",
-        "gallery/interactive-vr/VR Experience/1.mp4",
-        "gallery/interactive-vr/VR Experience/2.jpg",
-        "gallery/interactive-vr/VR Experience/3.jpg",
-        "gallery/interactive-vr/VR Experience/4.mp4",
-        "gallery/interactive-vr/VR Experience/5.mp4",
-        "gallery/interactive-vr/VR Experience/6.mp4"
-      ]
-    },
-    {
-      "category": "Motion",
-      "categoryFolder": "motion",
-      "slug": "Jazz Fest Commercial",
-      "hidden": true,
-      "images": [
-        "gallery/motion/Jazz Fest Commercial/00.jpg",
-        "gallery/motion/Jazz Fest Commercial/1.jpg",
-        "gallery/motion/Jazz Fest Commercial/2.mp4",
-        "gallery/motion/Jazz Fest Commercial/4.jpg"
-      ]
-    },
-    {
-      "category": "Motion",
-      "categoryFolder": "motion",
-      "slug": "Spotify Canvas Design",
-      "images": [
-        "gallery/motion/Spotify Canvas Design/00.jpg",
-        "gallery/motion/Spotify Canvas Design/1.jpg",
-        "gallery/motion/Spotify Canvas Design/2.mp4"
-      ]
-    },
-    {
-      "category": "Motion",
-      "categoryFolder": "motion",
-      "slug": "JusteDebout",
-      "images": [
-        "gallery/motion/JusteDebout/00.jpg",
-        "gallery/motion/JusteDebout/1.mp4",
-        "gallery/motion/JusteDebout/2.jpg",
-        "gallery/motion/JusteDebout/3.jpg"
-      ]
-    },
-    {
-      "category": "Motion",
-      "categoryFolder": "motion",
-      "slug": "Western Union",
-      "images": [
-        "gallery/motion/Western Union/00.jpg",
-        "gallery/motion/Western Union/1.mp4"
+        "gallery/1/00.jpg",
+        "gallery/1/1.mp4",
+        "gallery/1/2.mp4",
+        "gallery/1/3.jpg",
+        "gallery/1/4.jpg",
+        "gallery/1/5.mp4"
       ]
     },
     {
       "category": "3D Archive",
-      "categoryFolder": "3d-archive",
-      "slug": "Emberfall-Environment",
+      "categoryFolder": "work",
+      "slug": "2",
       "images": [
-        "gallery/3d-archive/Emberfall-Environment/00.jpg",
-        "gallery/3d-archive/Emberfall-Environment/1.mp4",
-        "gallery/3d-archive/Emberfall-Environment/2.mp4",
-        "gallery/3d-archive/Emberfall-Environment/3.jpg",
-        "gallery/3d-archive/Emberfall-Environment/4.jpg",
-        "gallery/3d-archive/Emberfall-Environment/5.mp4"
+        "gallery/2/00.jpg",
+        "gallery/2/1.mp4",
+        "gallery/2/2.jpg",
+        "gallery/2/3.jpg",
+        "gallery/2/4.jpg",
+        "gallery/2/5.jpg",
+        "gallery/2/6.jpg"
       ]
     },
     {
-      "category": "3D Archive",
-      "categoryFolder": "3d-archive",
-      "slug": "FB",
+      "category": "Interactive / VR",
+      "categoryFolder": "work",
+      "slug": "3",
       "images": [
-        "gallery/3d-archive/FB/00.jpg",
-        "gallery/3d-archive/FB/1.mp4",
-        "gallery/3d-archive/FB/2.jpg",
-        "gallery/3d-archive/FB/3.jpg",
-        "gallery/3d-archive/FB/4.jpg",
-        "gallery/3d-archive/FB/5.jpg",
-        "gallery/3d-archive/FB/6.jpg"
+        "gallery/3/00.jpg",
+        "gallery/3/1.mp4",
+        "gallery/3/2.jpg",
+        "gallery/3/3.jpg",
+        "gallery/3/4.mp4",
+        "gallery/3/5.mp4",
+        "gallery/3/6.mp4"
       ]
     },
     {
-      "category": "2D Archive",
-      "categoryFolder": "2d-archive",
-      "slug": "Illustrations",
+      "category": "Interactive / VR",
+      "categoryFolder": "work",
+      "slug": "4",
       "images": [
-        "gallery/2d-archive/Illustrations/00.jpg",
-        "gallery/2d-archive/Illustrations/1.jpg",
-        "gallery/2d-archive/Illustrations/2.jpg",
-        "gallery/2d-archive/Illustrations/3.jpg",
-        "gallery/2d-archive/Illustrations/4.jpg"
+        "gallery/4/00.jpg",
+        "gallery/4/1.mp4",
+        "gallery/4/2.jpg",
+        "gallery/4/3.jpg",
+        "gallery/4/4.jpg",
+        "gallery/4/5.jpg",
+        "gallery/4/6.jpg",
+        "gallery/4/7.jpg"
       ]
     },
     {
-      "category": "2D Archive",
-      "categoryFolder": "2d-archive",
-      "slug": "Psychodelic Magazine",
+      "category": "Motion",
+      "categoryFolder": "work",
+      "slug": "5",
+      "images": [
+        "gallery/5/00.jpg",
+        "gallery/5/1.jpg",
+        "gallery/5/2.mp4"
+      ]
+    },
+    {
+      "category": "Motion",
+      "categoryFolder": "work",
+      "slug": "6",
       "hidden": true,
       "images": [
-        "gallery/2d-archive/Psychodelic Magazine/00.jpg",
-        "gallery/2d-archive/Psychodelic Magazine/1.jpg",
-        "gallery/2d-archive/Psychodelic Magazine/2.jpg",
-        "gallery/2d-archive/Psychodelic Magazine/3.jpg",
-        "gallery/2d-archive/Psychodelic Magazine/4.jpg",
-        "gallery/2d-archive/Psychodelic Magazine/5.jpg"
+        "gallery/6/00.jpg",
+        "gallery/6/1.jpg",
+        "gallery/6/2.mp4",
+        "gallery/6/4.jpg"
+      ]
+    },
+    {
+      "category": "Motion",
+      "categoryFolder": "work",
+      "slug": "7",
+      "images": [
+        "gallery/7/00.jpg",
+        "gallery/7/1.mp4",
+        "gallery/7/2.jpg",
+        "gallery/7/3.jpg"
+      ]
+    },
+    {
+      "category": "Motion",
+      "categoryFolder": "work",
+      "slug": "8",
+      "images": [
+        "gallery/8/00.jpg",
+        "gallery/8/1.mp4"
+      ]
+    },
+    {
+      "category": "2D Archive",
+      "categoryFolder": "work",
+      "slug": "9",
+      "hidden": true,
+      "images": [
+        "gallery/9/00.jpg",
+        "gallery/9/1.jpg",
+        "gallery/9/2.jpg",
+        "gallery/9/3.jpg",
+        "gallery/9/4.jpg",
+        "gallery/9/5.jpg"
+      ]
+    },
+    {
+      "category": "2D Archive",
+      "categoryFolder": "work",
+      "slug": "10",
+      "images": [
+        "gallery/10/00.jpg",
+        "gallery/10/1.jpg",
+        "gallery/10/2.jpg",
+        "gallery/10/3.jpg",
+        "gallery/10/4.jpg"
+      ]
+    },
+    {
+      "category": "New",
+      "categoryFolder": "work",
+      "slug": "11",
+      "images": [
+        "gallery/11/00.jpg"
+      ]
+    },
+    {
+      "category": "New",
+      "categoryFolder": "work",
+      "slug": "12",
+      "images": [
+        "gallery/12/00.jpg"
+      ]
+    },
+    {
+      "category": "New",
+      "categoryFolder": "work",
+      "slug": "13",
+      "images": [
+        "gallery/13/00.jpg"
+      ]
+    },
+    {
+      "category": "New",
+      "categoryFolder": "work",
+      "slug": "14",
+      "images": [
+        "gallery/14/00.jpg"
+      ]
+    },
+    {
+      "category": "New",
+      "categoryFolder": "work",
+      "slug": "15",
+      "images": [
+        "gallery/15/00.jpg"
       ]
     }
   ]

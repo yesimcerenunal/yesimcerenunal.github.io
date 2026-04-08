@@ -5,7 +5,10 @@ import {
 } from "../context/WorksCategoryContext";
 import { translations } from "../i18n/translations";
 import {
+  GALLERY_FLAT_CATEGORY_FOLDER,
+  isDraftGallerySlugHidden,
   projectKeyFromParts,
+  slugFromProjectKey,
 } from "../utils/galleryProjectKey";
 import { publicAsset } from "../utils/publicAsset";
 import galleryManifest from "./gallery-manifest.json";
@@ -16,6 +19,7 @@ import galleryManifest from "./gallery-manifest.json";
  *
  * **Sources of truth:**
  * - Which projects exist and their `images[]` paths → **`src/app/data/gallery-manifest.json`**
+ *   (**`work`**: `projectKey` = `work/<slug>`, files under `gallery/<slug>/`; slug `--` / `--*` = draft, not listed.)
  * - Titles, descriptions, years → **`portfolio-content-en.json`**, **`portfolio-content-de.json`**, **`portfolio-content-tr.json`**
  *
  * `projectKey` = `categoryFolder/slug` and must match translation keys exactly.
@@ -45,7 +49,19 @@ function manifestEntryToGalleryImage(entry: GalleryManifestProject): GalleryImag
 }
 
 function manifestProjectVisible(entry: GalleryManifestProject): boolean {
-  return !("hidden" in entry && entry.hidden === true);
+  if ("hidden" in entry && entry.hidden === true) return false;
+  if (
+    entry.categoryFolder === GALLERY_FLAT_CATEGORY_FOLDER &&
+    isDraftGallerySlugHidden(entry.slug)
+  ) {
+    return false;
+  }
+  return true;
+}
+
+function isHiddenDraftPortfolioKey(projectKey: string): boolean {
+  if (!projectKey.startsWith(`${GALLERY_FLAT_CATEGORY_FOLDER}/`)) return false;
+  return isDraftGallerySlugHidden(slugFromProjectKey(projectKey));
 }
 
 /** Flat list for "All" and the gallery — order follows manifest (category order, then project). */
@@ -65,7 +81,11 @@ if (import.meta.env?.DEV) {
   const manifestProjects = Array.isArray(galleryManifest.projects)
     ? galleryManifest.projects
     : [];
-  const manifestKeys = new Set(manifestProjects.map((p) => projectKey(p)));
+  const manifestKeys = new Set(
+    manifestProjects
+      .filter(manifestProjectVisible)
+      .map((p) => projectKey(p)),
+  );
   for (const p of manifestProjects) {
     if (!manifestProjectVisible(p)) continue;
     const cat = p.category as GalleryCategory;
@@ -88,7 +108,7 @@ if (import.meta.env?.DEV) {
     }
   }
   for (const k of enProjectKeys) {
-    if (!manifestKeys.has(k)) {
+    if (!manifestKeys.has(k) && !isHiddenDraftPortfolioKey(k)) {
       console.error(
         `[galleryData] PROJECT KEY MISMATCH: expected=manifest project | actual=${JSON.stringify(k)} (orphan translation key — remove or add manifest row).`,
       );

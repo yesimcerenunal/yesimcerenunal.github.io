@@ -27,11 +27,11 @@ export const LOCALE_DISPLAY_LABELS: Record<Locale, string> = {
 
 export const defaultLocale: Locale = "en";
 
-/**
- * Bumped when we need a one-time reset of persisted language (e.g. old key stuck on `tr`).
- * Not migrated from previous keys — first visit after deploy uses {@link defaultLocale}.
- */
+/** Current persisted locale (v2). */
 export const LOCALE_STORAGE_KEY = "portfolio-locale-v2";
+
+/** Legacy key — migrated into v2 synchronously in {@link readStoredLocale}. */
+export const LEGACY_LOCALE_STORAGE_KEY = "portfolio-locale";
 
 export type CategoryMessages = { all: string } & Record<GalleryCategory, string>;
 
@@ -143,6 +143,7 @@ const categoryEn: Record<GalleryCategory, string> = {
   Motion: "Motion",
   "3D Archive": "3D Archive",
   "2D Archive": "2D Archive",
+  New: "New",
 };
 
 /** About page skill chips — tool names; shared across locales. */
@@ -258,6 +259,7 @@ const de: TranslationMessages = {
     Motion: "Motion Design",
     "3D Archive": "3D-Archiv",
     "2D Archive": "2D-Archiv",
+    New: "Neu",
   },
   gallery: {
     exploreHint: "Ziehen, scrollen oder klicken.. Du hast die Kontrolle!",
@@ -332,6 +334,7 @@ const tr: TranslationMessages = {
     Motion: "Hareket",
     "3D Archive": "3D arşiv",
     "2D Archive": "2D arşiv",
+    New: "Yeni",
   },
   gallery: {
     exploreHint: "Sürükle, kaydır veya tıkla.. Kontrol sende!",
@@ -399,7 +402,15 @@ export function isLocale(value: string | null | undefined): value is Locale {
 export function readStoredLocale(): Locale {
   try {
     if (typeof window === "undefined") return defaultLocale;
-    const raw = window.localStorage.getItem(LOCALE_STORAGE_KEY);
+    let raw = window.localStorage.getItem(LOCALE_STORAGE_KEY);
+    if (!raw) {
+      const legacy = window.localStorage.getItem(LEGACY_LOCALE_STORAGE_KEY);
+      if (isLocale(legacy)) {
+        window.localStorage.setItem(LOCALE_STORAGE_KEY, legacy);
+        window.localStorage.removeItem(LEGACY_LOCALE_STORAGE_KEY);
+        raw = legacy;
+      }
+    }
     if (isLocale(raw)) return raw;
   } catch {
     /* ignore */

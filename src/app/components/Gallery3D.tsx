@@ -383,7 +383,12 @@ const ALL_CLOUD_CIRCLE_SEGMENTS = 72;
  * min = uzaktaki taban (önceki “en küçük” boyut), max = yakındaki üst sınır.
  */
 const ALL_CLOUD_PERSPECTIVE_CLAMP_MIN = 0.58;
-const ALL_CLOUD_PERSPECTIVE_CLAMP_MAX = 1.74;
+/** Headroom so “near” planets can grow; far end still clamped at MIN. */
+const ALL_CLOUD_PERSPECTIVE_CLAMP_MAX = 2.12;
+/**
+ * Only scales ratios above 1.0 (closer discs): far planets keep the same MIN clamp behaviour.
+ */
+const ALL_CLOUD_PERSPECTIVE_NEAR_STRETCH = 1.17;
 /** Slot başına deterministik boyut jitter’ı (oranın etrafında ±). */
 const PLANET_SLOT_SCALE_JITTER = 0.14;
 /** depthScale hedefini takip (orbit sürüklerken daha çevik). */
@@ -438,12 +443,13 @@ function galleryProjectLayoutTweak(
     1,
   );
 
-  if (projectKey === "interactive-vr/VR Experience") {
-    /** Yakın perspektifte güçlü; uzakta hafif — üstten kırpmayı azaltır */
+  if (projectKey === "work/3") {
+    /** VR Experience — yakın perspektifte güçlü; uzakta hafif — üstten kırpmayı azaltır */
     const t = 0.22 + 0.78 * near01;
     return { dy: -k * 0.26 * t, scaleMul: 1 };
   }
-  if (projectKey === "3d-archive/Emberfall-Environment") {
+  if (projectKey === "work/1") {
+    /** Emberfall */
     return { dy: k * 0.2, scaleMul: 1.09 };
   }
   return { dy: 0, scaleMul: 1 };
@@ -453,10 +459,10 @@ function galleryProjectLayoutTweak(
  * Kabukta merkeze doğru çekme (0–1): kopuk duran projeleri küme ile hizalar; diğer gezegenlere dokunmaz.
  */
 function galleryProjectRadialPull(projectKey: string): number {
-  if (projectKey === "interactive-vr/VR Experience") {
+  if (projectKey === "work/3") {
     return 0.13;
   }
-  if (projectKey === "3d-archive/Emberfall-Environment") {
+  if (projectKey === "work/1") {
     return 0.13;
   }
   return 0;
@@ -660,8 +666,8 @@ function ringRadiusWorld(
 /** Used by camera framing math (must sit before carouselFramingExtents) */
 const HOVER_SCALE = 1.06;
 const HOVER_LIFT = 0.16;
-/** Uniform mesh scale — slightly smaller vs before so spread + black space read like the reference. */
-const CARD_MESH_BASE_SCALE = 1.52;
+/** Uniform mesh scale — disc / box hero size in the shell (satellite “planets”). */
+const CARD_MESH_BASE_SCALE = 1.64;
 /** Pull ring positions toward center for a tighter circle (after parallax) */
 const RING_RADIAL_COMPACT = 0.8;
 /**
@@ -1122,20 +1128,182 @@ const PLACEHOLDER_GRAY = new THREE.Color(0x5c5c66);
 /** Neutral map multiply — standard brightness/contrast on hero thumbnails. */
 const COVER_PHOTO_NEUTRAL = new THREE.Color(1, 1, 1);
 
-/** Soft disc edge: radial alpha in fragment shader (same UVs as the map). */
+/** Fallback outer veil (matches previous fixed purple) when cover color cannot be sampled. */
+const DEFAULT_DISC_OUTER_GLOW = new THREE.Vector3(0.38, 0.32, 0.52);
+
+/**
+ * Same center-crop square as {@link applySquareFaceTextureUV} (object-fit: cover on the card).
+ * Downsample + saturation-weighted average → dominant RGB for the outer glow.
+ */
+function extractCoverDominantGlowVector(texture: THREE.Texture): THREE.Vector3 {
+  const out = DEFAULT_DISC_OUTER_GLOW.clone();
+  if (typeof document === "undefined") return out;
+
+  const img = texture.image as
+    | HTMLImageElement
+    | ImageBitmap
+    | HTMLCanvasElement
+    | OffscreenCanvas
+    | { width?: number; height?: number }
+    | null
+    | undefined;
+
+  const w = (img && "width" in img && img.width) || 0;
+  const h = (img && "height" in img && img.height) || 0;
+  if (w < 2 || h < 2) return out;
+
+  const ar = w / h;
+  let sx: number;
+  let sy: number;
+  let sw: number;
+  let sh: number;
+  if (ar >= 1) {
+    sw = h;
+    sh = h;
+    sx = (w - sw) * 0.5;
+    sy = 0;
+  } else {
+    sw = w;
+    sh = w;
+    sx = 0;
+    sy = (h - sh) * 0.5;
+  }
+
+  const sampleSize = 48;
+  const canvas = document.createElement("canvas");
+  canvas.width = sampleSize;
+  canvas.height = sampleSize;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  if (!ctx) return out;
+
+  try {
+    ctx.drawImage(
+      img as CanvasImageSource,
+      sx,
+      sy,
+      sw,
+      sh,
+      0,
+      0,
+      sampleSize,
+      sampleSize,
+    );
+  } catch {
+    return out;
+  }
+
+  const data = ctx.getImageData(0, 0, sampleSize, sampleSize).data;
+
+  let r = 0;
+  let g = 0;
+  let b = 0;
+  let tw = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    const sr = data[i]! / 255;
+    const sg = data[i + 1]! / 255;
+    const sb = data[i + 2]! / 255;
+    const maxc = Math.max(sr, sg, sb);
+    const minc = Math.min(sr, sg, sb);
+    const sat = maxc > 1e-6 ? (maxc - minc) / maxc : 0;
+    const weight = 0.2 + sat * 2.8;
+    r += sr * weight;
+    g += sg * weight;
+    b += sb * weight;
+    tw += weight;
+  }
+  if (tw < 1e-9) return out;
+
+  r /= tw;
+  g /= tw;
+  b /= tw;
+
+  const maxc = Math.max(r, g, b);
+  const minc = Math.min(r, g, b);
+  const l = (maxc + minc) * 0.5;
+  const chromaBoost = 1.15;
+  r = THREE.MathUtils.clamp(l + (r - l) * chromaBoost, 0.06, 0.98);
+  g = THREE.MathUtils.clamp(l + (g - l) * chromaBoost, 0.06, 0.98);
+  b = THREE.MathUtils.clamp(l + (b - l) * chromaBoost, 0.06, 0.98);
+
+  out.set(r, g, b);
+  return out;
+}
+
+/**
+ * Disc rim: feather + cover-tinted outer veil + iridescence (slow uIrisTime drift, no white rim).
+ */
 const DISC_FEATHER_MAP_FRAGMENT_PATCH = `#include <map_fragment>
 #ifdef USE_MAP
 {
 	vec2 _hub = vMapUv - vec2(0.5);
 	float _rr = length(_hub) * 2.0;
-	diffuseColor.a *= 1.0 - smoothstep(0.75, 0.995, _rr);
+	float _featherA = 1.0 - smoothstep(0.87, 0.998, _rr);
+	float _glow = smoothstep(0.74, 0.91, _rr) * (1.0 - smoothstep(0.92, 1.02, _rr));
+	diffuseColor.rgb += uCoverGlow * _glow * 0.22;
+	vec2 _p = _hub * 2.0;
+	float _r2 = dot(_p, _p);
+	float _z = sqrt(max(0.001, 1.0 - _r2));
+	vec3 _N = normalize(vec3(_p.x, _p.y, _z));
+	vec3 _V = vec3(0.0, 0.0, 1.0);
+	float _vn = max(dot(_N, _V), 0.0);
+	float _fres = pow(1.0 - _vn, 2.35);
+	float _fresWide = pow(1.0 - _vn, 1.55);
+	float _rimBand = smoothstep(0.4, 0.93, _rr) * (1.0 - smoothstep(0.88, 1.03, _rr));
+	/** Hue / rim / glint / alpha: no uIrisInteract — avoids drag “pulse” on outer ring; glow stays steady. */
+	float _hue = uIrisTime * 0.55 + _rr * 5.2 + _fres * 3.8;
+	vec3 _a = vec3(sin(_hue * 1.1), sin(_hue * 1.1 + 2.1), sin(_hue * 1.1 + 4.18));
+	_a = _a * 0.5 + 0.5;
+	vec3 _iris = vec3(
+		_a.x * 0.72 + 0.18,
+		_a.y * 0.58 + 0.12,
+		_a.z * 0.78 + 0.15
+	);
+	_iris = mix(_iris, vec3(0.72, 0.28, 0.58), 0.55);
+	_iris = mix(_iris, vec3(0.22, 0.48, 0.82), 0.48);
+	_iris = mix(_iris, vec3(0.52, 0.32, 0.78), 0.42);
+	_iris = clamp(_iris, vec3(0.0), vec3(0.96));
+	float _irisAmt = _rimBand * (0.38 * _fres + 0.42 * _fresWide) * 0.22;
+	vec3 _glint = mix(vec3(0.45, 0.55, 0.88), vec3(0.82, 0.4, 0.72), 0.5 + 0.5 * sin(_hue * 0.9 + 1.0));
+	diffuseColor.rgb += _iris * _irisAmt;
+	diffuseColor.rgb += _glint * _rimBand * _fres * _fres * 0.07;
+	diffuseColor.a *= _featherA;
+	diffuseColor.a = max(diffuseColor.a, _rimBand * (_fres * 0.22 + _fresWide * 0.12) * 0.12);
 }
 #else
 #ifdef USE_UV
 {
 	vec2 _hub = vUv - vec2(0.5);
 	float _rr = length(_hub) * 2.0;
-	diffuseColor.a *= 1.0 - smoothstep(0.75, 0.995, _rr);
+	float _featherA = 1.0 - smoothstep(0.87, 0.998, _rr);
+	float _glow = smoothstep(0.74, 0.91, _rr) * (1.0 - smoothstep(0.92, 1.02, _rr));
+	diffuseColor.rgb += uCoverGlow * _glow * 0.22;
+	vec2 _p = _hub * 2.0;
+	float _r2 = dot(_p, _p);
+	float _z = sqrt(max(0.001, 1.0 - _r2));
+	vec3 _N = normalize(vec3(_p.x, _p.y, _z));
+	vec3 _V = vec3(0.0, 0.0, 1.0);
+	float _vn = max(dot(_N, _V), 0.0);
+	float _fres = pow(1.0 - _vn, 2.35);
+	float _fresWide = pow(1.0 - _vn, 1.55);
+	float _rimBand = smoothstep(0.4, 0.93, _rr) * (1.0 - smoothstep(0.88, 1.03, _rr));
+	float _hue = uIrisTime * 0.55 + _rr * 5.2 + _fres * 3.8;
+	vec3 _a = vec3(sin(_hue * 1.1), sin(_hue * 1.1 + 2.1), sin(_hue * 1.1 + 4.18));
+	_a = _a * 0.5 + 0.5;
+	vec3 _iris = vec3(
+		_a.x * 0.72 + 0.18,
+		_a.y * 0.58 + 0.12,
+		_a.z * 0.78 + 0.15
+	);
+	_iris = mix(_iris, vec3(0.72, 0.28, 0.58), 0.55);
+	_iris = mix(_iris, vec3(0.22, 0.48, 0.82), 0.48);
+	_iris = mix(_iris, vec3(0.52, 0.32, 0.78), 0.42);
+	_iris = clamp(_iris, vec3(0.0), vec3(0.96));
+	float _irisAmt = _rimBand * (0.38 * _fres + 0.42 * _fresWide) * 0.22;
+	vec3 _glint = mix(vec3(0.45, 0.55, 0.88), vec3(0.82, 0.4, 0.72), 0.5 + 0.5 * sin(_hue * 0.9 + 1.0));
+	diffuseColor.rgb += _iris * _irisAmt;
+	diffuseColor.rgb += _glint * _rimBand * _fres * _fres * 0.07;
+	diffuseColor.a *= _featherA;
+	diffuseColor.a = max(diffuseColor.a, _rimBand * (_fres * 0.22 + _fresWide * 0.12) * 0.12);
 }
 #endif
 #endif`;
@@ -1232,6 +1400,8 @@ function GalleryCardMesh({
   const smoothDepthScaleRef = useRef(1);
   /** Hover lift only — kept separate so “All” satellite float does not fight the hover lerp. */
   const smoothHoverYRef = useRef(0);
+  /** Cover photo → outer disc glow tint (same crop as card texture). */
+  const coverOuterGlowRef = useRef(DEFAULT_DISC_OUTER_GLOW.clone());
   /** Kabuk: r (yarıçap), az (yaw), py (düzlem) — önceki kare bazına impuls. */
   const orbitDeformRef = useRef<OrbitDeformState>({ r: 0, az: 0, py: 0 });
   const orbitDeformVelRef = useRef<OrbitDeformState>({ r: 0, az: 0, py: 0 });
@@ -1239,6 +1409,11 @@ function GalleryCardMesh({
 
   const finalImageUrl = primaryGalleryImageUrl(image);
   const texture = useResilientTexture(finalImageUrl);
+
+  useEffect(() => {
+    if (!texture) return;
+    coverOuterGlowRef.current.copy(extractCoverDominantGlowVector(texture));
+  }, [texture]);
 
   const backMap = useMemo(() => {
     if (!texture) return null;
@@ -1295,12 +1470,24 @@ function GalleryCardMesh({
       depthWrite: false,
       side: THREE.DoubleSide,
     });
-    mat.customProgramCacheKey = () => "galleryDiscFeather:v5";
+    mat.customProgramCacheKey = () => "galleryDiscFeatherGlowIris:v12";
     mat.onBeforeCompile = (shader) => {
+      shader.uniforms.uIrisTime = { value: 0 };
+      shader.uniforms.uCoverGlow = {
+        value: DEFAULT_DISC_OUTER_GLOW.clone(),
+      };
+      shader.fragmentShader = shader.fragmentShader.replace(
+        "#include <common>",
+        `#include <common>
+uniform float uIrisTime;
+uniform vec3 uCoverGlow;`,
+      );
       shader.fragmentShader = shader.fragmentShader.replace(
         "#include <map_fragment>",
         DISC_FEATHER_MAP_FRAGMENT_PATCH,
       );
+      mat.userData.uIrisTimeUniform = shader.uniforms.uIrisTime;
+      mat.userData.uCoverGlowUniform = shader.uniforms.uCoverGlow;
     };
     return mat;
   }, [texture, satelliteFloat]);
@@ -1771,8 +1958,14 @@ function GalleryCardMesh({
       const ratio = refD / Math.max(distCam, 0.01);
       const slotJitter =
         1 + (slotHash01(slot, 81) - 0.5) * 2 * PLANET_SLOT_SCALE_JITTER;
+      let ratioWeighted = ratio * slotJitter;
+      if (ratioWeighted > 1.0) {
+        ratioWeighted =
+          1.0 +
+          (ratioWeighted - 1.0) * ALL_CLOUD_PERSPECTIVE_NEAR_STRETCH;
+      }
       const perspectiveTarget = THREE.MathUtils.clamp(
-        ratio * slotJitter,
+        ratioWeighted,
         ALL_CLOUD_PERSPECTIVE_CLAMP_MIN,
         ALL_CLOUD_PERSPECTIVE_CLAMP_MAX,
       );
@@ -1829,10 +2022,24 @@ function GalleryCardMesh({
 
     const mats = mesh.material;
     if (satelliteFloat && !Array.isArray(mats)) {
-      const m = mats as THREE.MeshBasicMaterial;
+      const m = mats as THREE.MeshBasicMaterial & {
+        userData: {
+          uIrisTimeUniform?: { value: number };
+          uCoverGlowUniform?: { value: THREE.Vector3 };
+        };
+      };
       m.opacity = op;
       m.transparent = true;
       m.depthWrite = false;
+      const uT = m.userData.uIrisTimeUniform;
+      const uGlow = m.userData.uCoverGlowUniform;
+      if (uGlow) {
+        uGlow.value.copy(coverOuterGlowRef.current);
+      }
+      if (uT) {
+        /** Slow hue drift only — rim/glow no longer tied to orbit drag. */
+        uT.value = state.clock.elapsedTime * 0.22;
+      }
     } else {
       const list = Array.isArray(mats) ? mats : [mats];
       /** Box face order: +x, −x, +y, −y, +z (front), −z (back) */

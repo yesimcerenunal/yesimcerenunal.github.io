@@ -13,6 +13,7 @@ export const GALLERY_CATEGORIES = [
   "Motion",
   "3D Archive",
   "2D Archive",
+  "New",
 ] as const;
 
 export type GalleryCategory = (typeof GALLERY_CATEGORIES)[number];

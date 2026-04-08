@@ -1,15 +1,12 @@
 /**
  * `gallery/` (kök) ve `public/gallery/` arasında güvenli eşleme — Vite `public/` sunar.
  *
- * ÖNEMLİ (önceki hatalı davranış düzeltildi):
+ * `categoryFolder === "work"` → disk yolu `gallery/<slug>/` (tek seviye; slug = 1, 2, …).
+ * Diğer kategoriler: `gallery/<categoryFolder>/<slug>/`.
+ *
+ * ÖNEMLİ:
  * - **Hiçbir medya dosyası silinmez.**
- * - Sadece bir tarafta varsa diğer tarafa kopyalanır (yedek).
- * - İkisinde de var ama içerik farklıysa **daha yeni değiştirilme zamanı (mtime)** kazanır.
- * - mtime aynı ama içerik farklıysa **`public/` sürümü** tercih edilir (tarayıcıda test edilen dosya).
- *
- * Kullanım: npm run gallery:sync
- *
- * Kayıp dosyalar: Bu script geri getirmez. Git / Time Machine / yedek varsa oradan kurtarın.
+ * - `--` / `--*` slug (work) = taslak; manifest’te yoksa uyarı yok.
  */
 import crypto from "node:crypto";
 import fs from "node:fs";
@@ -19,6 +16,21 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, "..");
 const manifestPath = path.join(root, "src/app/data/gallery-manifest.json");
+
+/** Flat numaralı projeler — `projectKey` = `work/<slug>`, klasör = `gallery/<slug>/` */
+const FLAT_WORK_FOLDER = "work";
+
+function isDraftSlugHidden(slug) {
+  const s = String(slug).trim();
+  return s === "--" || s.startsWith("--");
+}
+
+function galleryRelFromProj(proj) {
+  if (proj.categoryFolder === FLAT_WORK_FOLDER) {
+    return path.join("gallery", String(proj.slug));
+  }
+  return path.join("gallery", proj.categoryFolder, proj.slug);
+}
 
 function listFiles(absDir) {
   if (!fs.existsSync(absDir)) return [];
@@ -43,7 +55,7 @@ const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
 const actions = [];
 
 for (const proj of manifest.projects) {
-  const rel = path.join("gallery", proj.categoryFolder, proj.slug);
+  const rel = galleryRelFromProj(proj);
   const srcDir = path.join(root, rel);
   const dstDir = path.join(root, "public", rel);
 
@@ -114,7 +126,7 @@ for (const proj of manifest.projects) {
   const finalList = naturalSort(
     [...new Set([...listFiles(srcDir), ...listFiles(dstDir)])],
   );
-  const prefix = `gallery/${proj.categoryFolder}/${proj.slug}/`;
+  const prefix = `${rel.replace(/\\/g, "/")}/`;
   proj.images = finalList.map((file) => `${prefix}${file}`.replace(/\\/g, "/"));
 }
 
@@ -132,21 +144,28 @@ const galleryRoot = path.join(root, "gallery");
 const knownProjects = new Set(
   manifest.projects.map((p) => `${p.categoryFolder}/${p.slug}`),
 );
+const flatNumRe = /^\d+$/;
+
 if (fs.existsSync(galleryRoot)) {
-  for (const cat of fs.readdirSync(galleryRoot)) {
-    if (cat.startsWith(".") || cat === "README.md") continue;
-    const catPath = path.join(galleryRoot, cat);
-    if (!fs.statSync(catPath).isDirectory()) continue;
-    for (const slug of fs.readdirSync(catPath)) {
-      if (slug.startsWith(".")) continue;
-      const slugPath = path.join(catPath, slug);
-      if (!fs.statSync(slugPath).isDirectory()) continue;
-      const key = `${cat}/${slug}`;
+  for (const name of fs.readdirSync(galleryRoot)) {
+    if (name.startsWith(".") || name === "README.md") continue;
+    const p = path.join(galleryRoot, name);
+    if (!fs.statSync(p).isDirectory()) continue;
+
+    if (flatNumRe.test(name)) {
+      const key = `${FLAT_WORK_FOLDER}/${name}`;
       if (!knownProjects.has(key)) {
         console.warn(
-          `[gallery:sync] "${key}" manifest’te yok → sitede görünmez; gallery-manifest.json’a proje ekleyin.`,
+          `[gallery:sync] "${key}" manifest’te yok → sitede görünmez; gallery-manifest.json’a work satırı ekleyin.`,
         );
       }
+      continue;
     }
+
+    if (isDraftSlugHidden(name)) continue;
+
+    console.warn(
+      `[gallery:sync] Beklenmeyen gallery alt klasörü (flat yapıda sadece 1…N veya taslak "--"): ${name}`,
+    );
   }
 }
