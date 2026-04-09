@@ -15,8 +15,8 @@ void main() {
 `;
 
 /**
- * White sun-ray PNG on a **square** quad: straight `vUv` sampling — same aspect as your Photoshop file,
- * no polar mapping, no radial zoom, no circular mask in the shader.
+ * White sun-ray PNG on a **square** quad: `uUvExpand` > 1 samples farther out in texture space from the
+ * center → the artwork’s inner void shrinks on screen so rays meet the planet rim (no dark gap ring).
  */
 const fragmentShader = /* glsl */ `
 uniform sampler2D uMap;
@@ -24,10 +24,13 @@ uniform float uTime;
 uniform float uAlpha;
 uniform vec3 uTint;
 uniform float uStrength;
+uniform float uUvExpand;
 varying vec2 vUv;
 
 void main() {
-  vec4 tex = texture2D(uMap, vUv);
+  vec2 uv = 0.5 + (vUv - 0.5) * uUvExpand;
+  uv = clamp(uv, vec2(0.001), vec2(0.999));
+  vec4 tex = texture2D(uMap, uv);
 
   float lum = max(tex.r, max(tex.g, tex.b));
   float mask = lum * tex.a;
@@ -55,6 +58,8 @@ export function createGallerySunburstHaloMaterial(
       uAlpha: { value: 0 },
       uTint: { value: new THREE.Vector3(1, 1, 1) },
       uStrength: { value: 2.35 },
+      /** >1 pulls rays inward (smaller central hole vs planet). */
+      uUvExpand: { value: 1.4 },
     },
     vertexShader,
     fragmentShader,

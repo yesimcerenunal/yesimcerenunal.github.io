@@ -2195,11 +2195,8 @@ uniform vec3 uCoverGlow;`,
         const t = state.clock.elapsedTime;
         su.uTime.value = t;
         su.uAlpha.value = a;
-        su.uTint.value.set(
-          _haloPastelScratch.r,
-          _haloPastelScratch.g,
-          _haloPastelScratch.b,
-        );
+        /** Same RGB as disc `uCoverGlow` (feather + `uCoverGlow * _glow * 0.22`), not pastel-white mix. */
+        su.uTint.value.set(g.x, g.y, g.z);
         const strWave =
           2.45 +
           0.14 * Math.sin(t * 0.62) +
@@ -2248,7 +2245,7 @@ uniform vec3 uCoverGlow;`,
           ref={sunRayMeshRef}
           geometry={sunRayGeometry}
           material={sunRayMaterial}
-          position={[0, 0, -0.036]}
+          position={[0, 0, -0.028]}
           frustumCulled={false}
           renderOrder={-3}
         />
