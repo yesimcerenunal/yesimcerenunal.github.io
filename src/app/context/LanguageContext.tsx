@@ -12,7 +12,6 @@ import {
   LOCALE_STORAGE_KEY,
   defaultLocale,
   isLocale,
-  readStoredLocale,
   resolveMessagesForLocale,
   type Locale,
   type TranslationMessages,
@@ -27,10 +26,8 @@ type LanguageContextValue = {
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(() => {
-    const initial = readStoredLocale();
-    return isLocale(initial) ? initial : defaultLocale;
-  });
+  /** Always start in English on full load — do not restore `portfolio-locale-v2` (user request). */
+  const [locale, setLocaleState] = useState<Locale>(() => defaultLocale);
 
   const setLocale = useCallback((next: Locale) => {
     if (!isLocale(next)) {

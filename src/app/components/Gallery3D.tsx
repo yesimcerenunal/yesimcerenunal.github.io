@@ -2,6 +2,7 @@ import {
   createContext,
   useContext,
   forwardRef,
+  Suspense,
   useRef,
   useEffect,
   useLayoutEffect,
@@ -19,7 +20,10 @@ import {
   useThree,
   type ThreeEvent,
 } from "@react-three/fiber";
-import { OrbitControls as DreiOrbitControls } from "@react-three/drei";
+import {
+  OrbitControls as DreiOrbitControls,
+  useTexture,
+} from "@react-three/drei";
 import type { OrbitControls as StdOrbitControls } from "three-stdlib";
 import { motion, AnimatePresence } from "motion/react";
 import { X } from "lucide-react";
@@ -41,6 +45,17 @@ import {
   primaryGalleryTextureUrl,
   withGalleryAssetCacheBust,
 } from "../utils/galleryMedia";
+import { playGalleryHoverChime } from "../utils/galleryHoverSfx";
+import {
+  createGallerySunburstHaloMaterial,
+  SUN_RAYS_PLANE_SIDE_MULT,
+} from "./gallerySunRaysMaterial";
+import {
+  buildGalleryHoverSparkleGeometry,
+  getGallerySparkleSpriteMap,
+  GALLERY_SPARKLE_LAYER_Z,
+  GALLERY_SPARKLE_RENDER_ORDER,
+} from "./galleryHoverSparkles";
 
 if (import.meta.env.DEV) {
   THREE.Cache.enabled = false;
@@ -945,6 +960,8 @@ function AdaptiveFovSync({
 }
 
 const HOVER_LERP = 10;
+/** Hover sun-ray layer opacity 0→1 (satellite discs). */
+const HOVER_HALO_LERP = 13;
 
 /** Slow camera orbit — invisible hub; primary motion (paused on hover / modal). */
 const AUTO_ROTATE_SPEED = 0.32;
@@ -1144,6 +1161,12 @@ const COVER_PHOTO_NEUTRAL = new THREE.Color(1, 1, 1);
 
 /** Fallback outer veil (matches previous fixed purple) when cover color cannot be sampled. */
 const DEFAULT_DISC_OUTER_GLOW = new THREE.Vector3(0.38, 0.32, 0.52);
+/** White sun-ray PNG (transparent center void) — tinted pastel via {@link HALO_PASTEL_LERP} (see gallerySunRaysMaterial). */
+const HALO_SUNBURST_PATH = "gallery-sun-ray-white.png";
+/** Mix cover glow toward white for soft pastel (0 = raw, 1 = white). */
+const HALO_PASTEL_LERP = 0.62;
+const _haloPastelScratch = new THREE.Color();
+const _HALO_WHITE = new THREE.Color(0xffffff);
 
 /**
  * Same center-crop square as {@link applySquareFaceTextureUV} (object-fit: cover on the card).
@@ -1366,6 +1389,7 @@ function GalleryCardMesh({
   allCategoryLayout,
   hovered,
   modalOpen,
+  sunBurstTexture,
   onHoverStart,
   onHoverEnd,
   onPick,
@@ -1383,6 +1407,8 @@ function GalleryCardMesh({
   allCategoryLayout: boolean;
   hovered: boolean;
   modalOpen: boolean;
+  /** Shared sun-ray texture for all cards (see {@link GalleryScene}). */
+  sunBurstTexture: THREE.Texture;
   onHoverStart: () => void;
   onHoverEnd: () => void;
   onPick: () => void;
@@ -1416,6 +1442,14 @@ function GalleryCardMesh({
   const smoothHoverYRef = useRef(0);
   /** Cover photo → outer disc glow tint (same crop as card texture). */
   const coverOuterGlowRef = useRef(DEFAULT_DISC_OUTER_GLOW.clone());
+  const smoothHoverHaloRef = useRef(0);
+  /** Cumulative Z spin for sun-ray quad (quaternion reset from disc each frame). */
+  const sunRaySpinAccumRef = useRef(0);
+  /** Ayrı hızda dönen sparkle katmanı (sun-ray’in arkası). */
+  const sparkleSpinAccumRef = useRef(0);
+  const sunRayMeshRef = useRef<THREE.Mesh>(null);
+  const sparkleMeshRef = useRef<THREE.Points>(null);
+  const prevHoveredForChimeRef = useRef(false);
   /** Kabuk: r (yarıçap), az (yaw), py (düzlem) — önceki kare bazına impuls. */
   const orbitDeformRef = useRef<OrbitDeformState>({ r: 0, az: 0, py: 0 });
   const orbitDeformVelRef = useRef<OrbitDeformState>({ r: 0, az: 0, py: 0 });
@@ -1467,6 +1501,39 @@ function GalleryCardMesh({
       );
     }
     return new THREE.BoxGeometry(CARD_W, CARD_H, CARD_D);
+  }, [satelliteFloat]);
+
+  const sunRayGeometry = useMemo(() => {
+    if (!satelliteFloat) return null;
+    const side = CARD_W * SUN_RAYS_PLANE_SIDE_MULT;
+    return new THREE.PlaneGeometry(side, side, 1, 1);
+  }, [satelliteFloat]);
+
+  const sunRayMaterial = useMemo(() => {
+    if (!satelliteFloat) return null;
+    return createGallerySunburstHaloMaterial(sunBurstTexture);
+  }, [satelliteFloat, sunBurstTexture]);
+
+  const sparkleGeometry = useMemo(() => {
+    if (!satelliteFloat) return null;
+    return buildGalleryHoverSparkleGeometry(CARD_W, SUN_RAYS_PLANE_SIDE_MULT);
+  }, [satelliteFloat]);
+
+  const sparkleMaterial = useMemo(() => {
+    if (!satelliteFloat) return null;
+    const m = new THREE.PointsMaterial({
+      map: getGallerySparkleSpriteMap(),
+      color: 0xffffff,
+      size: 0.052,
+      transparent: true,
+      opacity: 0,
+      depthWrite: false,
+      depthTest: true,
+      blending: THREE.AdditiveBlending,
+      sizeAttenuation: true,
+      toneMapped: false,
+    });
+    return m;
   }, [satelliteFloat]);
 
   /**
@@ -1552,6 +1619,18 @@ uniform vec3 uCoverGlow;`,
       geometry.dispose();
     };
   }, [geometry]);
+
+  useEffect(() => {
+    return () => {
+      if (sunRayGeometry) sunRayGeometry.dispose();
+    };
+  }, [sunRayGeometry]);
+
+  useEffect(() => {
+    return () => {
+      if (sunRayMaterial) sunRayMaterial.dispose();
+    };
+  }, [sunRayMaterial]);
 
   useEffect(() => {
     return () => {
@@ -2076,10 +2155,105 @@ uniform vec3 uCoverGlow;`,
         edge.depthWrite = op > 0.92;
       }
     }
+
+    if (satelliteFloat && mesh) {
+      const targetH = hovered && !modalOpen ? 1 : 0;
+      smoothHoverHaloRef.current = THREE.MathUtils.lerp(
+        smoothHoverHaloRef.current,
+        targetH,
+        Math.min(1, delta * HOVER_HALO_LERP),
+      );
+      const a = smoothHoverHaloRef.current;
+      const g = coverOuterGlowRef.current;
+      _haloPastelScratch.setRGB(g.x, g.y, g.z);
+      _haloPastelScratch.lerp(_HALO_WHITE, HALO_PASTEL_LERP);
+
+      if (sparkleMeshRef.current && sparkleMaterial) {
+        const sp = sparkleMeshRef.current;
+        sp.raycast = () => {};
+        const pm = sparkleMaterial as THREE.PointsMaterial;
+        pm.opacity = a * 0.82;
+        pm.color.copy(_haloPastelScratch);
+        if (a < 0.02) {
+          sparkleSpinAccumRef.current = 0;
+        } else if (!prefersReducedMotion) {
+          sparkleSpinAccumRef.current += delta * -0.15;
+        }
+        sp.quaternion.copy(mesh.quaternion);
+        sp.rotateZ(sparkleSpinAccumRef.current);
+        sp.scale.copy(mesh.scale);
+      }
+
+      if (sunRayMeshRef.current && sunRayMaterial) {
+        const srMesh = sunRayMeshRef.current;
+        srMesh.raycast = () => {};
+        const su = sunRayMaterial.uniforms as {
+          uTime: { value: number };
+          uAlpha: { value: number };
+          uTint: { value: THREE.Vector3 };
+          uStrength: { value: number };
+        };
+        const t = state.clock.elapsedTime;
+        su.uTime.value = t;
+        su.uAlpha.value = a;
+        su.uTint.value.set(
+          _haloPastelScratch.r,
+          _haloPastelScratch.g,
+          _haloPastelScratch.b,
+        );
+        const strWave =
+          2.45 +
+          0.14 * Math.sin(t * 0.62) +
+          0.09 * Math.sin(t * 1.17 + slot * 1.4);
+        su.uStrength.value = strWave;
+        if (a < 0.02) {
+          sunRaySpinAccumRef.current = 0;
+        } else if (!prefersReducedMotion) {
+          sunRaySpinAccumRef.current += delta * 0.082;
+        }
+        srMesh.quaternion.copy(mesh.quaternion);
+        srMesh.rotateZ(sunRaySpinAccumRef.current);
+        const base = Math.max(mesh.scale.x, mesh.scale.y);
+        const pulse = prefersReducedMotion
+          ? 1
+          : 1 +
+            0.046 * Math.sin(t * 0.51 + slot * 1.83) +
+            0.032 * Math.sin(t * 0.94 + slot * 2.7) +
+            0.021 * Math.sin(t * 1.58 + slotHash01(slot, 2) * 6.283) +
+            0.014 * Math.sin(t * 2.31 + slotHash01(slot, 5) * 6.283);
+        srMesh.scale.setScalar(base * pulse);
+      }
+
+      const engaged = hovered && !modalOpen;
+      if (engaged && !prevHoveredForChimeRef.current && !prefersReducedMotion) {
+        playGalleryHoverChime();
+      }
+      prevHoveredForChimeRef.current = engaged;
+    }
   });
 
   return (
     <group ref={groupRef} frustumCulled={false}>
+      {satelliteFloat && sparkleGeometry && sparkleMaterial ? (
+        <points
+          ref={sparkleMeshRef}
+          geometry={sparkleGeometry}
+          material={sparkleMaterial}
+          position={[0, 0, GALLERY_SPARKLE_LAYER_Z]}
+          frustumCulled={false}
+          renderOrder={GALLERY_SPARKLE_RENDER_ORDER}
+        />
+      ) : null}
+      {satelliteFloat && sunRayGeometry && sunRayMaterial ? (
+        <mesh
+          ref={sunRayMeshRef}
+          geometry={sunRayGeometry}
+          material={sunRayMaterial}
+          position={[0, 0, -0.036]}
+          frustumCulled={false}
+          renderOrder={-3}
+        />
+      ) : null}
       <mesh
         ref={meshRef}
         geometry={geometry}
@@ -2243,6 +2417,14 @@ function GalleryScene({
   const autoRotateSpeed =
     visibleCount >= 2 ? AUTO_ROTATE_SPEED_MANY : AUTO_ROTATE_SPEED;
 
+  const sunBurstTex = useTexture(publicAsset(HALO_SUNBURST_PATH));
+  useLayoutEffect(() => {
+    sunBurstTex.colorSpace = THREE.SRGBColorSpace;
+    sunBurstTex.wrapS = THREE.ClampToEdgeWrapping;
+    sunBurstTex.wrapT = THREE.ClampToEdgeWrapping;
+    sunBurstTex.needsUpdate = true;
+  }, [sunBurstTex]);
+
   const { size } = useThree();
   const aspect = Math.max(size.width / Math.max(size.height, 1), 0.25);
   const { min: minZoomDistance, max: maxZoomDistance } = useMemo(
@@ -2336,6 +2518,7 @@ function GalleryScene({
               allCategoryLayout={allCategoryLayout}
               hovered={hoveredIndex === imageIndex}
               modalOpen={modalOpen}
+              sunBurstTexture={sunBurstTex}
               onHoverStart={() => {
                 setHoveredIndex(imageIndex);
               }}
@@ -2777,26 +2960,28 @@ export function Gallery3D({
               }
             }}
           >
-            <GalleryScene
-              images={images}
-              visibleIndices={visibleIndices}
-              ringRadius={ringRadius}
-              orbitFramingRadius={orbitFramingRadius}
-              cardScaleMul={galleryCardScaleMul}
-              orbitDefaultDistanceT={orbitDefaultDistanceT}
-              allCategoryLayout={allFibonacciShellLayout}
-              orbitControlsRef={orbitControlsRef}
-              hoveredIndex={hoveredIndex}
-              setHoveredIndex={setHoveredIndex}
-              modalOpen={detailModalOpen}
-              onPick={handlePick}
-              onSoftGalleryHint={noopSoftGalleryHint}
-            />
+            <Suspense fallback={null}>
+              <GalleryScene
+                images={images}
+                visibleIndices={visibleIndices}
+                ringRadius={ringRadius}
+                orbitFramingRadius={orbitFramingRadius}
+                cardScaleMul={galleryCardScaleMul}
+                orbitDefaultDistanceT={orbitDefaultDistanceT}
+                allCategoryLayout={allFibonacciShellLayout}
+                orbitControlsRef={orbitControlsRef}
+                hoveredIndex={hoveredIndex}
+                setHoveredIndex={setHoveredIndex}
+                modalOpen={detailModalOpen}
+                onPick={handlePick}
+                onSoftGalleryHint={noopSoftGalleryHint}
+              />
+            </Suspense>
           </Canvas>
         </div>
 
         <p
-          className="pointer-events-none w-full max-w-lg shrink-0 self-center px-4 pb-1 pt-2 text-center text-[11px] font-medium italic leading-snug tracking-[0.12em] text-muted-foreground sm:pb-1.5"
+          className="pointer-events-none w-full max-w-lg shrink-0 self-center px-4 pb-1 pt-2 text-center text-sm font-medium italic leading-snug tracking-[0.12em] text-muted-foreground sm:pb-1.5"
           aria-live="polite"
         >
           {galleryCopy.exploreHint}

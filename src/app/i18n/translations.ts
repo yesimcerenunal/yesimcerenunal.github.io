@@ -8,29 +8,46 @@ import { slugFromProjectKey } from "../utils/galleryProjectKey";
  * **Single source of truth for all user-visible UI strings** (nav, layout, gallery chrome,
  * About/Contact, aria labels, locale switcher labels).
  * Portfolio project copy (EN / DE / TR): `portfolio-content-en.json`, `portfolio-content-de.json`, `portfolio-content-tr.json`.
+ * English UI uses `en` below; project titles/descriptions for locale `en` come **only** from `portfolio-content-en.json` (`portfolioEn`).
  * Project list and file paths come from `gallery-manifest.json` + `public/` (see `galleryData.ts`).
  */
 export type Locale = "en" | "de" | "tr";
 
+/**
+ * Header language switcher: fixed order and labels (never passed through UI translation).
+ * Single tuple avoids lookup bugs; use {@link LOCALES} for locale codes only.
+ */
+export const LOCALE_SWITCHER_ENTRIES: readonly {
+  code: Locale;
+  label: string;
+}[] = [
+  { code: "en", label: "EN" },
+  { code: "de", label: "DE" },
+  { code: "tr", label: "TR" },
+];
+
 /** Display and persistence order: EN → DE → TR */
-export const LOCALES: Locale[] = ["en", "de", "tr"];
+export const LOCALES: Locale[] = LOCALE_SWITCHER_ENTRIES.map((e) => e.code);
 
 /**
  * Short codes for the language switcher only — always EN / DE / TR (never localized),
  * so the three options stay unambiguous regardless of the active UI language.
  */
-export const LOCALE_DISPLAY_LABELS: Record<Locale, string> = {
-  en: "EN",
-  de: "DE",
-  tr: "TR",
-};
+export const LOCALE_DISPLAY_LABELS: Record<Locale, string> =
+  LOCALE_SWITCHER_ENTRIES.reduce(
+    (acc, e) => {
+      acc[e.code] = e.label;
+      return acc;
+    },
+    {} as Record<Locale, string>,
+  );
 
 export const defaultLocale: Locale = "en";
 
 /** Current persisted locale (v2). */
 export const LOCALE_STORAGE_KEY = "portfolio-locale-v2";
 
-/** Legacy key — migrated into v2 synchronously in {@link readStoredLocale}. */
+/** Legacy key — removed when persisting locale from the language switcher. */
 export const LEGACY_LOCALE_STORAGE_KEY = "portfolio-locale";
 
 export type CategoryMessages = { all: string } & Record<GalleryCategory, string>;
@@ -397,25 +414,6 @@ export function resolveMessagesForLocale(
 
 export function isLocale(value: string | null | undefined): value is Locale {
   return value === "en" || value === "de" || value === "tr";
-}
-
-export function readStoredLocale(): Locale {
-  try {
-    if (typeof window === "undefined") return defaultLocale;
-    let raw = window.localStorage.getItem(LOCALE_STORAGE_KEY);
-    if (!raw) {
-      const legacy = window.localStorage.getItem(LEGACY_LOCALE_STORAGE_KEY);
-      if (isLocale(legacy)) {
-        window.localStorage.setItem(LOCALE_STORAGE_KEY, legacy);
-        window.localStorage.removeItem(LEGACY_LOCALE_STORAGE_KEY);
-        raw = legacy;
-      }
-    }
-    if (isLocale(raw)) return raw;
-  } catch {
-    /* ignore */
-  }
-  return defaultLocale;
 }
 
 /** Resolve canonical English category from data to localized label */

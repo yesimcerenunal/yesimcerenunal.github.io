@@ -3,11 +3,7 @@ import {
   useCallback,
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
-import {
-  LOCALES,
-  LOCALE_DISPLAY_LABELS,
-  type Locale,
-} from "../i18n/translations";
+import { LOCALE_SWITCHER_ENTRIES, type Locale } from "../i18n/translations";
 import { useLanguage } from "../context/LanguageContext";
 
 export function LanguageSwitcher() {
@@ -26,10 +22,11 @@ export function LanguageSwitcher() {
   return (
     <nav
       lang="en"
-      className="flex shrink-0 items-center gap-x-2 text-[0.65rem] font-medium uppercase tracking-[0.14em] text-foreground sm:text-[0.68rem]"
+      translate="no"
+      className="notranslate flex shrink-0 items-center gap-x-2 text-[0.65rem] font-medium normal-case tracking-[0.14em] text-foreground sm:text-[0.68rem]"
       aria-label={messages.aria.languageSwitcher}
     >
-      {LOCALES.map((code, index) => {
+      {LOCALE_SWITCHER_ENTRIES.map(({ code, label }, index) => {
         const active = locale === code;
         return (
           <Fragment key={code}>
@@ -60,7 +57,7 @@ export function LanguageSwitcher() {
                     : undefined
                 }
               >
-                {LOCALE_DISPLAY_LABELS[code]}
+                {label}
               </span>
             </span>
           </Fragment>
