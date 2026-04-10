@@ -12,6 +12,7 @@ import {
 } from "../utils/galleryProjectKey";
 import { publicAsset } from "../utils/publicAsset";
 import galleryManifest from "./gallery-manifest.json";
+import portfolioContentEn from "./portfolio-content-en.json";
 
 /**
  * Gallery **project list and media paths** come from **`gallery-manifest.json`** (hand-edited;
@@ -21,6 +22,7 @@ import galleryManifest from "./gallery-manifest.json";
  * - Which projects exist and their `images[]` paths → **`src/app/data/gallery-manifest.json`**
  *   (**`work`**: `projectKey` = `work/<slug>`, files under `gallery/<slug>/`; slug `--` / `--*` = draft, not listed.)
  * - Titles, descriptions, years → **`portfolio-content-en.json`**, **`portfolio-content-de.json`**, **`portfolio-content-tr.json`**
+ *   (**EN** `title` ending with `--` = draft: hidden from gallery until the suffix is removed; UI strips it for display via `portfolioProjectCopy`.)
  *
  * `projectKey` = `categoryFolder/slug` and must match translation keys exactly.
  *
@@ -48,8 +50,19 @@ function manifestEntryToGalleryImage(entry: GalleryManifestProject): GalleryImag
   };
 }
 
+/** EN portfolio title ending with `--` hides the project from the gallery (draft / not ready). */
+function isEnPortfolioTitleDraftHidden(projectKey: string): boolean {
+  const row = (portfolioContentEn as Record<string, { title?: string } | undefined>)[
+    projectKey
+  ];
+  const t = row?.title?.trimEnd() ?? "";
+  return t.endsWith("--");
+}
+
 function manifestProjectVisible(entry: GalleryManifestProject): boolean {
   if ("hidden" in entry && entry.hidden === true) return false;
+  const key = projectKey(entry);
+  if (isEnPortfolioTitleDraftHidden(key)) return false;
   if (
     entry.categoryFolder === GALLERY_FLAT_CATEGORY_FOLDER &&
     isDraftGallerySlugHidden(entry.slug)
@@ -62,6 +75,13 @@ function manifestProjectVisible(entry: GalleryManifestProject): boolean {
 function isHiddenDraftPortfolioKey(projectKey: string): boolean {
   if (!projectKey.startsWith(`${GALLERY_FLAT_CATEGORY_FOLDER}/`)) return false;
   return isDraftGallerySlugHidden(slugFromProjectKey(projectKey));
+}
+
+function isOrphanTranslationOk(projectKey: string): boolean {
+  return (
+    isHiddenDraftPortfolioKey(projectKey) ||
+    isEnPortfolioTitleDraftHidden(projectKey)
+  );
 }
 
 /** Flat list for "All" and the gallery — order follows manifest (category order, then project). */
@@ -108,7 +128,7 @@ if (import.meta.env?.DEV) {
     }
   }
   for (const k of enProjectKeys) {
-    if (!manifestKeys.has(k) && !isHiddenDraftPortfolioKey(k)) {
+    if (!manifestKeys.has(k) && !isOrphanTranslationOk(k)) {
       console.error(
         `[galleryData] PROJECT KEY MISMATCH: expected=manifest project | actual=${JSON.stringify(k)} (orphan translation key — remove or add manifest row).`,
       );

@@ -46,6 +46,7 @@ import {
   primaryGalleryTextureUrl,
   withGalleryAssetCacheBust,
 } from "../utils/galleryMedia";
+import { galleryYearScaleFactorsForProjectKeys } from "../utils/galleryPlanetYearScale";
 import {
   playGalleryHoverChime,
   preloadGalleryHoverSfx,
@@ -490,6 +491,15 @@ function galleryProjectRadialPull(projectKey: string): number {
   if (projectKey === "work/1") {
     return 0.13;
   }
+  /** Western Union–FB (2), Jazz Fest (6), Juste Debout (7, 8): kabukta dışta kalmasın diye merkeze çek. */
+  if (
+    projectKey === "work/2" ||
+    projectKey === "work/6" ||
+    projectKey === "work/7" ||
+    projectKey === "work/8"
+  ) {
+    return 0.24;
+  }
   return 0;
 }
 
@@ -704,10 +714,12 @@ const RING_RADIAL_COMPACT = 0.8;
  * (pull = (scale - 1) * SCALE_INWARD_K * ringRadius).
  */
 const SCALE_INWARD_K = 0.5;
-const ZOOM_RING_EXPAND = 0.062;
-const ZOOM_DEPTH_PULL = 0.22;
+/** Yakın zoom’da kabuk genişlemesi — düşük = gezegenler birbirine daha yakın kalır. */
+const ZOOM_RING_EXPAND = 0.034;
+/** Kameraya doğru paralaks çekişi — düşük = yakınlaşınca daha az sağa-sola yayılma. */
+const ZOOM_DEPTH_PULL = 0.13;
 const ZOOM_PARALLAX_Y = 0.1;
-const ZOOM_SCALE_BOOST = 0.042;
+const ZOOM_SCALE_BOOST = 0.036;
 
 /**
  * Reference vertical FOV for orbit distance math and Canvas projection.
@@ -1406,8 +1418,10 @@ interface GallerySceneProps {
   ringRadius: number;
   /** Wider radius for orbit min/max + FOV when “All” cloud needs extra margin. */
   orbitFramingRadius: number;
-  /** Effective `ALL_CLOUD_LAYOUT_SCALE` × optional sparse-category boost. */
-  cardScaleMul: number;
+  /**
+   * Gezegen ölçeği — `images[i]` ile aynı uzunluk; yıl (portfolio EN) ile en yeni = en büyük.
+   */
+  cardScaleMuls: readonly number[];
   /** Initial orbit distance lerp (RingCameraSync + Canvas open frame). */
   orbitDefaultDistanceT: number;
   /** Fibonacci shell + drift (full gallery always uses this layout). */
@@ -1837,7 +1851,8 @@ uniform vec3 uCoverGlow;`,
       let basePx = cx + _toCamera.x * depth;
       let basePy = cy + _toCamera.y * depth * ZOOM_TO_CAM_Y_DAMP;
       let basePz = cz + _toCamera.z * depth;
-      const cloudCompact = 0.98;
+      /** Yakın zoom’da merkeze sıkıştır — dağılmayı azaltır. */
+      const cloudCompact = THREE.MathUtils.lerp(0.985, 0.93, ziLayout);
       basePx *= cloudCompact;
       basePy *= cloudCompact;
       basePz *= cloudCompact;
@@ -2517,7 +2532,7 @@ function GalleryScene({
   visibleIndices,
   ringRadius,
   orbitFramingRadius,
-  cardScaleMul,
+  cardScaleMuls,
   orbitDefaultDistanceT,
   allCategoryLayout,
   orbitControlsRef,
@@ -2625,6 +2640,7 @@ function GalleryScene({
         {visibleIndices.map((imageIndex, slot) => {
           const image = images[imageIndex];
           if (!image) return null;
+          const cardScaleMul = cardScaleMuls[imageIndex] ?? 1;
           return (
             <GalleryCardMesh
               key={`card-${imageIndex}`}
@@ -2945,10 +2961,13 @@ export function Gallery3D({
 
   const orbitDefaultDistanceT = DEFAULT_ORBIT_DISTANCE_T;
 
-  const galleryCardScaleMul = useMemo(
-    () => ALL_CLOUD_LAYOUT_SCALE * GALLERY_COVER_GLOBAL_SCALE,
-    [],
-  );
+  const galleryCardScaleMuls = useMemo(() => {
+    const base = ALL_CLOUD_LAYOUT_SCALE * GALLERY_COVER_GLOBAL_SCALE;
+    const factors = galleryYearScaleFactorsForProjectKeys(
+      images.map((img) => img.projectKey),
+    );
+    return factors.map((f) => base * f);
+  }, [images]);
 
   const cameraWorldPos = useMemo((): [number, number, number] => {
     const aspect = defaultViewportAspect();
@@ -3085,7 +3104,7 @@ export function Gallery3D({
                 visibleIndices={visibleIndices}
                 ringRadius={ringRadius}
                 orbitFramingRadius={orbitFramingRadius}
-                cardScaleMul={galleryCardScaleMul}
+                cardScaleMuls={galleryCardScaleMuls}
                 orbitDefaultDistanceT={orbitDefaultDistanceT}
                 allCategoryLayout={allFibonacciShellLayout}
                 orbitControlsRef={orbitControlsRef}

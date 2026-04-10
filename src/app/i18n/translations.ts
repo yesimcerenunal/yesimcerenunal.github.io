@@ -430,6 +430,11 @@ export function localizedCategory(
  * Lookup is a plain object get: `messages.portfolio.projects[projectKey]` — must match
  * `projectKeyFromManifestEntry` / `gallery-manifest.json` keys (see `galleryProjectKey.ts`).
  */
+/** Strip EN draft marker (` … --` at end of title) so modals never show the raw suffix. */
+function stripPortfolioTitleDraftSuffix(title: string): string {
+  return title.replace(/\s*--\s*$/, "").trim();
+}
+
 export function portfolioProjectCopy(
   messages: TranslationMessages,
   projectKey: string,
@@ -439,12 +444,13 @@ export function portfolioProjectCopy(
 
   const p = messages.portfolio?.projects?.[projectKey];
   if (p) {
-    const title = p.title?.trim() ?? "";
+    const rawTitle = p.title?.trim() ?? "";
+    const title = stripPortfolioTitleDraftSuffix(rawTitle);
     const year = String(p.year ?? "").trim();
     const titleOut = title || slug;
     const yearOut = year || yearDash;
     if (import.meta.env?.DEV) {
-      if (!title) {
+      if (!title && !rawTitle) {
         console.warn(
           `[portfolio] Empty title — using slug fallback | projectKey=${JSON.stringify(projectKey)} | slug=${JSON.stringify(slug)}`,
         );
