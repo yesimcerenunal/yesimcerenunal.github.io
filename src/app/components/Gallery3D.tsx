@@ -3157,17 +3157,16 @@ export function Gallery3D({
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.94, opacity: 0, y: 20 }}
               transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-              className="relative my-auto flex w-full max-w-6xl min-h-0 flex-col gap-10 lg:grid lg:grid-cols-[minmax(0,560px)_minmax(0,28rem)] lg:grid-rows-[auto_auto_auto] lg:items-stretch lg:gap-x-14 lg:gap-y-10"
+              className="relative my-auto flex w-full max-w-6xl min-h-0 flex-col gap-10 lg:grid lg:grid-cols-[minmax(0,560px)_minmax(0,28rem)] lg:items-stretch lg:gap-x-14"
               onClick={(e: MouseEvent<HTMLDivElement>) => e.stopPropagation()}
             >
-              {/* Üst satır: medya yüksekliği = sadece başlık+açıklama; alt bitiş, sağdaki çizgi+meta ile aynı hizada değil — çizgi bir alt satırda */}
-              <div className="min-h-0 w-full min-w-0 shrink-0 bg-app-shell-bg lg:col-start-1 lg:row-start-1 lg:relative lg:min-h-0 lg:self-stretch lg:max-w-none">
+              <div className="min-h-0 w-full min-w-0 shrink-0 bg-app-shell-bg lg:col-start-1 lg:row-start-1 lg:relative lg:max-w-none lg:self-stretch lg:min-h-[min(70vh,580px)]">
                 <ProjectImageScroll
                   ref={detailModalScrollRef}
                   key={`${selectedImage.projectKey}|${selectedImage.images.join("|")}`}
                   urls={selectedImage.images}
                   heroAlt={selectedPortfolioCopy.title}
-                  className="min-h-[min(70vh,580px)] max-h-[min(70vh,580px)] lg:absolute lg:inset-0 lg:min-h-0 lg:h-full lg:max-h-none"
+                  className="min-h-[min(70vh,580px)] max-h-[min(70vh,580px)] lg:absolute lg:inset-0 lg:h-full lg:min-h-0 lg:max-h-none"
                 />
               </div>
 
@@ -3179,7 +3178,7 @@ export function Gallery3D({
                   duration: 0.4,
                   ease: [0.25, 0.46, 0.45, 0.94],
                 }}
-                className="flex min-h-0 w-full flex-col justify-start lg:col-start-2 lg:row-start-1 lg:max-w-none"
+                className="flex min-h-0 w-full flex-col gap-10 justify-start lg:col-start-2 lg:row-start-1 lg:max-w-none"
               >
                 <div>
                   <p className="mb-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">
@@ -3195,9 +3194,7 @@ export function Gallery3D({
                     {selectedPortfolioCopy.description}
                   </p>
                 </div>
-              </motion.div>
 
-              <div className="border-t border-border pt-10 lg:col-start-2 lg:row-start-2">
                 <div className="flex flex-col gap-6">
                   {selectedPortfolioCopy.tools.trim() !== "" ? (
                     <div className="flex flex-col gap-1.5 sm:flex-row sm:items-baseline sm:gap-4">
@@ -3218,18 +3215,18 @@ export function Gallery3D({
                     </span>
                   </div>
                 </div>
-              </div>
 
-              <motion.button
-                type="button"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={closeModal}
-                className="mt-2 w-fit rounded-full bg-primary px-6 py-2.5 text-sm tracking-wide text-primary-foreground lg:col-start-2 lg:row-start-3 lg:mt-0"
-                style={{ fontWeight: 500 }}
-              >
-                {galleryCopy.backToGallery}
-              </motion.button>
+                <motion.button
+                  type="button"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={closeModal}
+                  className="w-fit rounded-full bg-primary px-6 py-2.5 text-sm tracking-wide text-primary-foreground"
+                  style={{ fontWeight: 500 }}
+                >
+                  {galleryCopy.backToGallery}
+                </motion.button>
+              </motion.div>
 
               <button
                 type="button"
