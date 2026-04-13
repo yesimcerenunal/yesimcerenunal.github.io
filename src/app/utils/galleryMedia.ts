@@ -25,6 +25,18 @@ export function isVideoUrl(url: string): boolean {
   return VIDEO_RE.test(pathOnly(url));
 }
 
+/**
+ * Video yüklenene kadar `<video poster>`: `gallery/…/1.mp4` → `gallery/…/1-.jpg` (manifest’e yazılmaz).
+ * Uzantı şimdilik `.jpg`; dosya yoksa tarayıcı poster’ı yok sayar (siyah alan önceki gibi).
+ */
+export function detailVideoPosterUrl(videoUrl: string): string | null {
+  const p = pathOnly(videoUrl);
+  if (!isVideoUrl(p)) return null;
+  const posterPath = p.replace(/\.(mp4|webm)$/i, "-.jpg");
+  if (posterPath === p) return null;
+  return withGalleryAssetCacheBust(posterPath);
+}
+
 export function isRasterImageUrl(url: string): boolean {
   return RASTER_RE.test(pathOnly(url));
 }
@@ -83,12 +95,22 @@ export function prefetchDetailModalMedia(urls: readonly string[]): void {
     link.setAttribute("data-gallery-detail-preload", "1");
     if (isVideoUrl(u)) {
       link.as = "video";
+      document.head.appendChild(link);
+      const poster = detailVideoPosterUrl(u);
+      if (poster) {
+        const pl = document.createElement("link");
+        pl.rel = "preload";
+        pl.href = poster;
+        pl.as = "image";
+        pl.setAttribute("data-gallery-detail-preload", "1");
+        document.head.appendChild(pl);
+      }
     } else if (isRasterImageUrl(u)) {
       link.as = "image";
+      document.head.appendChild(link);
     } else {
       continue;
     }
-    document.head.appendChild(link);
   }
 }
 

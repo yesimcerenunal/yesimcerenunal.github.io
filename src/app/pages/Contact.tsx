@@ -1,11 +1,6 @@
 import { motion } from "motion/react";
 import { useLanguage } from "../context/LanguageContext";
-import linkedInIconUrl from "../assets/linkedin.png?url";
-import {
-  CONTACT_EMAIL,
-  FORMSPREE_ENDPOINT,
-  LINKEDIN_PROFILE_URL,
-} from "../config/contact";
+import { CONTACT_EMAIL, FORMSPREE_ENDPOINT } from "../config/contact";
 
 const fieldClass =
   "mt-1.5 w-full rounded-lg border border-border bg-input-background px-3 py-2.5 text-sm text-foreground outline-none transition-[box-shadow,border-color] placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/25";
@@ -55,22 +50,6 @@ export function Contact() {
               className="inline-flex w-fit items-center rounded-full bg-primary px-4 py-2 text-sm font-medium tracking-wide text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
             >
               {c.emailCta}
-            </a>
-            <a
-              href={LINKEDIN_PROFILE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={c.linkedinAriaLabel}
-              className="mt-5 inline-flex h-[22px] w-[22px] shrink-0 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
-            >
-              <img
-                src={linkedInIconUrl}
-                alt=""
-                width={22}
-                height={22}
-                className="h-[22px] w-[22px] object-contain"
-                decoding="async"
-              />
             </a>
           </div>
         </div>

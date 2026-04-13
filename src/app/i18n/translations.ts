@@ -123,8 +123,6 @@ export type TranslationMessages = {
     send: string;
     formSubject: string;
     noFormNote: string;
-    /** Accessible label for the LinkedIn icon link (opens in new tab). */
-    linkedinAriaLabel: string;
   };
   portfolio: {
     projects: Record<string, PortfolioProjectCopy>;
@@ -170,10 +168,9 @@ const ABOUT_SKILLS: readonly string[] = [
   "Figma",
   "Blender",
   "Unity",
+  "Unreal Engine",
   "AI-assisted Design",
-  "TouchDesigner",
-  "WebGL",
-  "Three.js",
+  "Claude",
   "Cursor",
   "Substance Painter",
 ];
@@ -242,7 +239,6 @@ const en: TranslationMessages = {
     send: "Send message",
     formSubject: "Portfolio contact",
     noFormNote: "",
-    linkedinAriaLabel: "LinkedIn profile (opens in new tab)",
   },
   portfolio: {
     projects: portfolioEn,
@@ -317,7 +313,6 @@ const de: TranslationMessages = {
     send: "Nachricht senden",
     formSubject: "Portfolio Kontakt",
     noFormNote: "",
-    linkedinAriaLabel: "LinkedIn-Profil (öffnet in neuem Tab)",
   },
   portfolio: {
     projects: portfolioDe,
@@ -392,7 +387,6 @@ const tr: TranslationMessages = {
     send: "Mesaj gönder",
     formSubject: "Portfolyo iletişim",
     noFormNote: "",
-    linkedinAriaLabel: "LinkedIn profili (yeni sekmede açılır)",
   },
   portfolio: {
     projects: portfolioTr,

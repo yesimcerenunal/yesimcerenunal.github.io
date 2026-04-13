@@ -35,4 +35,6 @@ npm run gallery:placeholders
 
 ## Videos
 
-Additional clips can live under **`public/videos/`** — see `public/videos/README.md`.
+Detay modalında video yüklenene kadar siyah kare yerine kapak: videoyla **aynı klasörde**, dosya adı **`{n}-.{jpg|png|webp}`** — ör. `1.mp4` → `1-.jpg`. Bu dosyalar `gallery:sync` ile kopyalanır ama **`gallery-manifest.json` içindeki `images[]` listesine yazılmaz** (ayrı slayt değilller); `<video poster>` URL’i uygulama tarafından videonun yolundan türetilir.
+
+Ek klipler için ayrıca **`public/videos/`** — bkz. `public/videos/README.md`.

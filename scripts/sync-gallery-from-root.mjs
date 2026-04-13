@@ -45,6 +45,11 @@ function naturalSort(files) {
   return [...files].sort(c.compare);
 }
 
+/** `1.mp4` yanında `1-.jpg` — manifest slaytı değil; yalnızca video poster (UI türetir). */
+function isVideoPosterCompanionFilename(name) {
+  return /^\d+-\.(jpe?g|png|webp)$/i.test(String(name));
+}
+
 function hashFile(p) {
   const h = crypto.createHash("md5");
   h.update(fs.readFileSync(p));
@@ -125,7 +130,7 @@ for (const proj of manifest.projects) {
 
   const finalList = naturalSort(
     [...new Set([...listFiles(srcDir), ...listFiles(dstDir)])],
-  );
+  ).filter((f) => !isVideoPosterCompanionFilename(f));
   const prefix = `${rel.replace(/\\/g, "/")}/`;
   proj.images = finalList.map((file) => `${prefix}${file}`.replace(/\\/g, "/"));
 }

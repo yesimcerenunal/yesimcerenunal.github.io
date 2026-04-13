@@ -40,6 +40,7 @@ import { logGalleryHeroLoadErrorsInDev } from "../utils/galleryDevValidation";
 import {
   clearGalleryDetailVideoPreload,
   detailPageMediaUrls,
+  detailVideoPosterUrl,
   firstDetailVideoUrl,
   galleryFilenameIndex,
   isVideoUrl,
@@ -464,9 +465,9 @@ function galleryProjectLayoutTweak(
   );
 
   if (projectKey === "work/3") {
-    /** VR Experience — yakın perspektifte güçlü; uzakta hafif — üstten kırpmayı azaltır */
+    /** Hafif Y− (kırpma); fazlası work/5 ile ekranda üst üste bindiriyordu */
     const t = 0.22 + 0.78 * near01;
-    return { dy: -k * 0.26 * t, scaleMul: 1 };
+    return { dy: -k * 0.1 * t, scaleMul: 1 };
   }
   if (projectKey === "work/1") {
     /** Emberfall */
@@ -478,19 +479,49 @@ function galleryProjectLayoutTweak(
 /**
  * Kabukta merkeze doğru çekme (0–1): kopuk duran projeleri küme ile hizalar; diğer gezegenlere dokunmaz.
  */
-function galleryProjectRadialPull(projectKey: string): number {
-  if (projectKey === "work/3") {
-    return 0.13;
+/**
+ * “Tümü” kabuğunda: xz açı + Y + isteğe bağlı radyal ölçek (merkeze göre farklı katman).
+ * Zoom karışımı ayrı — work/3–5 için taban yüzdesi var (tam sönmesin).
+ */
+function galleryProjectShellSeparation(
+  projectKey: string,
+  allCategoryLayout: boolean,
+): { angleRad: number; yMul: number; radialMul: number } {
+  if (!allCategoryLayout) {
+    return { angleRad: 0, yMul: 0, radialMul: 1 };
   }
   if (projectKey === "work/1") {
-    return 0.13;
+    return { angleRad: 0.38, yMul: 0.18, radialMul: 1 };
   }
-  /** Western Union–FB (2), Jazz Fest (6), Juste Debout (7, 8): kabukta dışta kalmasın diye merkeze çek. */
+  if (projectKey === "work/4") {
+    return { angleRad: -0.38, yMul: -0.17, radialMul: 1 };
+  }
+  if (projectKey === "work/3") {
+    /** Geniş açı + Y + dış kabuğa itiş — work/5 ile aynı görüş hattında kalmayı kırar */
+    return { angleRad: 0.98, yMul: 0.55, radialMul: 1.16 };
+  }
+  if (projectKey === "work/5") {
+    return { angleRad: -0.98, yMul: -0.52, radialMul: 0.84 };
+  }
+  if (projectKey === "work/8") {
+    return { angleRad: 0.52, yMul: 0.3, radialMul: 1 };
+  }
+  return { angleRad: 0, yMul: 0, radialMul: 1 };
+}
+
+function galleryProjectRadialPull(projectKey: string): number {
+  if (projectKey === "work/3") {
+    /** Önceki 0.13 ile merkeze çekiş 5’e göre fazla yakın duruma katkı yapabiliyordu */
+    return 0;
+  }
+  if (projectKey === "work/1") {
+    return 0;
+  }
+  /** Western Union–FB (2), Jazz Fest (6), Juste Debout (7): kabukta dışta kalmasın diye merkeze çek. work/8 ayrı — work/5 ile çakışmayı azaltmak için çekim yok. */
   if (
     projectKey === "work/2" ||
     projectKey === "work/6" ||
-    projectKey === "work/7" ||
-    projectKey === "work/8"
+    projectKey === "work/7"
   ) {
     return 0.24;
   }
@@ -710,8 +741,11 @@ const RING_RADIAL_COMPACT = 0.8;
  * `pull = (scaleForHubInward - 1) * SCALE_INWARD_K * ringRadius`.
  */
 const SCALE_INWARD_K = 0.5;
-/** Yakın zoom’da kabuk genişlemesi — düşük = gezegenler birbirine daha yakın kalır. */
-const ZOOM_RING_EXPAND = 0.034;
+/**
+ * Zoom ile halka/kabuk yarıçapını büyütme (0 = zoom’da çekirdekten dışarı kayma yok).
+ * Eskiden küçük pozitif değer “yakın zoom’da kabuk genişlemesi” veriyordu.
+ */
+const ZOOM_RING_EXPAND = 0;
 /** Kameraya doğru paralaks çekişi — düşük = yakınlaşınca daha az sağa-sola yayılma. */
 const ZOOM_DEPTH_PULL = 0.13;
 const ZOOM_PARALLAX_Y = 0.1;
@@ -1168,12 +1202,13 @@ function ZoomFrameSync({
   zoomRef: ZoomFxRef;
 }) {
   const { camera } = useThree();
+  /** Düşük öncelik: kartlardan önce çalışsın; ilk karede `zoomIn` güncel olsun. */
   useFrame(() => {
     const dist = camera.position.distanceTo(_orbitTarget);
     const zoomIn = 1 - THREE.MathUtils.smoothstep(dist, minDistance, maxDistance);
     zoomRef.current.zoomIn = zoomIn;
     zoomRef.current.camAzimuth = Math.atan2(camera.position.x, camera.position.z);
-  });
+  }, -20);
   return null;
 }
 
@@ -1784,6 +1819,42 @@ uniform vec3 uCoverGlow;`,
       let cx = cx0 * ca - cz0 * sa;
       let cz = cx0 * sa + cz0 * ca;
       let cy = cy0 + d.py * radius * DEFORM_PY_RADIUS_MUL;
+      const sep = galleryProjectShellSeparation(
+        image.projectKey,
+        allCategoryLayout,
+      );
+      /**
+       * Açılış + zoom: `ziLayout`/`zTarget` birleşimi. work/3–5: taban ~0.82 — uzak zoom’da
+       * tamamen sönüp yeniden yapışmasınlar (diğerleri hâlâ doğal toplanır).
+       */
+      let sepZoomBlend = THREE.MathUtils.clamp(
+        Math.max(ziLayout, zTarget),
+        0,
+        1,
+      );
+      if (image.projectKey === "work/3" || image.projectKey === "work/5") {
+        sepZoomBlend = Math.max(sepZoomBlend, 0.82);
+      }
+      const sepAngleRad = sep.angleRad * sepZoomBlend;
+      const sepYMul = sep.yMul * sepZoomBlend;
+      if (sepAngleRad !== 0) {
+        const rh = Math.hypot(cx, cz);
+        if (rh > 1e-6) {
+          const t0 = Math.atan2(cz, cx);
+          const t1 = t0 + sepAngleRad;
+          cx = Math.cos(t1) * rh;
+          cz = Math.sin(t1) * rh;
+        }
+      }
+      if (sepYMul !== 0) {
+        cy += sepYMul * shellR;
+      }
+      if (sep.radialMul !== 1) {
+        const rm = 1 + (sep.radialMul - 1) * sepZoomBlend;
+        cx *= rm;
+        cy *= rm;
+        cz *= rm;
+      }
       const radialPull = galleryProjectRadialPull(image.projectKey);
       if (radialPull > 0) {
         const f = 1 - radialPull;
@@ -2484,7 +2555,8 @@ function GalleryScene({
     () => orbitZoomLimits(orbitFramingRadius, aspect),
     [orbitFramingRadius, aspect],
   );
-  const zoomFxRef = useRef({ zoomIn: 0, camAzimuth: 0 });
+  /** Açılışta 0 olunca ilk paint’te ayrım blend’i 0 kalıyordu; ~varsayılan orbit’e yakın. */
+  const zoomFxRef = useRef({ zoomIn: 0.52, camAzimuth: 0 });
   const orbitPhysicsApiRef = useRef<OrbitDragPhysicsApi>({
     omegaSmoothed: 0,
     isDragging: false,
@@ -2770,6 +2842,7 @@ const ProjectImageScroll = forwardRef(function ProjectImageScroll(
             indexLabel != null ? `${heroAlt} — ${indexLabel}` : heroAlt;
           const isPrimaryDetailVideo =
             showVideo && firstVideoUrl != null && url === firstVideoUrl;
+          const videoPoster = showVideo ? detailVideoPosterUrl(url) : null;
           return (
             <div
               key={`${url}-${i}`}
@@ -2784,6 +2857,7 @@ const ProjectImageScroll = forwardRef(function ProjectImageScroll(
                     videoRefs.current[i] = el;
                   }}
                   src={src}
+                  poster={videoPoster ?? undefined}
                   controls
                   controlsList="nodownload"
                   playsInline
