@@ -1,63 +1,63 @@
 {
   "work/1": {
     "title": "Real-Time Cinematic Environment Production",
-    "description": "Responsible for the end-to-end development of a large-scale, fantasy-inspired library environment for a realistic short film. The story takes place in the Emberfall Kingdom, where a princess narrates a tale to the audience within the library setting. The environment was designed to support this narrative moment, emphasizing atmosphere, scale, and storytelling through space. I designed and modeled all environment props from scratch, along with creating clean and optimized UV maps to ensure a high-quality real-time workflow. I also developed the overall environment layout and spatial composition, shaping a grand, immersive library space with intricate architectural details. Beyond environment production, I edited the final trailer, handling both video editing and sound design to enhance the cinematic tone and emotional impact of the project. Texturing and PBR material creation, the princess character, including her animation and textures, was developed by other artists.",
-    "year": "2024",
-    "tools": "Adobe"
+    "description": "Gerçekçi bir animasyon filmi için büyük ölçekli, fantezi esintili bir kütüphane ortamının oluşturulmasından sorumluydum. Hikâye Emberfall Krallığı’nda geçiyor; bir prenses kütüphane mekânında izleyiciye bir anlatı sunuyor. Ortam, bu anlatı anını destekleyecek şekilde tasarlandı; atmosfer, ölçek ve mekân üzerinden hikâye anlatımı ön planda. Moodboard’dan mekânsal kompozisyona kadar tüm çevre objelerini sıfırdan modelledim; yüksek kaliteli gerçek zamanlı iş akışı ve karmaşık mimari detaylarda sürükleyici bir kütüphane alanı için temiz ve optimize UV haritaları hazırladım. Çevre üretiminin ötesinde film fragmanını kurguladım; görüntü ve ses tasarımıyla sinematik ton ve duygusal etkiyi güçlendirdim. Dokulama ve PBR malzeme üretimi ile prenses karakteri, animasyonu ve dokuları grup içindeki diğer sanatçılar tarafından geliştirildi.",
+    "year": "2025",
+    "tools": "Unreal Engine, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/2": {
     "title": "Character Customization & Animation",
-    "description": "Responsible for the creation of 3D character costumes and in-game visual assets, combining modeling, UV mapping, weight painting, and texturing within a production pipeline. I designed and developed character clothing and accessories, including full 3D costume construction in Blender, followed by UV unwrapping, mesh optimization, and skin-weight painting for proper in-game deformation. Texturing was completed in Substance 3D Painter, with a focus on material consistency and visual clarity. In addition, I contributed to the production of 3D and 2D assets across more than 30 mobile game levels and over 100 characters, supporting a large-scale content pipeline. My responsibilities also included the creation of illustrations, textures, UI visual components, props, and interactive elements, ensuring visual coherence across different game systems. I played a key role in the production of Fashion Battle (120M+ downloads), contributing to concept development, 3D modeling, texturing, and UI-related visual design. Beyond production work, I actively participated in playtests, providing feedback on gameplay mechanics, visual design, and user experience. I also worked closely with development, design, and production teams to ensure quality control, consistency, and smooth integration of assets into the final product.",
+    "description": "3D karakter kostümleri ve oyun içi görsel varlıkların oluşturulmasından sorumluydum. Blender’da tam 3D kostüm üretimi, ardından UV açma, mesh optimizasyonu ve oyun içi deformasyon için skin-weight boyama. Dokulama Substance 3D Painter ile tamamlandı; malzeme tutarlılığı ve görsel netlik öncelikliydi. Buna ek olarak düğme, ekran ve etkileşimli öğeler gibi 2D varlıklara — illüstrasyon, doku ve UI bileşenlerine — katkı sağladım; 30’dan fazla mobil oyun seviyesi ve 100’ün üzerinde karakterde görsel bütünlük sağlandı. Fashion Battle (120M+ indirme) üretiminde moda konsepti, 3D modelleme, dokulama ve UI ile ilgili görsel tasarımda kilit rol oynadım. Üretimin yanı sıra oynanış testlerine katıldım; mekanikler, görsel tasarım ve kullanıcı deneyimi hakkında geri bildirim verdim. Geliştirme, tasarım ve prodüksiyon ekipleriyle kalite, tutarlılık ve varlıkların ürüne sorunsuz entegrasyonu için yakın çalıştım.",
     "year": "2021-2024",
-    "tools": "Adobe"
+    "tools": "Unity, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/3": {
     "title": "VR Experience",
-    "description": "Boneheads Raid is an immersive VR work combining spatial layout, real-time media, and guided focus across a sequence of scenes.",
+    "description": "Boneheads Raid, oyuncuların kutsal bir idolü dalga dalga iskelet düşman saldırılarına karşı sürükleyici bir VR ortamında savunduğu bir VR oyun projesidir. Bu projede ortam yerleşimi, VFX, karakter rig ve animasyonundan sorumluydum. İskeletlerin kılıçları için dinamik ışık ve iz efektleri; Unity’de vuruş tepki animasyonları sırasında tetiklenen parçacık efektleri ile dövüş geri bildirimini güçlendirdim. Ayrıca anahtar kare animasyonlarıyla entegre özel doğum ve ölüm materyalleri geliştirerek iskeletlerin doğma ve ölüm anlarında görsel olarak etkileyici şekilde erimesini veya kaybolmasını sağladım.",
     "year": "2024",
-    "tools": "Adobe"
+    "tools": "Unity, Blender, Adobe Photoshop & Premiere Pro"
   },
   "work/4": {
     "title": "Cozy Zen",
-    "description": "Cozy Zen is my thesis project that explores cozy game experiences through the concept of a Zen garden. The goal was to create a calming yet engaging interactive game environment that offers players a sense of relaxation and presence. Within a very limited timeframe, I independently developed both the theoretical thesis and a fully playable prototype. I was responsible for the entire production process, including animation, visual design, and game development, bringing the concept to life using Unity and Blender. I also utilized Codex to support the coding process and gameplay implementation. Despite the tight schedule, this project became a highly rewarding and educational journey — from learning programming fundamentals to experimenting with mechanics and refining every detail from concept to playable prototype.",
+    "description": "Cozy Zen, kış temalı bir Zen bahçesi kavramı üzerinden rahatlatıcı oyun deneyimlerini inceleyen yüksek lisans tez projemdir. Oyunculara hem sakin hem de sürükleyici bir etkileşimli ortam sunmayı hedefledim. Çok kısıtlı sürede hem teorik tezi hem de tam oynanabilir bir prototipi tek başıma geliştirdim. Animasyon, görsel tasarım ve oyun geliştirme dahil tüm üretim sürecinden sorumluydum; konsepti Blender ve Unity ile hayata geçirdim. Kodlama ve oyun mekaniği için Codex’ten yararlandım. Programlama temellerinden farklı mekanik denemelere ve kavramdan oynanabilir prototipe kadar her ayrıntıyı rafine etmek benim için çok öğretici bir yolculuk oldu.",
     "year": "2025",
-    "tools": "Adobe"
+    "tools": "Unity, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/5": {
     "title": "Spotify Canvas Design",
-    "description": "Designed the visual identity for the Spotify release of the album “Bulut” which means cloud in English, including the album presentation and accompanying Canvas animations. My work focused on creating short-form motion visuals optimized for Spotify’s Canvas format, combining video editing, motion design, and rhythm-driven visual storytelling to enhance the listening experience. The visuals were designed to complement the mood and atmosphere of the album while maintaining platform-specific constraints and user interaction flow.",
-    "year": "2024",
-    "tools": "Adobe"
+    "description": "Hip hop albümü “Bulut”un (İngilizcede anlamı “cloud”, bulut) Spotify yayını için görsel kimlik; albüm sunumu ve eşlik eden Canvas animasyonları dahil. Çalışmam, hip hop, sokak stili ve format ilhamlı kısa motion görselleri oluşturmaya odaklandı; video kurgusu, motion tasarım ve ritim odaklı görsel anlatımı bir araya getirdim. Bu görseller dinleme deneyimini güçlendirmek ve albümün havası ile atmosferik tonuyla uyum sağlamak için hazırlandı. Tüm varlıklar platforma özgü kısıtlar ve kullanıcı etkileşim kalıpları gözetilerek optimize edildi; Spotify arayüzünde hem görsel etki hem sorunsuz entegrasyon hedeflendi.",
+    "year": "2025",
+    "tools": "Unity, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/6": {
-    "title": "Jazz Fest Commercial --",
-    "description": "This project was developed as a commercial motion piece for a jazz festival, combining rhythm-based editing, typography, and music-synced visual storytelling aligned with the festival’s brand tone. Beyond motion design, I took an active role in the full visual production process, including preparing the model through makeup styling and directing a professional photoshoot to create high-quality visual assets for the campaign. The final output integrated motion design with photographed material, focusing on rhythm, composition, and brand identity. The project was submitted to a competition and received the “Mansion Award” recognition.",
+    "title": "Jazz Fest Commercial",
+    "description": "Bir caz festivali için ticari bir motion çalışması olarak geliştirildi; ritim odaklı kurgu, tipografi ve müzikle senkron görsel anlatım festival tonuyla uyumlu. Motion tasarımın ötesinde makyajla model hazırlığı ve profesyonel çekim yönetimi dahil görsel üretimin tamamında aktif rol aldım. Nihai çıktı fotoğraf malzemesiyle motion tasarımı birleştiriyor; ritim, kompozisyon ve marka kimliği ön planda. Proje bir yarışmaya gönderildi ve “Mansion Award” ile onurlandırıldı.",
     "year": "2019",
-    "tools": "Adobe"
+    "tools": "Adobe Photoshop & Premiere Pro"
   },
   "work/7": {
     "title": "Juste Debout",
-    "description": "Campaign and motion work for Juste Debout—rhythm, framing, and social-ready visuals built for the stage.",
+    "description": "Juste Debout için kampanya görselleri ve motion içerik; hip hop ritimleri, sokak dansı kültürü ve dinamik anlatı odaklı. 2002’den beri dünyanın önde gelen hip hop dans etkinliklerinden biri olarak proje, küresel kimliği ve köklü tarihi yansıtan güçlü ve otantik bir görsel dil gerektirdi. Sosyal medya ve baskı için geniş bir varlık seti oluşturdum; her birini dijital platformlara göre uyarlayarak netlik, etki ve formatlar arası tutarlılık sağladım. Genel görsel yön, sahne enerjisini yakalarken tanınabilir bir kampanya kimliğini korumayı hedefledi.",
     "year": "2026",
-    "tools": "Adobe"
+    "tools": "Adobe Photoshop, Illustrator, Premiere Pro & After Effects"
   },
   "work/8": {
     "title": "Western Union",
-    "description": "Worked on commercial projects for Western Union, producing animated promotional materials using Adobe After Effects. The content was developed in multiple languages including Greek, Georgian, Russian, and English, to effectively reach and engage diverse international audiences.",
+    "description": "Western Union için ticari projelerde çalıştım; Adobe After Effects ile animasyonlu tanıtım materalleri ürettim. İçerik Yunanca, Gürcüce, Rusça ve Ukraynaca dahil birden çok dile yerelleştirilerek farklı kitlelere ulaşacak şekilde hazırlandı.",
     "year": "2019",
-    "tools": "Adobe"
+    "tools": "Adobe Photoshop, Premiere Pro & After Effects"
   },
   "work/9": {
     "title": "Psychedelic Magazine --",
-    "description": "Editorial and magazine spreads—layout, typography, and image treatment for a bold print identity.",
+    "description": "Editoryal ve dergi sayfaları — yerleşim, tipografi ve güçlü bir baskı kimliği için görsel işleme.",
     "year": "2019",
     "tools": "Adobe"
   },
   "work/10": {
     "title": "Illustrations",
-    "description": "Selected illustration work—series, composition, color, and narrative tone across print and digital.",
+    "description": "Kişisel illüstrasyon çalışmaları — seri, kompozisyon, renk ve anlatı tonu.",
     "year": "2019-2023",
-    "tools": "Adobe"
+    "tools": "Adobe Photoshop"
   },
   "work/11": {
     "title": "Yeni proje 1 --",
@@ -66,7 +66,7 @@
     "tools": ""
   },
   "work/12": {
-    "title": "Yeni proje 2",
+    "title": "Yeni proje 2 --",
     "description": "Yer tutucu — başlık, açıklama ve medyayı gallery/12/ içinde güncelleyin.",
     "year": "",
     "tools": ""

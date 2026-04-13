@@ -56,15 +56,6 @@ import {
   createGallerySunburstHaloMaterial,
   SUN_RAYS_PLANE_SIDE_MULT,
 } from "./gallerySunRaysMaterial";
-import {
-  applyGallerySparkleBlendMode,
-  buildGalleryHoverSparkleGeometry,
-  getGallerySparkleSpriteMap,
-  patchGallerySparkleOuterRimFeather,
-  GALLERY_SPARKLE_LAYER_Z,
-  GALLERY_SPARKLE_RENDER_ORDER,
-} from "./galleryHoverSparkles";
-
 /** Hover halo diskin hafif önünde (kamera yönü +Z); arkada kalınca opak disk tamamen kapatıyordu. */
 const GALLERY_HALO_LAYER_Z = 0.01;
 const GALLERY_HALO_RENDER_ORDER = 4;
@@ -1193,10 +1184,6 @@ const COVER_PHOTO_NEUTRAL = new THREE.Color(1, 1, 1);
 
 /** Fallback outer veil (matches previous fixed purple) when cover color cannot be sampled. */
 const DEFAULT_DISC_OUTER_GLOW = new THREE.Vector3(0.38, 0.32, 0.52);
-/** Mix cover glow toward white for soft pastel (0 = raw, 1 = white). */
-const HALO_PASTEL_LERP = 0.62;
-const _haloPastelScratch = new THREE.Color();
-const _HALO_WHITE = new THREE.Color(0xffffff);
 /** Koyu/mor kapaklarda halo için pastel üst ton (görünürlük + yumuşaklık). */
 const _HALO_PASTEL_SOFT = new THREE.Color(0xe8e4f6);
 /** Hover halo halkası: kapak rengini doyurganlaştır (her gezegende farklı his). */
@@ -1506,10 +1493,7 @@ function GalleryCardMesh({
   const smoothHoverHaloRef = useRef(0);
   /** Cumulative Z spin for sun-ray quad (quaternion reset from disc each frame). */
   const sunRaySpinAccumRef = useRef(0);
-  /** Ayrı hızda dönen sparkle katmanı (sun-ray’in arkası). */
-  const sparkleSpinAccumRef = useRef(0);
   const sunRayMeshRef = useRef<THREE.Mesh>(null);
-  const sparkleMeshRef = useRef<THREE.Points>(null);
   const prevHoveredForChimeRef = useRef(false);
   /** Kabuk: r (yarıçap), az (yaw), py (düzlem) — önceki kare bazına impuls. */
   const orbitDeformRef = useRef<OrbitDeformState>({ r: 0, az: 0, py: 0 });
@@ -1574,29 +1558,6 @@ function GalleryCardMesh({
     if (!satelliteFloat) return null;
     return createGallerySunburstHaloMaterial(sunBurstTexture);
   }, [satelliteFloat, sunBurstTexture]);
-
-  const sparkleGeometry = useMemo(() => {
-    if (!satelliteFloat) return null;
-    return buildGalleryHoverSparkleGeometry(CARD_W, SUN_RAYS_PLANE_SIDE_MULT);
-  }, [satelliteFloat]);
-
-  const sparkleMaterial = useMemo(() => {
-    if (!satelliteFloat) return null;
-    const m = new THREE.PointsMaterial({
-      map: getGallerySparkleSpriteMap(),
-      color: 0xffffff,
-      size: 0.052,
-      transparent: true,
-      opacity: 0,
-      depthWrite: false,
-      depthTest: true,
-      sizeAttenuation: true,
-      toneMapped: false,
-    });
-    applyGallerySparkleBlendMode(m);
-    patchGallerySparkleOuterRimFeather(m);
-    return m;
-  }, [satelliteFloat]);
 
   /**
    * “All”: one circular mesh, one hero texture (no repeated faces).
@@ -2265,24 +2226,6 @@ uniform vec3 uCoverGlow;`,
       );
       const a = smoothHoverHaloRef.current;
       const g = coverOuterGlowRef.current;
-      _haloPastelScratch.setRGB(g.x, g.y, g.z);
-      _haloPastelScratch.lerp(_HALO_WHITE, HALO_PASTEL_LERP);
-
-      if (sparkleMeshRef.current && sparkleMaterial) {
-        const sp = sparkleMeshRef.current;
-        sp.raycast = () => {};
-        const pm = sparkleMaterial as THREE.PointsMaterial;
-        pm.opacity = a * 0.82;
-        pm.color.copy(_haloPastelScratch);
-        if (a < 0.02) {
-          sparkleSpinAccumRef.current = 0;
-        } else if (!prefersReducedMotion) {
-          sparkleSpinAccumRef.current += delta * -0.15;
-        }
-        sp.quaternion.copy(mesh.quaternion);
-        sp.rotateZ(sparkleSpinAccumRef.current);
-        sp.scale.copy(mesh.scale);
-      }
 
       if (sunRayMeshRef.current && sunRayMaterial) {
         const srMesh = sunRayMeshRef.current;
@@ -2341,11 +2284,6 @@ uniform vec3 uCoverGlow;`,
         cardGroup.renderOrder = onTop ? GALLERY_CARD_HOVER_RENDER_ORDER : 0;
       }
       mesh.renderOrder = onTop ? GALLERY_CARD_HOVER_RENDER_ORDER : 0;
-      if (sparkleMeshRef.current) {
-        sparkleMeshRef.current.renderOrder = onTop
-          ? GALLERY_CARD_HOVER_RENDER_ORDER - 1
-          : GALLERY_SPARKLE_RENDER_ORDER;
-      }
       if (sunRayMeshRef.current) {
         sunRayMeshRef.current.renderOrder = onTop
           ? GALLERY_CARD_HOVER_RENDER_ORDER + 1
@@ -2359,16 +2297,6 @@ uniform vec3 uCoverGlow;`,
 
   return (
     <group ref={groupRef} frustumCulled={false}>
-      {satelliteFloat && sparkleGeometry && sparkleMaterial ? (
-        <points
-          ref={sparkleMeshRef}
-          geometry={sparkleGeometry}
-          material={sparkleMaterial}
-          position={[0, 0, GALLERY_SPARKLE_LAYER_Z]}
-          frustumCulled={false}
-          renderOrder={GALLERY_SPARKLE_RENDER_ORDER}
-        />
-      ) : null}
       {satelliteFloat && sunRayGeometry && sunRayMaterial ? (
         <mesh
           ref={sunRayMeshRef}

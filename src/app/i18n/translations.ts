@@ -123,6 +123,8 @@ export type TranslationMessages = {
     send: string;
     formSubject: string;
     noFormNote: string;
+    /** Accessible label for the LinkedIn icon link (opens in new tab). */
+    linkedinAriaLabel: string;
   };
   portfolio: {
     projects: Record<string, PortfolioProjectCopy>;
@@ -189,8 +191,8 @@ const en: TranslationMessages = {
   },
   nav: {
     gallery: "GALLERY",
-    about: "ABOUT",
-    contact: "CONTACT",
+    about: "ABOUT ME",
+    contact: "CONNECT",
   },
   sidebar: {
     portfolio: "Portfolio",
@@ -214,23 +216,23 @@ const en: TranslationMessages = {
     imageErrorAlt: "Error loading image",
   },
   about: {
-    title: "ABOUT",
+    title: "ABOUT ME",
     lead:
-      "A multidisciplinary designer and creative technologist focused on interactive experiences, immersive systems, and physical-digital storytelling.",
+      "A multidisciplinary designer, creative explorer and technologist focused on interactive experiences, immersive, and digital storytelling.",
     p2:
-      "My practice explores how design can move beyond static visuals into responsive and experiential systems  where interaction, motion, and real-time technologies shape how people engage with digital environments. With a background in digital art and architectural thinking, I work across interaction design, real-time graphics, and experimental media to build systems that connect physical and digital spaces.",
+      "My artworks are going to reveal how design can move beyond static visuals into responsive and experiential systems where interaction, motion, and real-time technologies shape the engagement of people with digital environments.",
     p3:
-      "I am particularly interested in emerging technologies such as creative coding, real-time rendering, and AI-assisted design as tools for building new types of experiences rather than traditional outputs.",
+      "With a bachelor in graphic design and master in 3D Animation for Film & Games. I work across motion design, real-time graphics, and experimental media to build interaction systems that connect physical and digital spaces. These days I am particularly interested in emerging technologies such as vibe coding, and AI-assisted design as tools for building new types of artworks rather than traditional outputs.",
     skillsHeading: "Skills & Tools",
     skills: ABOUT_SKILLS,
   },
   contact: {
-    title: "CONTACT",
-    headline: "Available for new opportunities!",
-    description:
-      "I design thoughtful visual systems and experiences that connect storytelling, aesthetics, and technology from brand and editorial work to real-time and interactive projects.",
+    title: "CONNECT",
+    headline:
+      "Available for new opportunities!\nCurrently, email is the quickest way to get in touch. Use Email Me button below for business inquiries.",
+    description: "",
     emailCta: "Email Me",
-    rolesLine: "Freelance, contract, and full-time roles.",
+    rolesLine: "",
     nameLabel: "Name",
     emailLabel: "Email",
     messageLabel: "Message",
@@ -239,8 +241,8 @@ const en: TranslationMessages = {
     placeholderMessage: "Tell me about your project or role…",
     send: "Send message",
     formSubject: "Portfolio contact",
-    noFormNote:
-      "For now, email is the quickest way to get in touch. Use Email Me above.",
+    noFormNote: "",
+    linkedinAriaLabel: "LinkedIn profile (opens in new tab)",
   },
   portfolio: {
     projects: portfolioEn,
@@ -261,7 +263,7 @@ const de: TranslationMessages = {
   nav: {
     gallery: "GALERIE",
     about: "ÜBER MICH",
-    contact: "KONTAKT",
+    contact: "VERNETZEN",
   },
   sidebar: {
     portfolio: "Portfolio",
@@ -291,21 +293,21 @@ const de: TranslationMessages = {
   about: {
     title: "ÜBER MICH",
     lead:
-      "Als multidisziplinärer Designer und Creative Technologist spezialisiere ich mich auf 3D-Visualisierung, interaktive Erlebnisse und experimentelles Design.",
+      "Ein multidisziplinärer Designer, kreativer Entdecker und Technologe mit Fokus auf interaktive Erfahrungen, immersive Ansätze und digitales Storytelling.",
     p2:
-      "Mit einem Hintergrund in Architektur und digitaler Kunst erforsche ich die Schnittstelle von physischer und digitaler Welt durch immersive Installationen, Computational Design und moderne Rendering-Techniken.",
+      "Meine Arbeiten zeigen, wie Design über statische Visualität hinausgehen kann – hin zu responsiven und erfahrungsorientierten Systemen, in denen Interaktion, Bewegung und Echtzeittechnologien die Art und Weise prägen, wie Menschen mit digitalen Umgebungen interagieren.",
     p3:
-      "Meine Arbeit verbindet klassische Designprinzipien mit Technologien wie KI, Echtzeit-Rendering und gestenbasierter Interaktion, um einzigartige visuelle Erlebnisse zu schaffen.",
+      "Ich habe einen Bachelor Abschluss in Grafikdesign sowie einen Master in 3D-Animation für Film und Spiele. Ich arbeite an der Schnittstelle von Motion Design, Echtzeitgrafik und experimentellen Medien, um interaktive Systeme zu entwickeln, die physische und digitale Räume miteinander verbinden. Aktuell interessiere ich mich besonders für neue Technologien wie Vibe Coding und KI-gestütztes Design als Werkzeuge zur Entwicklung neuer künstlerischer Ausdrucksformen, jenseits traditioneller Ergebnisse.",
     skillsHeading: "Skills & Tools",
     skills: ABOUT_SKILLS,
   },
   contact: {
-    title: "KONTAKT",
-    headline: "Offen für neue Möglichkeiten!",
-    description:
-      "Ich gestalte durchdachte visuelle Systeme und Erlebnisse, die Storytelling, Ästhetik und Technologie verbinden: von Marken- und Editorial-Arbeit bis zu Echtzeit- und interaktiven Projekten.",
+    title: "VERNETZEN",
+    headline:
+      "Offen für neue Möglichkeiten!\n\nDerzeit ist E-Mail der schnellste Weg. Nutzen Sie den Button „E-Mail schreiben“ unten für geschäftliche Anfragen.",
+    description: "",
     emailCta: "E-Mail schreiben",
-    rolesLine: "Freelance, Festanstellung und Projektaufträge.",
+    rolesLine: "",
     nameLabel: "Name",
     emailLabel: "E-Mail",
     messageLabel: "Nachricht",
@@ -314,8 +316,8 @@ const de: TranslationMessages = {
     placeholderMessage: "Erzählen Sie von Ihrem Projekt oder der Rolle…",
     send: "Nachricht senden",
     formSubject: "Portfolio Kontakt",
-    noFormNote:
-      "Vorerst ist E-Mail der schnellste Weg. Nutzen Sie oben E-Mail schreiben.",
+    noFormNote: "",
+    linkedinAriaLabel: "LinkedIn-Profil (öffnet in neuem Tab)",
   },
   portfolio: {
     projects: portfolioDe,
@@ -366,21 +368,21 @@ const tr: TranslationMessages = {
   about: {
     title: "HAKKIMDA",
     lead:
-      "3D görselleştirme, etkileşimli deneyimler ve deneysel tasarım üzerine çalışan çok disiplinli bir tasarımcı ve yaratıcı teknologum.",
+      "Etkileşimli deneyimler, dijital ve sürükleyici hikâye anlatımı üzerine odaklanan multidisipliner bir tasarımcı, yaratıcı bir keşifçi ve teknolojiyi yakından takip eden bir sanatçıyım.",
     p2:
-      "Mimari ve dijital sanat geçmişimle, sürükleyici enstalasyonlar, hesaplamalı tasarım ve ileri düzey görüntüleme teknikleri aracılığıyla fiziksel ve dijital dünyaların kesişimini keşfediyorum.",
+      "Çalışmalarım, tasarımın statik görsellerin ötesine geçerek; etkileşim, hareket ve gerçek zamanlı teknolojilerin insanların dijital ortamlarla kurduğu etkileşimi nasıl şekillendirdiğini ortaya koymayı amaçlıyor.",
     p3:
-      "Çalışmalarım geleneksel tasarım ilkelerini yapay zekâ, gerçek zamanlı görüntüleme ve jest tabanlı arayüzler gibi gelişen teknolojilerle birleştirerek özgün görsel deneyimler üretiyor.",
+      "Grafik tasarım alanında lisans ve Film & Oyunlar için 3D Animasyon alanında yüksek lisans derecesine sahip biri olarak motion design, real-time capturing ve deneysel medya alanlarında çalışarak fiziksel ve dijital mekânları birbirine bağlayan etkileşim sistemleri geliştiriyorum. Son zamanlarda özellikle vibe coding ve yapay zekâ destekli tasarımlara ve yeni teknolojilere ilgi duyuyorum; bu araçları geleneksel çıktılar üretmekten ziyade yeni tür sanatsal üretim biçimleri geliştiriyorum.",
     skillsHeading: "Yetenekler ve araçlar",
     skills: ABOUT_SKILLS,
   },
   contact: {
     title: "İLETİŞİM",
-    headline: "Yeni fırsatlara açığım!",
-    description:
-      "Hikâye anlatımı, estetik ve teknolojiyi bir araya getiren; marka ve yayın çalışmalarından gerçek zamanlı ve etkileşimli projelere uzanan düşünceli görsel sistemler ve deneyimler tasarlıyorum.",
+    headline:
+      "Yeni fırsatlara açığım!\nŞu an en hızlı yol e-posta. İş birlikleri için E-posta gönderebilirsiniz.",
+    description: "",
     emailCta: "E-posta gönder",
-    rolesLine: "Serbest, sözleşmeli ve tam zamanlı roller.",
+    rolesLine: "",
     nameLabel: "Ad",
     emailLabel: "E-posta",
     messageLabel: "Mesaj",
@@ -389,8 +391,8 @@ const tr: TranslationMessages = {
     placeholderMessage: "Projeniz veya rol hakkında yazın…",
     send: "Mesaj gönder",
     formSubject: "Portfolyo iletişim",
-    noFormNote:
-      "Şimdilik en hızlı yol e-posta. Yukarıdaki E-posta gönder bağlantısını kullanın.",
+    noFormNote: "",
+    linkedinAriaLabel: "LinkedIn profili (yeni sekmede açılır)",
   },
   portfolio: {
     projects: portfolioTr,

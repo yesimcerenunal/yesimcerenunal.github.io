@@ -1,8 +1,10 @@
 import { motion } from "motion/react";
 import { useLanguage } from "../context/LanguageContext";
+import linkedInIconUrl from "../assets/linkedin.png?url";
 import {
   CONTACT_EMAIL,
   FORMSPREE_ENDPOINT,
+  LINKEDIN_PROFILE_URL,
 } from "../config/contact";
 
 const fieldClass =
@@ -23,25 +25,58 @@ export function Contact() {
       className="max-w-3xl"
     >
       <div className="space-y-8 leading-relaxed text-muted-foreground">
-        <div className="space-y-5">
-          <h1 className="text-xl font-normal text-foreground">{c.headline}</h1>
-          <p>{c.description}</p>
+        <div className="space-y-6">
+          <h1 className="text-sm font-normal uppercase tracking-[0.22em] text-muted-foreground">
+            {c.title}
+          </h1>
+          <div className="space-y-5">
+            <p className="whitespace-pre-line text-base font-normal italic leading-relaxed text-muted-foreground">
+              {c.headline}
+            </p>
+            {c.description.trim() ? (
+              <p className="text-base text-muted-foreground">{c.description}</p>
+            ) : null}
+          </div>
         </div>
 
-        <div className="flex flex-col items-start gap-3">
-          <a
-            href={mailtoHref}
-            className="inline-flex w-fit rounded-full bg-primary px-6 py-2.5 text-sm font-medium tracking-wide text-primary-foreground transition-opacity hover:opacity-90"
-          >
-            {c.emailCta}
-          </a>
-          <p className="max-w-md text-[0.8rem] leading-snug text-muted-foreground">
-            {c.rolesLine}
-          </p>
+        {!FORMSPREE_ENDPOINT && c.noFormNote.trim() ? (
+          <p className="max-w-lg text-sm text-muted-foreground">{c.noFormNote}</p>
+        ) : null}
+
+        <div className="border-t border-border pt-8">
+          <div className="flex flex-col items-start gap-3">
+            {c.rolesLine.trim() ? (
+              <p className="mb-6 max-w-md text-[0.8rem] leading-snug text-muted-foreground">
+                {c.rolesLine}
+              </p>
+            ) : null}
+            <a
+              href={mailtoHref}
+              className="inline-flex w-fit items-center rounded-full bg-primary px-4 py-2 text-sm font-medium tracking-wide text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+            >
+              {c.emailCta}
+            </a>
+            <a
+              href={LINKEDIN_PROFILE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={c.linkedinAriaLabel}
+              className="mt-5 inline-flex h-[22px] w-[22px] shrink-0 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+            >
+              <img
+                src={linkedInIconUrl}
+                alt=""
+                width={22}
+                height={22}
+                className="h-[22px] w-[22px] object-contain"
+                decoding="async"
+              />
+            </a>
+          </div>
         </div>
 
-        <div className="border-t border-border pt-10">
-          {FORMSPREE_ENDPOINT ? (
+        {FORMSPREE_ENDPOINT ? (
+          <div className="border-t border-border pt-10">
             <form
               action={FORMSPREE_ENDPOINT}
               method="POST"
@@ -96,10 +131,8 @@ export function Contact() {
                 {c.send}
               </button>
             </form>
-          ) : (
-            <p className="max-w-lg text-sm text-muted-foreground">{c.noFormNote}</p>
-          )}
-        </div>
+          </div>
+        ) : null}
       </div>
     </motion.div>
   );

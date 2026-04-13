@@ -13,10 +13,12 @@ export function About() {
       className="max-w-3xl"
     >
       <div className="space-y-6 leading-relaxed text-muted-foreground">
-        <h1 className="text-xl font-normal text-foreground">{a.lead}</h1>
+        <h1 className="text-sm font-normal uppercase tracking-[0.22em] text-muted-foreground">
+          {a.title}
+        </h1>
 
+        <p>{a.lead}</p>
         <p>{a.p2}</p>
-
         <p>{a.p3}</p>
 
         <div className="mt-12 border-t border-border pt-8">

@@ -11,3 +11,6 @@ export const CONTACT_EMAIL =
 export const FORMSPREE_ENDPOINT = (
   import.meta.env.VITE_FORMSPREE_ENDPOINT as string | undefined
 )?.trim();
+
+/** Public LinkedIn profile — Connect page icon link. */
+export const LINKEDIN_PROFILE_URL = "https://www.linkedin.com/in/yesim-ceren/";

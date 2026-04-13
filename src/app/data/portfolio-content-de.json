@@ -1,63 +1,63 @@
 {
   "work/1": {
     "title": "Real-Time Cinematic Environment Production",
-    "description": "Responsible for the end-to-end development of a large-scale, fantasy-inspired library environment for a realistic short film. The story takes place in the Emberfall Kingdom, where a princess narrates a tale to the audience within the library setting. The environment was designed to support this narrative moment, emphasizing atmosphere, scale, and storytelling through space. I designed and modeled all environment props from scratch, along with creating clean and optimized UV maps to ensure a high-quality real-time workflow. I also developed the overall environment layout and spatial composition, shaping a grand, immersive library space with intricate architectural details. Beyond environment production, I edited the final trailer, handling both video editing and sound design to enhance the cinematic tone and emotional impact of the project. Texturing and PBR material creation, the princess character, including her animation and textures, was developed by other artists.",
-    "year": "2024",
-    "tools": "Adobe"
+    "description": "Verantwortlich für die Erstellung einer großformatigen, fantasy-inspirierten Bibliotheksumgebung für einen realistischen Animationsfilm. Die Geschichte spielt im Königreich Emberfall, wo eine Prinzessin dem Publikum in der Bibliothek eine Erzählung vorträgt. Die Umgebung wurde gestaltet, um diesen narrativen Moment zu tragen – mit Fokus auf Atmosphäre, Maßstab und Storytelling durch den Raum. Von Moodboard bis räumlicher Komposition habe ich alle Umgebungs-Props von Grund auf modelliert sowie saubere und optimierte UV-Karten erstellt, um einen hochwertigen Echtzeit-Workflow mit immersiver Bibliotheksarchitektur zu gewährleisten. Neben der Umgebungsproduktion habe ich den Filmtrailer geschnitten – Videobearbeitung und Sounddesign, um die cineastische Stimmung und emotionale Wirkung zu verstärken. Texturierung und PBR-Materialien sowie die Prinzessin-Figur inklusive Animation und Texturen wurden von anderen Künstlerinnen und Künstlern in unserer Gruppe umgesetzt.",
+    "year": "2025",
+    "tools": "Unreal Engine, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/2": {
     "title": "Character Customization & Animation",
-    "description": "Responsible for the creation of 3D character costumes and in-game visual assets, combining modeling, UV mapping, weight painting, and texturing within a production pipeline. I designed and developed character clothing and accessories, including full 3D costume construction in Blender, followed by UV unwrapping, mesh optimization, and skin-weight painting for proper in-game deformation. Texturing was completed in Substance 3D Painter, with a focus on material consistency and visual clarity. In addition, I contributed to the production of 3D and 2D assets across more than 30 mobile game levels and over 100 characters, supporting a large-scale content pipeline. My responsibilities also included the creation of illustrations, textures, UI visual components, props, and interactive elements, ensuring visual coherence across different game systems. I played a key role in the production of Fashion Battle (120M+ downloads), contributing to concept development, 3D modeling, texturing, and UI-related visual design. Beyond production work, I actively participated in playtests, providing feedback on gameplay mechanics, visual design, and user experience. I also worked closely with development, design, and production teams to ensure quality control, consistency, and smooth integration of assets into the final product.",
+    "description": "Verantwortlich für die Erstellung von 3D-Charakterkostümen und visuellen In-Game-Assets. Vollständiger 3D-Kostümaufbau in Blender, anschließend UV-Unwrapping, Mesh-Optimierung und Skin-Weight-Painting für korrekte Deformation im Spiel. Die Texturierung erfolgte in Substance 3D Painter mit Fokus auf Materialkonsistenz und visuelle Klarheit. Darüber hinaus trug ich zur Produktion von 2D-Assets bei – Illustrationen, Texturen, UI-Elemente wie Buttons, Screens und interaktive Komponenten – und sorgte für visuelle Kohärenz in über 30 Mobile-Game-Levels und bei über 100 Charakteren innerhalb einer groß angelegten Content-Pipeline. Ich spielte eine zentrale Rolle bei Fashion Battle (120M+ Downloads): Modekonzeption, 3D-Modellierung, Texturierung und UI-bezogenes visuelles Design. Neben der Produktion nahm ich aktiv an Playtests teil und lieferte Feedback zu Gameplay, visuellem Design und UX. Eng zusammen mit Entwicklung, Design und Produktion arbeitete ich an Qualitätssicherung, Konsistenz und reibungsloser Integration der Assets ins Endprodukt.",
     "year": "2021-2024",
-    "tools": "Adobe"
+    "tools": "Unity, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/3": {
     "title": "VR Experience",
-    "description": "Boneheads Raid is an immersive VR work combining spatial layout, real-time media, and guided focus across a sequence of scenes.",
+    "description": "Boneheads Raid ist ein VR-Spiel, in dem Spieler ein heiliges Idol gegen Wellen angreifender Skelettgegner in einer immersiven VR-Umgebung verteidigen. Ich war verantwortlich für Umgebungslayout, VFX, Character-Rigging und Animation. Ich erstellte dynamische Licht- und Schweif-Effekte für die Schwerter der Skelette sowie Partikeleffekte in Unity, die bei Trefferreaktions-Animationen ausgelöst werden, um das Kampffeedback zu verstärken. Zusätzlich entwickelte ich benutzerdefinierte Birth- und Death-Materialien, gekoppelt mit Keyframe-Animationen, damit Skelette beim Spawn und bei der Niederlage auf visuell ansprechende Weise zerfallen oder verschwinden.",
     "year": "2024",
-    "tools": "Adobe"
+    "tools": "Unity, Blender, Adobe Photoshop & Premiere Pro"
   },
   "work/4": {
     "title": "Cozy Zen",
-    "description": "Cozy Zen is my thesis project that explores cozy game experiences through the concept of a Zen garden. The goal was to create a calming yet engaging interactive game environment that offers players a sense of relaxation and presence. Within a very limited timeframe, I independently developed both the theoretical thesis and a fully playable prototype. I was responsible for the entire production process, including animation, visual design, and game development, bringing the concept to life using Unity and Blender. I also utilized Codex to support the coding process and gameplay implementation. Despite the tight schedule, this project became a highly rewarding and educational journey — from learning programming fundamentals to experimenting with mechanics and refining every detail from concept to playable prototype.",
+    "description": "Cozy Zen ist mein Masterarbeit-Projekt, das gemütliche Spielerlebnisse über das Konzept eines winterlichen Zen-Gartens erforscht. Ziel war eine beruhigende und zugleich einnehmende interaktive Spielumgebung, die Entspannung und Präsenz vermittelt. In sehr begrenzter Zeit entwickelte ich eigenständig sowohl die theoretische Arbeit als auch einen voll spielbaren Prototyp. Ich übernahm die gesamte Produktion – Animation, visuelles Design und Spielentwicklung – und setzte das Konzept mit Blender und Unity um. Codex unterstützte mich beim Programmieren und bei der Gameplay-Umsetzung. Das Projekt wurde für mich zu einer intensiven Lernerfahrung: von Programmiergrundlagen über Mechanik-Experimente bis zur Verfeinerung vom Konzept zum spielbaren Prototyp.",
     "year": "2025",
-    "tools": "Adobe"
+    "tools": "Unity, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/5": {
     "title": "Spotify Canvas Design",
-    "description": "Designed the visual identity for the Spotify release of the album “Bulut” which means cloud in English, including the album presentation and accompanying Canvas animations. My work focused on creating short-form motion visuals optimized for Spotify’s Canvas format, combining video editing, motion design, and rhythm-driven visual storytelling to enhance the listening experience. The visuals were designed to complement the mood and atmosphere of the album while maintaining platform-specific constraints and user interaction flow.",
-    "year": "2024",
-    "tools": "Adobe"
+    "description": "Gestaltung der visuellen Identität für die Spotify-Veröffentlichung des Hip-Hop-Albums „Bulut“ (auf Englisch „cloud“, Wolke), einschließlich Albumpräsentation und begleitender Canvas-Animationen. Der Schwerpunkt lag auf kurzen Motion-Visuals inspiriert von Hip-Hop, Street-Style und Format, verbunden mit Videoschnitt, Motion Design und rhythmusgetriebener visueller Erzählung. Die Inhalte sollten das Hörerlebnis stärken und zur Stimmung und zum atmosphärischen Ton des Albums passen. Alle Assets wurden unter Berücksichtigung plattformspezifischer Vorgaben und Nutzungsmuster optimiert – für visuelle Wirkung und nahtlose Einbettung in die Spotify-Oberfläche.",
+    "year": "2025",
+    "tools": "Unity, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/6": {
-    "title": "Jazz Fest Commercial --",
-    "description": "This project was developed as a commercial motion piece for a jazz festival, combining rhythm-based editing, typography, and music-synced visual storytelling aligned with the festival’s brand tone. Beyond motion design, I took an active role in the full visual production process, including preparing the model through makeup styling and directing a professional photoshoot to create high-quality visual assets for the campaign. The final output integrated motion design with photographed material, focusing on rhythm, composition, and brand identity. The project was submitted to a competition and received the “Mansion Award” recognition.",
+    "title": "Jazz Fest Commercial",
+    "description": "Dieses Projekt entstand als kommerzieller Motion-Spot für ein Jazzfestival – mit rhythmusbasiertem Schnitt, Typografie und zur Musik synchronisierter Bilderzählung im Sinne der Markenstimmung. Neben Motion Design war ich in der gesamten visuellen Produktion eingebunden: inklusive Styling über Make-up und Regie eines professionellen Fotoshootings für hochwertige Kampagnen-Assets. Das Endergebnis verband Motion Design mit Fotomaterial – mit Fokus auf Rhythmus, Komposition und Markenidentität. Das Projekt wurde zu einem Wettbewerb eingereicht und erhielt die Anerkennung „Mansion Award“.",
     "year": "2019",
-    "tools": "Adobe"
+    "tools": "Adobe Photoshop & Premiere Pro"
   },
   "work/7": {
     "title": "Juste Debout",
-    "description": "Campaign and motion work for Juste Debout—rhythm, framing, and social-ready visuals built for the stage.",
+    "description": "Kampagnenvisuals und Motion-Content für Juste Debout – mit Hip-Hop-Rhythmen, Street-Dance-Kultur und dynamischer Erzählung. Als eine der weltweit führenden Hip-Hop-Tanzveranstaltungen seit 2002 verlangte das Projekt eine starke, authentische Bildsprache, die globale Identität und Geschichte widerspiegelt. Ich erstellte Social-Media- und Print-Assets und passte jedes Format sorgfältig für digitale Kanäle an – für Klarheit, Wirkung und Konsistenz. Die visuelle Richtung sollte die rohe Energie der Bühne einfangen und gleichzeitig eine wiedererkennbare Kampagnenidentität bewahren.",
     "year": "2026",
-    "tools": "Adobe"
+    "tools": "Adobe Photoshop, Illustrator, Premiere Pro & After Effects"
   },
   "work/8": {
     "title": "Western Union",
-    "description": "Worked on commercial projects for Western Union, producing animated promotional materials using Adobe After Effects. The content was developed in multiple languages including Greek, Georgian, Russian, and English, to effectively reach and engage diverse international audiences.",
+    "description": "Kommerzielle Projekte für Western Union: animierte Werbematerialien in Adobe After Effects. Die Inhalte wurden in mehrere Sprachen lokalisiert – darunter Griechisch, Georgisch, Russisch und Ukrainisch – um internationale Zielgruppen zu erreichen.",
     "year": "2019",
-    "tools": "Adobe"
+    "tools": "Adobe Photoshop, Premiere Pro & After Effects"
   },
   "work/9": {
     "title": "Psychedelic Magazine --",
-    "description": "Editorial and magazine spreads—layout, typography, and image treatment for a bold print identity.",
+    "description": "Editorial und Magazinseiten – Layout, Typografie und Bildbehandlung für eine markante Print-Identität.",
     "year": "2019",
     "tools": "Adobe"
   },
   "work/10": {
     "title": "Illustrations",
-    "description": "Selected illustration work—series, composition, color, and narrative tone across print and digital.",
+    "description": "Persönliche Illustrationsarbeit – Serien, Komposition, Farbe und erzählerischer Ton.",
     "year": "2019-2023",
-    "tools": "Adobe"
+    "tools": "Adobe Photoshop"
   },
   "work/11": {
     "title": "Neues Projekt 1 --",
