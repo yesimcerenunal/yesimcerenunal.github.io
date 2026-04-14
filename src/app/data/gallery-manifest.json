@@ -1,7 +1,7 @@
 {
   "sourceOfTruth": "Flat layout: disk gallery/<n>/ for numbered slots; manifest projectKey work/<n>. Taslak: slug -- veya --* (gallery/--/). gallery:sync images[] + lastUpdated.",
   "version": 1,
-  "lastUpdated": "2026-04-13T03:11:06.427Z",
+  "lastUpdated": "2026-04-14T13:06:05.097Z",
   "projects": [
     {
       "category": "3D Archive",
@@ -132,7 +132,12 @@
       "categoryFolder": "work",
       "slug": "11",
       "images": [
-        "gallery/11/00.jpg"
+        "gallery/11/00.jpg",
+        "gallery/11/1.jpg",
+        "gallery/11/2.jpg",
+        "gallery/11/3.jpg",
+        "gallery/11/4.jpg",
+        "gallery/11/5.jpg"
       ]
     },
     {
