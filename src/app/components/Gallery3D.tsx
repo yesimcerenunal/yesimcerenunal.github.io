@@ -480,6 +480,10 @@ function galleryProjectLayoutTweak(
     /** Emberfall */
     return { dy: k * 0.2, scaleMul: 1.09 };
   }
+  if (projectKey === "work/9") {
+    /** Wholy Cow / 2D Archive — hafif Y− (kabukta biraz aşağı) */
+    return { dy: -k * 0.14, scaleMul: 1 };
+  }
   return { dy: 0, scaleMul: 1 };
 }
 

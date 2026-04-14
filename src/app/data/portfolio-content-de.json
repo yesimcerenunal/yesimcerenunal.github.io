@@ -1,48 +1,48 @@
 {
   "work/1": {
-    "title": "Real-Time Cinematic Environment Production",
+    "title": "3D-Echtzeit-Filmische Umgebungsproduktion",
     "description": "Verantwortlich für die Erstellung einer großformatigen, fantasy-inspirierten Bibliotheksumgebung für einen realistischen Animationsfilm. Die Geschichte spielt im Königreich Emberfall, wo eine Prinzessin dem Publikum in der Bibliothek eine Erzählung vorträgt. Die Umgebung wurde gestaltet, um diesen narrativen Moment zu tragen – mit Fokus auf Atmosphäre, Maßstab und Storytelling durch den Raum. Von Moodboard bis räumlicher Komposition habe ich alle Umgebungs-Props von Grund auf modelliert sowie saubere und optimierte UV-Karten erstellt, um einen hochwertigen Echtzeit-Workflow mit immersiver Bibliotheksarchitektur zu gewährleisten. Neben der Umgebungsproduktion habe ich den Filmtrailer geschnitten – Videobearbeitung und Sounddesign, um die cineastische Stimmung und emotionale Wirkung zu verstärken. Texturierung und PBR-Materialien sowie die Prinzessin-Figur inklusive Animation und Texturen wurden von anderen Künstlerinnen und Künstlern in unserer Gruppe umgesetzt.",
     "year": "2025",
     "tools": "Unreal Engine, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/2": {
-    "title": "Character Customization & Animation",
+    "title": "3D-Charakter-Anpassung & Animation",
     "description": "Verantwortlich für die Erstellung von 3D-Charakterkostümen und visuellen In-Game-Assets. Vollständiger 3D-Kostümaufbau in Blender, anschließend UV-Unwrapping, Mesh-Optimierung und Skin-Weight-Painting für korrekte Deformation im Spiel. Die Texturierung erfolgte in Substance 3D Painter mit Fokus auf Materialkonsistenz und visuelle Klarheit. Darüber hinaus trug ich zur Produktion von 2D-Assets bei – Illustrationen, Texturen, UI-Elemente wie Buttons, Screens und interaktive Komponenten – und sorgte für visuelle Kohärenz in über 30 Mobile-Game-Levels und bei über 100 Charakteren innerhalb einer groß angelegten Content-Pipeline. Ich spielte eine zentrale Rolle bei Fashion Battle (120M+ Downloads): Modekonzeption, 3D-Modellierung, Texturierung und UI-bezogenes visuelles Design. Neben der Produktion nahm ich aktiv an Playtests teil und lieferte Feedback zu Gameplay, visuellem Design und UX. Eng zusammen mit Entwicklung, Design und Produktion arbeitete ich an Qualitätssicherung, Konsistenz und reibungsloser Integration der Assets ins Endprodukt.",
     "year": "2021-2024",
     "tools": "Unity, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/3": {
-    "title": "VR Experience",
+    "title": "VR-Kampfspiel-Produktion",
     "description": "Boneheads Raid ist ein VR-Spiel, in dem Spieler ein heiliges Idol gegen Wellen angreifender Skelettgegner in einer immersiven VR-Umgebung verteidigen. Ich war verantwortlich für Umgebungslayout, VFX, Character-Rigging und Animation. Ich erstellte dynamische Licht- und Schweif-Effekte für die Schwerter der Skelette sowie Partikeleffekte in Unity, die bei Trefferreaktions-Animationen ausgelöst werden, um das Kampffeedback zu verstärken. Zusätzlich entwickelte ich benutzerdefinierte Birth- und Death-Materialien, gekoppelt mit Keyframe-Animationen, damit Skelette beim Spawn und bei der Niederlage auf visuell ansprechende Weise zerfallen oder verschwinden.",
     "year": "2024",
     "tools": "Unity, Blender, Adobe Photoshop & Premiere Pro"
   },
   "work/4": {
-    "title": "Cozy Zen",
+    "title": "Cozy Zen — Spieldesign & -entwicklung",
     "description": "Cozy Zen ist mein Masterarbeit-Projekt, das gemütliche Spielerlebnisse über das Konzept eines winterlichen Zen-Gartens erforscht. Ziel war eine beruhigende und zugleich einnehmende interaktive Spielumgebung, die Entspannung und Präsenz vermittelt. In sehr begrenzter Zeit entwickelte ich eigenständig sowohl die theoretische Arbeit als auch einen voll spielbaren Prototyp. Ich übernahm die gesamte Produktion – Animation, visuelles Design und Spielentwicklung – und setzte das Konzept mit Blender und Unity um. Codex unterstützte mich beim Programmieren und bei der Gameplay-Umsetzung. Das Projekt wurde für mich zu einer intensiven Lernerfahrung: von Programmiergrundlagen über Mechanik-Experimente bis zur Verfeinerung vom Konzept zum spielbaren Prototyp.",
     "year": "2025",
     "tools": "Unity, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/5": {
-    "title": "Spotify Canvas Motion Design",
+    "title": "Spotify Album Canvas Design",
     "description": "Gestaltung der visuellen Identität für die Spotify-Veröffentlichung des Hip-Hop-Albums „Bulut“ (englisch „cloud“, Wolke), einschließlich Albumpräsentation und begleitender Canvas-Animationen. Mein Fokus lag auf kurzen Motion-Visuals inspiriert von Hip-Hop, Streetstyle und Format: Videoschnitt, Motion Design und rhythmusgetriebene visuelle Erzählung kombiniert. Die Inhalte sollten das Hörerlebnis stärken und zur Stimmung und zum atmosphärischen Ton des Albums passen. Alle Assets wurden unter Berücksichtigung plattformspezifischer Vorgaben und Nutzungsmuster optimiert – für visuelle Wirkung und nahtlose Einbettung in die Spotify-Oberfläche.",
     "year": "2025",
     "tools": "Adobe Photoshop & Premiere Pro"
   },
   "work/6": {
-    "title": "Jazz Fest Commercial",
+    "title": "Jazz Fest Commercial Design",
     "description": "Dieses Projekt entstand als kommerzieller Motion-Spot für ein Jazzfestival – mit rhythmusbasiertem Schnitt, Typografie und zur Musik synchronisierter Bilderzählung im Sinne der Markenstimmung. Neben Motion Design war ich in der gesamten visuellen Produktion eingebunden: inklusive Styling über Make-up und Regie eines professionellen Fotoshootings für hochwertige Kampagnen-Assets. Das Endergebnis verband Motion Design mit Fotomaterial – mit Fokus auf Rhythmus, Komposition und Markenidentität. Das Projekt wurde zu einem Wettbewerb eingereicht und erhielt die Anerkennung „Mansion Award“.",
     "year": "2019",
     "tools": "Adobe Photoshop & Premiere Pro"
   },
   "work/7": {
-    "title": "Juste Debout",
+    "title": "Juste Debout Campaign Design",
     "description": "Kampagnenvisuals und Motion-Content für Juste Debout – mit Hip-Hop-Rhythmen, Street-Dance-Kultur und dynamischer Erzählung. Als eine der weltweit führenden Hip-Hop-Tanzveranstaltungen seit 2002 verlangte das Projekt eine starke, authentische Bildsprache, die globale Identität und Geschichte widerspiegelt. Ich erstellte Social-Media- und Print-Assets und passte jedes Format sorgfältig für digitale Kanäle an – für Klarheit, Wirkung und Konsistenz. Die visuelle Richtung sollte die rohe Energie der Bühne einfangen und gleichzeitig eine wiedererkennbare Kampagnenidentität bewahren.",
     "year": "2026",
     "tools": "Adobe Photoshop, Illustrator, Premiere Pro & After Effects"
   },
   "work/8": {
-    "title": "Western Union",
+    "title": "Western Union Commercial Design",
     "description": "Kommerzielle Projekte für Western Union: animierte Werbematerialien in Adobe After Effects. Die Inhalte wurden in mehrere Sprachen lokalisiert – darunter Griechisch, Georgisch, Russisch und Ukrainisch – um internationale Zielgruppen zu erreichen.",
     "year": "2019",
     "tools": "Adobe Photoshop, Premiere Pro & After Effects"

@@ -21,7 +21,7 @@ import portfolioContentEn from "./portfolio-content-en.json";
  * **Sources of truth:**
  * - Which projects exist and their `images[]` paths → **`src/app/data/gallery-manifest.json`**
  *   (**`work`**: `projectKey` = `work/<slug>`, files under `gallery/<slug>/`; slug `--` / `--*` = draft, not listed.)
- * - Titles, descriptions, years → **`portfolio-content-en.json`**, **`portfolio-content-de.json`**, **`portfolio-content-tr.json`**
+ * - Titles, descriptions, years → **`portfolio-content-*.json`**; **gallery category tag** → **`portfolio-content-en.json`** `category` (canonical `GALLERY_CATEGORIES`, overrides manifest for UI)
  *   (**EN** `title` ending with `--` = draft: hidden from gallery until the suffix is removed; UI strips it for display via `portfolioProjectCopy`.)
  *
  * `projectKey` = `categoryFolder/slug` and must match translation keys exactly.
@@ -42,11 +42,38 @@ function projectKey(entry: { categoryFolder: string; slug: string }): string {
   return projectKeyFromManifestEntry(entry);
 }
 
+/**
+ * Nav / modal tag: prefer **`portfolio-content-en.json`** `category` (canonical `GALLERY_CATEGORIES`),
+ * else manifest (keeps media-only workflows working).
+ */
+function resolveGalleryCategory(
+  manifestEntry: GalleryManifestProject,
+  projectKey: string,
+): string {
+  const row = (
+    portfolioContentEn as Record<
+      string,
+      { category?: string } | undefined
+    >
+  )[projectKey];
+  const raw = row?.category?.trim();
+  if (raw && (GALLERY_CATEGORIES as readonly string[]).includes(raw)) {
+    return raw;
+  }
+  if (raw && import.meta.env?.DEV) {
+    console.warn(
+      `[galleryData] Invalid portfolio category for ${JSON.stringify(projectKey)}: ${JSON.stringify(raw)} — must be one of: ${GALLERY_CATEGORIES.join(", ")}. Falling back to manifest.`,
+    );
+  }
+  return manifestEntry.category;
+}
+
 function manifestEntryToGalleryImage(entry: GalleryManifestProject): GalleryImage {
+  const pk = projectKey(entry);
   return {
-    projectKey: projectKey(entry),
+    projectKey: pk,
     images: entry.images.map((p) => publicAsset(p)),
-    category: entry.category,
+    category: resolveGalleryCategory(entry, pk),
   };
 }
 
@@ -108,14 +135,14 @@ if (import.meta.env?.DEV) {
   );
   for (const p of manifestProjects) {
     if (!manifestProjectVisible(p)) continue;
-    const cat = p.category as GalleryCategory;
     const k = projectKey(p);
+    const cat = resolveGalleryCategory(p, k) as GalleryCategory;
     console.log(
       `[galleryData] projectKey generation: categoryFolder=${JSON.stringify(p.categoryFolder)} slug=${JSON.stringify(p.slug)} → projectKey=${JSON.stringify(k)}`,
     );
     if (!GALLERY_CATEGORIES.includes(cat)) {
       console.warn(
-        `[galleryData] Unknown category in manifest: "${p.category}" (project "${p.slug}").`,
+        `[galleryData] Unknown resolved category: "${cat}" (project "${p.slug}"; check portfolio-content-en.json category + manifest).`,
       );
       continue;
     }

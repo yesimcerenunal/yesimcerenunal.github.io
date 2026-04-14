@@ -1,5 +1,6 @@
 {
   "work/1": {
+    "category": "3D Archive",
     "title": "3D Real-Time Cinematic Environment Production",
     "description": "Responsible for the creation of a large-scale, fantasy-inspired library environment for a realistic animation film. The story takes place in the Emberfall Kingdom, where a princess narrates a tale to the audience within the library setting. The environment was designed to support this narrative moment, emphasizing atmosphere, scale, and storytelling through space. From moodboard to spatial composition, I modeled all environment props from scratch, along with creating clean and optimized UV maps to ensure a high-quality real-time workflow with immersive library space in complex architectural details. Beyond environment production, I edited the movie trailer, handling both video editing and sound design to enhance the cinematic tone and emotional impact of the project. Texturing and PBR material creation, the princess character, including her animation and textures, was developed by other artists in our group.",
     "year": "2025",
@@ -12,7 +13,8 @@
     "tools": "Unity, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/3": {
-    "title": "VR Combat Experience Design",
+    "category": "Interactive / VR",
+    "title": "VR Combat Game Production",
     "description": "Boneheads Raid is a VR game project where players defend a sacred idol against waves of attacking skeleton enemies in an immersive VR environment. In this project, I was responsible for environment layout, VFX, character rigging and animation. I created dynamic light and trail effects for the skeletons’ swords, as well as particle effects that are triggered during hit reaction animations in Unity, for enhancing the combat feedback. Additionally, I developed custom birth and death materials integrated with keyframe animations, allowing the skeletons to dissolve or vanish in a visually engaging way during their spawn and death moments.",
     "year": "2024",
     "tools": "Unity, Blender, Adobe Photoshop & Premiere Pro"
@@ -24,48 +26,55 @@
     "tools": "Unity, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/5": {
-    "title": "Spotify Canvas Motion Design",
+    "category": "Motion",
+    "title": "Spotify Album Canvas Design",
     "description": "Designed the visual identity for the Spotify release of the hip hop album “Bulut” (meaning “cloud” in English), including the album presentation and accompanying Canvas animations. My work focused on creating short-form motion visuals inspired by hip hop, street style, format, combining video editing, motion design, and rhythm-driven visual storytelling. These visuals were crafted to enhance the listening experience while aligning with the album’s mood and atmospheric tone. All assets were optimized with platform-specific constraints and user interaction patterns in mind, ensuring both visual impact and seamless integration within Spotify’s interface.",
     "year": "2025",
     "tools": "Adobe Photoshop & Premiere Pro"
   },
   "work/6": {
-    "title": "Jazz Fest Commercial Motion Design",
+    "title": "Jazz Fest Commercial Design",
     "description": "This project was developed as a commercial motion piece for a jazz festival, combining rhythm-based editing, typography, and music-synced visual storytelling aligned with the festival’s brand tone. Beyond motion design, I took an active role in the full visual production process, including preparing the model through makeup styling and directing a professional photoshoot to create high-quality visual assets for the campaign. The final output integrated motion design with photographed material, focusing on rhythm, composition, and brand identity. The project was submitted to a competition and received the “Mansion Award” recognition.",
     "year": "2019",
     "tools": "Adobe Photoshop & Premiere Pro"
   },
   "work/7": {
-    "title": "Juste Debout Campaign Motion Design",
+    "category": "Motion",
+    "title": "Juste Debout Campaign Design",
     "description": "Developed campaign visuals and motion content for Juste Debout, focusing on hip hop rhythms, street dance culture, and dynamic storytelling. As one of the world’s leading hip hop dance events since 2002, the project required a strong and authentic visual language that reflects both its global identity and rich history. I created a range of social media and print assets, carefully adapting each for digital platforms to ensure clarity, impact, and consistency across formats. The overall visual direction aimed to capture the raw energy of the stage while maintaining a cohesive and recognizable campaign identity.",
     "year": "2026",
     "tools": "Adobe Photoshop, Illustrator, Premiere Pro & After Effects"
   },
   "work/8": {
-    "title": "Western Union Commercial Motion Design",
+    "category": "Motion",
+    "title": "Western Union Commercial Design",
     "description": "Worked on commercial projects for Western Union, producing animated promotional materials using Adobe After Effects. The content was localized into multiple languages, including Greek, Georgian, Russian, and Ukrainian, to effectively reach and engage diverse international audiences.",
     "year": "2019",
     "tools": "Adobe Photoshop, Premiere Pro & After Effects"
   },
   "work/9": {
+    "category": "2D Archive",
     "title": "Wholy Cow Beef Tallow Logo & Packaging",
     "description": "This project for Wholy Cow Beef Tallow focused on creating a strong and cohesive brand identity through logo and packaging design. Multiple concepts were explored and refined, considering the brand’s natural essence and target audience. The final design reflects a clean, bold, and authentic visual identity. The product belongs to a startup company and is planned to enter production and distribution in the Netherlands in the near future.",
     "year": "2026",
     "tools": "Adobe Illustrator & Photoshop"
   },
   "work/10": {
+    "category": "2D Archive",
     "title": "Illustrations",
     "description": "Personal illustration work exploring series, composition, color, and narrative tone.",
     "year": "2019-2023",
     "tools": "Adobe Photoshop"
   },
   "work/11": {
+    "category": "New",
     "title": "New project 1 --",
     "description": "Placeholder — replace title, description, and media in gallery/11/.",
     "year": "",
     "tools": ""
   },
   "work/12": {
+    "category": "New",
     "title": "New project 2 --",
     "description": "Placeholder — replace title, description, and media in gallery/12/.",
     "year": "",
@@ -78,12 +87,14 @@
     "tools": ""
   },
   "work/14": {
+    "category": "New",
     "title": "New project 4 --",
     "description": "Placeholder — replace title, description, and media in gallery/14/.",
     "year": "",
     "tools": ""
   },
   "work/15": {
+    "category": "New",
     "title": "New project 5 --",
     "description": "Placeholder — replace title, description, and media in gallery/15/.",
     "year": "",

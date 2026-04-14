@@ -1,6 +1,6 @@
 {
   "work/1": {
-    "title": "Real-Time Cinematic Environment Production",
+    "title": "3D Gerçek Zamanlı Sinematik Ortam Üretimi",
     "description": "Gerçekçi bir animasyon filmi için büyük ölçekli, fantezi esintili bir kütüphane ortamının oluşturulmasından sorumluydum. Hikâye Emberfall Krallığı’nda geçiyor; bir prenses kütüphane mekânında izleyiciye bir anlatı sunuyor. Ortam, bu anlatı anını destekleyecek şekilde tasarlandı; atmosfer, ölçek ve mekân üzerinden hikâye anlatımı ön planda. Moodboard’dan mekânsal kompozisyona kadar tüm çevre objelerini sıfırdan modelledim; yüksek kaliteli gerçek zamanlı iş akışı ve karmaşık mimari detaylarda sürükleyici bir kütüphane alanı için temiz ve optimize UV haritaları hazırladım. Çevre üretiminin ötesinde film fragmanını kurguladım; görüntü ve ses tasarımıyla sinematik ton ve duygusal etkiyi güçlendirdim. Dokulama ve PBR malzeme üretimi ile prenses karakteri, animasyonu ve dokuları grup içindeki diğer sanatçılar tarafından geliştirildi.",
     "year": "2025",
     "tools": "Unreal Engine, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
@@ -12,37 +12,37 @@
     "tools": "Unity, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/3": {
-    "title": "VR Experience",
+    "title": "VR Dövüş Oyunu Üretimi",
     "description": "Boneheads Raid, oyuncuların kutsal bir idolü dalga dalga iskelet düşman saldırılarına karşı sürükleyici bir VR ortamında savunduğu bir VR oyun projesidir. Bu projede ortam yerleşimi, VFX, karakter rig ve animasyonundan sorumluydum. İskeletlerin kılıçları için dinamik ışık ve iz efektleri; Unity’de vuruş tepki animasyonları sırasında tetiklenen parçacık efektleri ile dövüş geri bildirimini güçlendirdim. Ayrıca anahtar kare animasyonlarıyla entegre özel doğum ve ölüm materyalleri geliştirerek iskeletlerin doğma ve ölüm anlarında görsel olarak etkileyici şekilde erimesini veya kaybolmasını sağladım.",
     "year": "2024",
     "tools": "Unity, Blender, Adobe Photoshop & Premiere Pro"
   },
   "work/4": {
-    "title": "Cozy Zen",
+    "title": "Cozy Zen Oyun Tasarımı ve Geliştirmesi",
     "description": "Cozy Zen, kış temalı bir Zen bahçesi kavramı üzerinden rahatlatıcı oyun deneyimlerini inceleyen yüksek lisans tez projemdir. Oyunculara hem sakin hem de sürükleyici bir etkileşimli ortam sunmayı hedefledim. Çok kısıtlı sürede hem teorik tezi hem de tam oynanabilir bir prototipi tek başıma geliştirdim. Animasyon, görsel tasarım ve oyun geliştirme dahil tüm üretim sürecinden sorumluydum; konsepti Blender ve Unity ile hayata geçirdim. Kodlama ve oyun mekaniği için Codex’ten yararlandım. Programlama temellerinden farklı mekanik denemelere ve kavramdan oynanabilir prototipe kadar her ayrıntıyı rafine etmek benim için çok öğretici bir yolculuk oldu.",
     "year": "2025",
     "tools": "Unity, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/5": {
-    "title": "Spotify Canvas Motion Design",
+    "title": "Spotify Albüm Canvas Tasarımı",
     "description": "Hip hop albümü “Bulut”un (İngilizcede anlamı “cloud”, bulut) Spotify yayını için görsel kimliği tasarladım; albüm sunumu ve eşlik eden Canvas animasyonları dahil. Çalışmam, hip hop, sokak stili ve format ilhamlı kısa motion görselleri üzerinde yoğunlaştı; video kurgusu, motion tasarım ve ritim odaklı görsel anlatımı birleştirdim. Bu görseller dinleme deneyimini güçlendirmek ve albümün havası ile atmosferik tonuyla uyum sağlamak için hazırlandı. Tüm varlıklar platforma özgü kısıtlar ve kullanıcı etkileşim kalıpları gözetilerek optimize edildi; Spotify arayüzünde hem görsel etki hem sorunsuz entegrasyon sağlandı.",
     "year": "2025",
     "tools": "Adobe Photoshop & Premiere Pro"
   },
   "work/6": {
-    "title": "Jazz Fest Commercial",
+    "title": "Jazz Fest Ticari Tasarım",
     "description": "Bir caz festivali için ticari bir motion çalışması olarak geliştirildi; ritim odaklı kurgu, tipografi ve müzikle senkron görsel anlatım festival tonuyla uyumlu. Motion tasarımın ötesinde makyajla model hazırlığı ve profesyonel çekim yönetimi dahil görsel üretimin tamamında aktif rol aldım. Nihai çıktı fotoğraf malzemesiyle motion tasarımı birleştiriyor; ritim, kompozisyon ve marka kimliği ön planda. Proje bir yarışmaya gönderildi ve “Mansion Award” ile onurlandırıldı.",
     "year": "2019",
     "tools": "Adobe Photoshop & Premiere Pro"
   },
   "work/7": {
-    "title": "Juste Debout",
+    "title": "Juste Debout Kampanya Tasarımı",
     "description": "Juste Debout için kampanya görselleri ve motion içerik; hip hop ritimleri, sokak dansı kültürü ve dinamik anlatı odaklı. 2002’den beri dünyanın önde gelen hip hop dans etkinliklerinden biri olarak proje, küresel kimliği ve köklü tarihi yansıtan güçlü ve otantik bir görsel dil gerektirdi. Sosyal medya ve baskı için geniş bir varlık seti oluşturdum; her birini dijital platformlara göre uyarlayarak netlik, etki ve formatlar arası tutarlılık sağladım. Genel görsel yön, sahne enerjisini yakalarken tanınabilir bir kampanya kimliğini korumayı hedefledi.",
     "year": "2026",
     "tools": "Adobe Photoshop, Illustrator, Premiere Pro & After Effects"
   },
   "work/8": {
-    "title": "Western Union",
+    "title": "Western Union Ticari Tasarım",
     "description": "Western Union için ticari projelerde çalıştım; Adobe After Effects ile animasyonlu tanıtım materalleri ürettim. İçerik Yunanca, Gürcüce, Rusça ve Ukraynaca dahil birden çok dile yerelleştirilerek farklı kitlelere ulaşacak şekilde hazırlandı.",
     "year": "2019",
     "tools": "Adobe Photoshop, Premiere Pro & After Effects"

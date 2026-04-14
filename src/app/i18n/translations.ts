@@ -59,6 +59,11 @@ export type PortfolioProjectCopy = {
   year: string;
   /** Comma-separated or free-text tool names (e.g. "Adobe", "Blender, Unity"). */
   tools: string;
+  /**
+   * Gallery nav / modal tag — canonical English labels only (`GALLERY_CATEGORIES`).
+   * Set in **`portfolio-content-en.json`**; overrides `gallery-manifest.json` `category` when present.
+   */
+  category?: string;
 };
 
 export type TranslationMessages = {
@@ -139,15 +144,25 @@ function normalizePortfolioContentJson(
   const out: Record<string, PortfolioProjectCopy> = {};
   for (const [key, v] of Object.entries(raw as Record<string, unknown>)) {
     if (typeof v !== "object" || v === null) {
-      out[key] = { title: "", description: "", year: "", tools: "" };
+      out[key] = {
+        title: "",
+        description: "",
+        year: "",
+        tools: "",
+      };
       continue;
     }
     const o = v as Record<string, unknown>;
+    const category =
+      typeof o.category === "string" && o.category.trim() !== ""
+        ? o.category.trim()
+        : undefined;
     out[key] = {
       title: typeof o.title === "string" ? o.title : "",
       description: typeof o.description === "string" ? o.description : "",
       year: typeof o.year === "string" ? o.year : "",
       tools: typeof o.tools === "string" ? o.tools : "",
+      ...(category !== undefined ? { category } : {}),
     };
   }
   return out;
