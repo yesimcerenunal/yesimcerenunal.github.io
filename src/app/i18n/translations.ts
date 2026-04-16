@@ -406,7 +406,7 @@ const tr: TranslationMessages = {
   contact: {
     title: "İLETİŞİM",
     headline:
-      "Çalışmalarımı incelerken kalp atışımı duydunuz mu?\n\nEğer öyleyse, hadi iletişime geçelim! Bana ulaşmanın en hızlı yolu şimdilik e-posta.",
+      "Çalışmalarımı incelerken kalp atışlarımı duydunuz mu?\n\nEğer öyleyse, hadi iletişime geçelim! Bana ulaşmanın en hızlı yolu şimdilik e-posta.",
     description: "",
     emailCta: "E-posta gönder",
     rolesLine: "",
