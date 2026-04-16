@@ -252,7 +252,7 @@ const en: TranslationMessages = {
   contact: {
     title: "CONNECT",
     headline:
-      "Available for new opportunities!\nCurrently, email is the quickest way to get in touch. Use Email Me button below for business inquiries.",
+      "Did you hear my heartbeat while viewing my artworks?\n\nIf so, let's connect now! Email is the quickest way to get in touch.",
     description: "",
     emailCta: "Email Me",
     rolesLine: "",
@@ -329,7 +329,7 @@ const de: TranslationMessages = {
   contact: {
     title: "VERNETZEN",
     headline:
-      "Offen für neue Möglichkeiten!\n\nDerzeit ist E-Mail der schnellste Weg. Nutzen Sie den Button „E-Mail schreiben“ unten für geschäftliche Anfragen.",
+      "Haben Sie meinen Herzschlag gehört, während Sie meine Arbeiten angesehen haben?\n\nWenn ja, lassen Sie uns jetzt in Kontakt treten! E-Mail ist der schnellste Weg, mich zu erreichen.",
     description: "",
     emailCta: "E-Mail schreiben",
     rolesLine: "",
@@ -406,7 +406,7 @@ const tr: TranslationMessages = {
   contact: {
     title: "İLETİŞİM",
     headline:
-      "Yeni fırsatlara açığım!\nŞu an en hızlı yol e-posta. İş birlikleri için E-posta gönderebilirsiniz.",
+      "Çalışmalarımı incelerken kalp atışımı duydunuz mu?\n\nEğer öyleyse, hadi iletişime geçelim! Bana ulaşmanın en hızlı yolu şimdilik e-posta.",
     description: "",
     emailCta: "E-posta gönder",
     rolesLine: "",

@@ -1,9 +1,4 @@
-import galleryHoverSfx1Url from "../assets/gallery-hover-1.wav?url";
-import galleryHoverSfx2Url from "../assets/gallery-hover-2.wav?url";
-import galleryHoverSfx3Url from "../assets/gallery-hover-3.wav?url";
-import galleryHoverSfx4Url from "../assets/gallery-hover-4.wav?url";
-import galleryHoverSfx5Url from "../assets/gallery-hover-5.wav?url";
-import galleryHoverSfx6Url from "../assets/gallery-hover-6.wav?url";
+import galleryHoverBeatUrl from "../assets/gallery-hover-beat.wav?url";
 import galleryClickMp3Url from "../assets/gallery-click.mp3?url";
 
 /**
@@ -36,14 +31,7 @@ function pickHoverBufferIndex(count: number): number {
   return idx;
 }
 
-const HOVER_SFX_URLS = [
-  galleryHoverSfx1Url,
-  galleryHoverSfx2Url,
-  galleryHoverSfx3Url,
-  galleryHoverSfx4Url,
-  galleryHoverSfx5Url,
-  galleryHoverSfx6Url,
-] as const;
+const HOVER_SFX_URLS = [galleryHoverBeatUrl] as const;
 
 let preloadHintsInjected = false;
 let clickPreloadHintInjected = false;
