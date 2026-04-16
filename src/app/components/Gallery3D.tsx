@@ -51,8 +51,11 @@ import {
 } from "../utils/galleryMedia";
 import { galleryYearScaleFactorsForProjectKeys } from "../utils/galleryPlanetYearScale";
 import {
+  playGalleryClickSound,
   playGalleryHoverChime,
   preloadGalleryHoverSfx,
+  primeGalleryAudioEngineFromUserGesture,
+  wakeGalleryHoverAudioFromUserGesture,
 } from "../utils/galleryHoverSfx";
 import {
   createGallerySunburstHaloMaterial,
@@ -1540,7 +1543,6 @@ function GalleryCardMesh({
   /** Cumulative Z spin for sun-ray quad (quaternion reset from disc each frame). */
   const sunRaySpinAccumRef = useRef(0);
   const sunRayMeshRef = useRef<THREE.Mesh>(null);
-  const prevHoveredForChimeRef = useRef(false);
   /** Kabuk: r (yarıçap), az (yaw), py (düzlem) — önceki kare bazına impuls. */
   const orbitDeformRef = useRef<OrbitDeformState>({ r: 0, az: 0, py: 0 });
   const orbitDeformVelRef = useRef<OrbitDeformState>({ r: 0, az: 0, py: 0 });
@@ -2354,12 +2356,6 @@ uniform vec3 uCoverGlow;`,
         srMesh.scale.setScalar(base);
       }
 
-      const engaged = hovered && !modalOpen;
-      if (engaged && !prevHoveredForChimeRef.current && !prefersReducedMotion) {
-        playGalleryHoverChime();
-      }
-      prevHoveredForChimeRef.current = engaged;
-
       const onTop = hovered && !modalOpen;
       const cardGroup = groupRef.current;
       if (cardGroup) {
@@ -2399,6 +2395,10 @@ uniform vec3 uCoverGlow;`,
         onPointerOver={(e: ThreeEvent<PointerEvent>) => {
           e.stopPropagation();
           if (modalOpen) return;
+          wakeGalleryHoverAudioFromUserGesture();
+          if (!prefersReducedMotion) {
+            playGalleryHoverChime();
+          }
           onHoverStart();
         }}
         onPointerOut={(e: ThreeEvent<PointerEvent>) => {
@@ -2407,6 +2407,7 @@ uniform vec3 uCoverGlow;`,
         }}
         onPointerDown={(e: ThreeEvent<PointerEvent>) => {
           e.stopPropagation();
+          primeGalleryAudioEngineFromUserGesture();
           onSoftGalleryHint();
           prefetchDetailModalMedia(image.images);
           pointerDown.current = { x: e.clientX, y: e.clientY };
@@ -2419,6 +2420,7 @@ uniform vec3 uCoverGlow;`,
           if (Math.hypot(e.clientX - p.x, e.clientY - p.y) > 12) {
             return;
           }
+          playGalleryClickSound();
           onPick();
         }}
       />

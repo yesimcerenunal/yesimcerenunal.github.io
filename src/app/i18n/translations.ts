@@ -111,6 +111,7 @@ export type TranslationMessages = {
     lead: string;
     p2: string;
     p3: string;
+    p4: string;
     skillsHeading: string;
     /** Skill / tool names shown as chips (localized where it makes sense). */
     skills: readonly string[];
@@ -190,6 +191,11 @@ const ABOUT_SKILLS: readonly string[] = [
   "Claude",
   "Cursor",
   "Substance Painter",
+  "TouchDesigner",
+  "Weavy",
+  "Luma",
+  "Xsense",
+  "VR",
 ];
 
 const en: TranslationMessages = {
@@ -233,11 +239,13 @@ const en: TranslationMessages = {
   about: {
     title: "ABOUT ME",
     lead:
-      "A multidisciplinary designer, creative explorer and technologist focused on interactive experiences, immersive, and digital storytelling.",
+      "I'm a multidisciplinary designer working across 3D, motion, and interaction. I'm curious by nature, I enjoy learning, and I try to constantly improve everything rather than leaving things as they are.",
     p2:
-      "My artworks are going to reveal how design can move beyond static visuals into responsive and experiential systems where interaction, motion, and real-time technologies shape the engagement of people with digital environments.",
+      "It all started with graphic design. Designs were supposed to stay static, but that didn't last long. I'm drawn to motion and interaction, so over time my work evolved into responsive, immersive experiences that pull people in.",
     p3:
-      "With a bachelor in graphic design and master in 3D Animation for Film & Games. I work across motion design, real-time graphics, and experimental media to build interaction systems that connect physical and digital spaces. These days I am particularly interested in emerging technologies such as vibe coding, and AI-assisted design as tools for building new types of artworks rather than traditional outputs.",
+      "By combining my background in graphic design with a master's degree in 3D animation, I was able to refine my production methods and work with tools such as VR, Xsens, and TouchDesigner. Today, I focus on how rhythm, movement, and interaction shape digital experiences, and I'm shifting away from static outputs toward evolving systems.",
+    p4:
+      "Recently, my focus has been on building my portfolio website, programming NFC chips, and creating experiences that feel alive. I'm still exploring, still experimenting, and still making mistakes.",
     skillsHeading: "Skills & Tools",
     skills: ABOUT_SKILLS,
   },
@@ -308,11 +316,13 @@ const de: TranslationMessages = {
   about: {
     title: "ÜBER MICH",
     lead:
-      "Ein multidisziplinärer Designer, kreativer Entdecker und Technologe mit Fokus auf interaktive Erfahrungen, immersive Ansätze und digitales Storytelling.",
+      "Ich bin ein multidisziplinärer Designer, der in den Bereichen 3D, Motion und Interaktion arbeitet. Ich bin von Natur aus neugierig, lerne gerne und versuche, alles kontinuierlich zu verbessern, anstatt Dinge so zu lassen, wie sie sind.",
     p2:
-      "Meine Arbeiten zeigen, wie Design über statische Visualität hinausgehen kann – hin zu responsiven und erfahrungsorientierten Systemen, in denen Interaktion, Bewegung und Echtzeittechnologien die Art und Weise prägen, wie Menschen mit digitalen Umgebungen interagieren.",
+      "Alles begann mit Grafikdesign. Eigentlich sollten Designs statisch bleiben, aber das hielt nicht lange. Ich fühle mich zu Bewegung und Interaktion hingezogen, sodass sich meine Arbeit mit der Zeit zu responsiven, immersiven Erlebnissen entwickelt hat, die Menschen in sich hineinziehen.",
     p3:
-      "Ich habe einen Bachelor Abschluss in Grafikdesign sowie einen Master in 3D-Animation für Film und Spiele. Ich arbeite an der Schnittstelle von Motion Design, Echtzeitgrafik und experimentellen Medien, um interaktive Systeme zu entwickeln, die physische und digitale Räume miteinander verbinden. Aktuell interessiere ich mich besonders für neue Technologien wie Vibe Coding und KI-gestütztes Design als Werkzeuge zur Entwicklung neuer künstlerischer Ausdrucksformen, jenseits traditioneller Ergebnisse.",
+      "Durch die Kombination meines Hintergrunds im Grafikdesign mit einem Master in 3D-Animation konnte ich meine Arbeitsweise verfeinern und mit Tools wie VR, Xsens und TouchDesigner arbeiten. Heute beschäftige ich mich vor allem damit, wie Rhythmus, Bewegung und Interaktion digitale Erlebnisse prägen, und entferne mich zunehmend von statischen Ergebnissen hin zu sich entwickelnden Systemen.",
+    p4:
+      "In letzter Zeit liegt mein Fokus darauf, meine Portfolio-Website zu bauen, NFC-Chips zu programmieren und Erlebnisse zu schaffen, die sich lebendig anfühlen. Ich bin immer noch am Entdecken, am Ausprobieren und mache immer noch Fehler.",
     skillsHeading: "Skills & Tools",
     skills: ABOUT_SKILLS,
   },
@@ -383,12 +393,14 @@ const tr: TranslationMessages = {
   about: {
     title: "HAKKIMDA",
     lead:
-      "Etkileşimli deneyimler, dijital ve sürükleyici hikâye anlatımı üzerine odaklanan multidisipliner bir tasarımcı, yaratıcı bir keşifçi ve teknolojiyi yakından takip eden bir sanatçıyım.",
+      "3D, motion ve etkileşim alanlarında çalışan multidisipliner bir tasarımcıyım. Meraklıyım, öğrenmeyi seviyorum ve hiçbir şeyi olduğu gibi bırakmadan geliştirmeye çalışıyorum.",
     p2:
-      "Çalışmalarım, tasarımın statik görsellerin ötesine geçerek; etkileşim, hareket ve gerçek zamanlı teknolojilerin insanların dijital ortamlarla kurduğu etkileşimi nasıl şekillendirdiğini ortaya koymayı amaçlıyor.",
+      "Her şey grafik tasarımla başladı. Tasarımların statik kalması gerekiyordu ama bu uzun sürmedi. Çünkü hareketi ve etkileşimi seviyorum; işlerim zamanla tepki veren ve insanları içine çeken deneyimlere dönüştü.",
     p3:
-      "Grafik tasarım alanında lisans ve Film & Oyunlar için 3D Animasyon alanında yüksek lisans derecesine sahip biri olarak motion design, real-time capturing ve deneysel medya alanlarında çalışarak fiziksel ve dijital mekânları birbirine bağlayan etkileşim sistemleri geliştiriyorum. Son zamanlarda özellikle vibe coding ve yapay zekâ destekli tasarımlara ve yeni teknolojilere ilgi duyuyorum; bu araçları geleneksel çıktılar üretmekten ziyade yeni tür sanatsal üretim biçimleri geliştiriyorum.",
-    skillsHeading: "Yetenekler ve araçlar",
+      "Grafik tasarım geçmişimi 3D animasyon alanındaki yüksek lisansımla birleştirmem sayesinde, üretim yöntemlerimi geliştirerek VR, Xsense ve TouchDesigner gibi programlarla çalışma fırsatı buldum. Günümüzde ritim, hareket ve etkileşimin dijital deneyimleri nasıl şekillendirdiğine odaklanıyorum ve sabit çıktılardan ziyade evrilen sistemler yaratmaya yöneliyorum.",
+    p4:
+      "Son zamanlarda odağım portfolio websitemi oluşturmak, NFC çipi programlamak ve yaşayan gibi hissettiren deneyimler üretmeye kaydı. Hâlâ keşfediyorum, hâlâ deniyorum ve yanılıyorum.",
+    skillsHeading: "Dijital Araçlar",
     skills: ABOUT_SKILLS,
   },
   contact: {

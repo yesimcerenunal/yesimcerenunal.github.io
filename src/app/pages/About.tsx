@@ -20,6 +20,7 @@ export function About() {
         <p>{a.lead}</p>
         <p>{a.p2}</p>
         <p>{a.p3}</p>
+        <p>{a.p4}</p>
 
         <div className="mt-12 border-t border-border pt-8">
           <h2 className="mb-4 text-sm uppercase tracking-wider text-muted-foreground">
