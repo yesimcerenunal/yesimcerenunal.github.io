@@ -3,6 +3,7 @@ import { Outlet, useLocation } from "react-router";
 import { LanguageProvider, useLanguage } from "../context/LanguageContext";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { FooterNav } from "./FooterNav";
+import { SHELL_NAV_LABEL_CLASSNAME } from "../shellNavLabel";
 import { cn } from "./ui/utils";
 
 function LayoutShell() {
@@ -26,11 +27,16 @@ function LayoutShell() {
             */}
             <p
               lang="en"
-              className="text-[0.75rem] font-semibold tracking-[0.22em] text-foreground sm:text-sm"
+              className="text-[calc(0.75rem+1pt)] font-semibold tracking-[0.22em] text-foreground sm:text-[calc(0.875rem+1pt)]"
             >
               {messages.layout.brandName}
             </p>
-            <p className="text-[0.62rem] font-medium uppercase tracking-[0.2em] text-muted-foreground sm:text-[0.68rem]">
+            <p
+              className={cn(
+                SHELL_NAV_LABEL_CLASSNAME,
+                "text-muted-foreground",
+              )}
+            >
               {messages.sidebar.portfolio}
             </p>
           </div>
@@ -43,7 +49,8 @@ function LayoutShell() {
           lang={locale}
           className={cn(
             "flex min-h-0 flex-1 flex-col",
-            isGallery && "overflow-hidden px-6 sm:px-10 lg:px-12",
+            isGallery &&
+              "overflow-hidden px-7 sm:px-12 lg:px-14",
             !isGallery &&
               !isAboutOrContact &&
               "overflow-y-auto px-7 pb-4 sm:px-12 lg:px-14",

@@ -3071,7 +3071,7 @@ export function Gallery3D({
 
   return (
     <div className="flex min-h-0 min-w-0 w-full flex-1 flex-col">
-      <div className="flex min-h-0 w-full flex-1 flex-col px-2 pb-0 pt-0 sm:px-4">
+      <div className="flex min-h-0 w-full flex-1 flex-col px-0 pb-0 pt-0">
         <div
           className="relative min-h-[220px] w-full min-w-0 flex-1 basis-0 select-none bg-background sm:min-h-[240px]"
             style={{
@@ -3138,7 +3138,7 @@ export function Gallery3D({
         </div>
 
         <p
-          className="pointer-events-none w-full max-w-lg shrink-0 self-center px-4 pb-1 pt-2 text-center text-xs font-medium italic leading-snug tracking-[0.12em] text-muted-foreground sm:pb-1.5"
+          className="pointer-events-none w-full shrink-0 self-start pb-1 pt-2 text-left text-[length:var(--font-size)] font-medium italic leading-snug tracking-[0.12em] text-muted-foreground sm:pb-1.5"
           aria-live="polite"
         >
           {galleryCopy.exploreHint}

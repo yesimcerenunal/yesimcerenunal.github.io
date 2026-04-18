@@ -107,20 +107,19 @@ export type TranslationMessages = {
     imageErrorAlt: string;
   };
   about: {
-    title: string;
     lead: string;
     p2: string;
     p3: string;
     p4: string;
-    skillsHeading: string;
-    /** Skill / tool names shown as chips (localized where it makes sense). */
-    skills: readonly string[];
   };
   contact: {
-    title: string;
     headline: string;
     description: string;
     emailCta: string;
+    /** Between mailto CTA and address: "or" / "oder" / "veya". */
+    emailInlineOr: string;
+    copyEmail: string;
+    emailCopiedFeedback: string;
     rolesLine: string;
     nameLabel: string;
     emailLabel: string;
@@ -181,23 +180,6 @@ const categoryEn: Record<GalleryCategory, string> = {
   New: "New",
 };
 
-/** About page skill chips — tool names; shared across locales. */
-const ABOUT_SKILLS: readonly string[] = [
-  "Figma",
-  "Blender",
-  "Unity",
-  "Unreal Engine",
-  "AI-assisted Design",
-  "Claude",
-  "Cursor",
-  "Substance Painter",
-  "TouchDesigner",
-  "Weavy",
-  "Luma",
-  "Xsense",
-  "VR",
-];
-
 const en: TranslationMessages = {
   layout: {
     documentTitle: "YESIM CEREN ÜNAL Portfolio",
@@ -215,7 +197,7 @@ const en: TranslationMessages = {
     contact: "CONNECT",
   },
   sidebar: {
-    portfolio: "Portfolio",
+    portfolio: "PORTFOLIO",
     taglineWorks:
       "A creative playground for art, code, and interactive experience.",
     taglineOther:
@@ -226,7 +208,7 @@ const en: TranslationMessages = {
     ...categoryEn,
   },
   gallery: {
-    exploreHint: "Drag, scroll or click.. You're in control!",
+    exploreHint: "Drag, scroll.. You're in control!",
     modalYear: "Year",
     modalToolsLabel: "Tools",
     modalProjectFallback: "Project",
@@ -237,24 +219,23 @@ const en: TranslationMessages = {
     imageErrorAlt: "Error loading image",
   },
   about: {
-    title: "ABOUT ME",
     lead:
       "I'm a multidisciplinary designer working across 3D, motion, and interaction. I'm curious by nature, I enjoy learning, and I try to constantly improve everything rather than leaving things as they are.",
     p2:
       "It all started with graphic design. Designs were supposed to stay static, but that didn't last long. I'm drawn to motion and interaction, so over time my work evolved into responsive, immersive experiences that pull people in.",
     p3:
-      "By combining my background in graphic design with a master's degree in 3D animation, I was able to refine my production methods and work with tools such as VR, Xsens, and TouchDesigner. Today, I focus on how rhythm, movement, and interaction shape digital experiences, and I'm shifting away from static outputs toward evolving systems.",
+      "By combining my background in graphic design with a master's degree in 3D animation, I was able to refine my production methods and expand the way I work with tools. Today, I focus on how rhythm, movement, and interaction shape digital experiences, and I'm shifting away from static outputs toward evolving systems. Recently, I've been exploring AI as a rendering engine, using it as a medium to shape and materialize ideas.",
     p4:
       "Recently, my focus has been on building my portfolio website, programming NFC chips, and creating experiences that feel alive. I'm still exploring, still experimenting, and still making mistakes.",
-    skillsHeading: "Skills & Tools",
-    skills: ABOUT_SKILLS,
   },
   contact: {
-    title: "CONNECT",
     headline:
       "Did you hear my heartbeat while viewing my artworks?\n\nIf so, let's connect now! Email is the quickest way to get in touch.",
     description: "",
     emailCta: "Email Me",
+    emailInlineOr: "or",
+    copyEmail: "Copy",
+    emailCopiedFeedback: "Copied!",
     rolesLine: "",
     nameLabel: "Name",
     emailLabel: "Email",
@@ -288,7 +269,7 @@ const de: TranslationMessages = {
     contact: "VERNETZEN",
   },
   sidebar: {
-    portfolio: "Portfolio",
+    portfolio: "PORTFOLIO",
     taglineWorks:
       "Ein kreativer Spielraum für neue Tools, KI-gestützte Workflows und präzisen visuellen Craft.",
     taglineOther:
@@ -303,7 +284,7 @@ const de: TranslationMessages = {
     New: "Neu",
   },
   gallery: {
-    exploreHint: "Ziehen, scrollen oder klicken.. Du hast die Kontrolle!",
+    exploreHint: "Scrollen, ziehen… deine Kontrolle, einfach volle!",
     modalYear: "Jahr",
     modalToolsLabel: "Tools",
     modalProjectFallback: "Projekt",
@@ -314,24 +295,23 @@ const de: TranslationMessages = {
     imageErrorAlt: "Bild konnte nicht geladen werden",
   },
   about: {
-    title: "ÜBER MICH",
     lead:
       "Ich bin ein multidisziplinärer Designer, der in den Bereichen 3D, Motion und Interaktion arbeitet. Ich bin von Natur aus neugierig, lerne gerne und versuche, alles kontinuierlich zu verbessern, anstatt Dinge so zu lassen, wie sie sind.",
     p2:
       "Alles begann mit Grafikdesign. Eigentlich sollten Designs statisch bleiben, aber das hielt nicht lange. Ich fühle mich zu Bewegung und Interaktion hingezogen, sodass sich meine Arbeit mit der Zeit zu responsiven, immersiven Erlebnissen entwickelt hat, die Menschen in sich hineinziehen.",
     p3:
-      "Durch die Kombination meines Hintergrunds im Grafikdesign mit einem Master in 3D-Animation konnte ich meine Arbeitsweise verfeinern und mit Tools wie VR, Xsens und TouchDesigner arbeiten. Heute beschäftige ich mich vor allem damit, wie Rhythmus, Bewegung und Interaktion digitale Erlebnisse prägen, und entferne mich zunehmend von statischen Ergebnissen hin zu sich entwickelnden Systemen.",
+      "Durch die Kombination meines Hintergrunds im Grafikdesign mit einem Master in 3D-Animation konnte ich meine Produktionsmethoden verfeinern und meinen Umgang mit Tools erweitern. Heute beschäftige ich mich vor allem damit, wie Rhythmus, Bewegung und Interaktion digitale Erlebnisse prägen, und entferne mich zunehmend von statischen Ergebnissen hin zu sich entwickelnden Systemen. Kürzlich erkunde ich Künstliche Intelligenz als Rendering-Engine und nutze sie als Medium, um Ideen zu gestalten und zu materialisieren.",
     p4:
       "In letzter Zeit liegt mein Fokus darauf, meine Portfolio-Website zu bauen, NFC-Chips zu programmieren und Erlebnisse zu schaffen, die sich lebendig anfühlen. Ich bin immer noch am Entdecken, am Ausprobieren und mache immer noch Fehler.",
-    skillsHeading: "Skills & Tools",
-    skills: ABOUT_SKILLS,
   },
   contact: {
-    title: "VERNETZEN",
     headline:
       "Haben Sie meinen Herzschlag gehört, während Sie meine Arbeiten angesehen haben?\n\nWenn ja, lassen Sie uns jetzt in Kontakt treten! E-Mail ist der schnellste Weg, mich zu erreichen.",
     description: "",
     emailCta: "E-Mail schreiben",
+    emailInlineOr: "oder",
+    copyEmail: "Kopieren",
+    emailCopiedFeedback: "Kopiert!",
     rolesLine: "",
     nameLabel: "Name",
     emailLabel: "E-Mail",
@@ -365,7 +345,7 @@ const tr: TranslationMessages = {
     contact: "İLETİŞİM",
   },
   sidebar: {
-    portfolio: "Portfolyo",
+    portfolio: "PORTFOLYO",
     taglineWorks:
       "Yeni araçlar, yapay zekâ destekli iş akışları ve rafine görsel ustalık için yaratıcı bir oyun alanı.",
     taglineOther:
@@ -380,7 +360,7 @@ const tr: TranslationMessages = {
     New: "Yeni",
   },
   gallery: {
-    exploreHint: "Sürükle, kaydır veya tıkla.. Kontrol sende!",
+    exploreHint: "Kaydır, sürükle.. kontrol sende!",
     modalYear: "Yıl",
     modalToolsLabel: "Araçlar",
     modalProjectFallback: "Proje",
@@ -391,24 +371,23 @@ const tr: TranslationMessages = {
     imageErrorAlt: "Görüntü yüklenemedi",
   },
   about: {
-    title: "HAKKIMDA",
     lead:
-      "3D, motion ve etkileşim alanlarında çalışan multidisipliner bir tasarımcıyım. Meraklıyım, öğrenmeyi seviyorum ve hiçbir şeyi olduğu gibi bırakmadan geliştirmeye çalışıyorum.",
+      "3D, motion ve etkileşim alanlarında çalışan multidisipliner bir tasarımcıyım. Meraklıyım, öğrenmeyi ve geliştirmeyi seviyorum.",
     p2:
       "Her şey grafik tasarımla başladı. Tasarımların statik kalması gerekiyordu ama bu uzun sürmedi. Çünkü hareketi ve etkileşimi seviyorum; işlerim zamanla tepki veren ve insanları içine çeken deneyimlere dönüştü.",
     p3:
-      "Grafik tasarım geçmişimi 3D animasyon alanındaki yüksek lisansımla birleştirmem sayesinde, üretim yöntemlerimi geliştirerek VR, Xsense ve TouchDesigner gibi programlarla çalışma fırsatı buldum. Günümüzde ritim, hareket ve etkileşimin dijital deneyimleri nasıl şekillendirdiğine odaklanıyorum ve sabit çıktılardan ziyade evrilen sistemler yaratmaya yöneliyorum.",
+      "Grafik tasarım geçmişimi 3D animasyon alanındaki yüksek lisansımla birleştirerek üretim yöntemlerimi rafine ettim ve daha farklı araçlarla çalışmaya başladım. Bugün ritmin, hareketin ve etkileşimin dijital deneyimleri nasıl şekillendirdiğine odaklanıyorum; sabit çıktılardan uzaklaşıp evrilen sistemlere yöneliyorum.",
     p4:
-      "Son zamanlarda odağım portfolio websitemi oluşturmak, NFC çipi programlamak ve yaşayan gibi hissettiren deneyimler üretmeye kaydı. Hâlâ keşfediyorum, hâlâ deniyorum ve yanılıyorum.",
-    skillsHeading: "Dijital Araçlar",
-    skills: ABOUT_SKILLS,
+      "Son zamanlarda yapay zekâyı kodlama ile destekleyerek fikirlerimi somutlaştırmak için kullanıyorum. Portfolio websitemi geliştirmek, NFC çipi programlamak ve yaşayan gibi hissettiren deneyimler üretmeye çalışıyorum. Hâlâ keşfediyorum, hâlâ deniyorum ve yanılıyorum.",
   },
   contact: {
-    title: "İLETİŞİM",
     headline:
       "Çalışmalarımı incelerken kalp atışlarımı duydunuz mu?\n\nEğer öyleyse, hadi iletişime geçelim! Bana ulaşmanın en hızlı yolu şimdilik e-posta.",
     description: "",
     emailCta: "E-posta gönder",
+    emailInlineOr: "veya",
+    copyEmail: "Kopyala",
+    emailCopiedFeedback: "Kopyalandı!",
     rolesLine: "",
     nameLabel: "Ad",
     emailLabel: "E-posta",

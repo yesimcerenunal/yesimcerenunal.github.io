@@ -1,5 +1,7 @@
 import { Link, useLocation } from "react-router";
 import { useLanguage } from "../context/LanguageContext";
+import { SHELL_NAV_LABEL_CLASSNAME } from "../shellNavLabel";
+import { cn } from "./ui/utils";
 
 export function FooterNav() {
   const location = useLocation();
@@ -26,11 +28,13 @@ export function FooterNav() {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`text-[0.7rem] font-medium uppercase tracking-[0.12em] transition-colors duration-200 ${
+                className={cn(
+                  SHELL_NAV_LABEL_CLASSNAME,
+                  "transition-colors duration-200",
                   active
                     ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
+                    : "text-muted-foreground hover:text-foreground",
+                )}
               >
                 {link.label}
               </Link>
@@ -43,7 +47,7 @@ export function FooterNav() {
           aria-hidden
         >
           <span className="inline-block h-2 w-2 rounded-full border border-dashed border-muted-foreground/40 opacity-80" />
-          <span className="text-sm leading-none tracking-[0.3em] text-muted-foreground/35">
+          <span className="text-xs leading-none tracking-[0.3em] text-muted-foreground/35">
             ···
           </span>
         </div>
