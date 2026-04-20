@@ -15,7 +15,7 @@
   },
   "work/3": {
     "category": "Interactive / VR",
-    "title": "VR Combat Game Production",
+    "title": "VR Combat Game Environment & Animation Production",
     "description": "Boneheads Raid is a VR game project where players defend a sacred idol against waves of attacking skeleton enemies in an immersive VR environment. In this project, I was responsible for environment layout, VFX, character rigging and animation. I created dynamic light and trail effects for the skeletons’ swords, as well as particle effects that are triggered during hit reaction animations in Unity, for enhancing the combat feedback. Additionally, I developed custom birth and death materials integrated with keyframe animations, allowing the skeletons to dissolve or vanish in a visually engaging way during their spawn and death moments.",
     "year": "2024",
     "tools": "Unity, Blender, Adobe Photoshop & Premiere Pro"
@@ -56,11 +56,11 @@
     "tools": "Adobe Photoshop, Premiere Pro & After Effects"
   },
   "work/9": {
-    "category": "2D Archive",
-    "title": "Wholy Cow Beef Tallow Logo & Packaging",
-    "description": "This project for Wholy Cow Beef Tallow focused on creating a strong and cohesive brand identity through logo and packaging design. Multiple concepts were explored and refined, considering the brand’s natural essence and target audience. The final design reflects a clean, bold, and authentic visual identity. The product belongs to a startup company and is planned to enter production and distribution in the Netherlands in the near future.",
+    "category": "Motion",
+    "title": "Wholy Cow Beef Tallow Branding, Packaging and Campaign Design",
+    "description": "This project for Wholy Cow Beef Tallow aimed to build a distinctive and cohesive brand identity through logo and packaging design. Multiple label concepts were explored and refined, aligning the visual direction with the brand’s natural positioning and target audience. The final result is a clean, bold, and authentic identity that communicates quality and trust. As a startup, Wholy Cow has successfully moved into production and is currently distributed in the Netherlands. AI-assisted motion and static visuals were developed for social media campaigns, extending the brand’s presence with high-impact, modern advertising content.",
     "year": "2026",
-    "tools": "Adobe Illustrator & Photoshop"
+    "tools": "Adobe Illustrator & Photoshop, Premiere Pro"
   },
   "work/10": {
     "category": "2D Archive",
