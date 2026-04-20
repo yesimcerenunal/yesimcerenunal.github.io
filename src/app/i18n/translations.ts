@@ -278,7 +278,7 @@ const de: TranslationMessages = {
   categories: {
     all: "Alle",
     "Interactive / VR": "Interaktiv / VR",
-    Motion: "Motion Design",
+    Motion: "BEWEGTBILD",
     "3D Archive": "3D-Archiv",
     "2D Archive": "2D-Archiv",
     New: "Neu",
