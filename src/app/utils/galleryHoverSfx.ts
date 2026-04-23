@@ -1,4 +1,6 @@
-import galleryHoverBeatUrl from "../assets/gallery-hover-beat.wav?url";
+import galleryHoverHeartbeat1Url from "../assets/gallery-hover-heartbeat-1.wav?url";
+import galleryHoverHeartbeat2Url from "../assets/gallery-hover-heartbeat-2.wav?url";
+import galleryHoverHeartbeat3Url from "../assets/gallery-hover-heartbeat-3.wav?url";
 import galleryClickMp3Url from "../assets/gallery-click.mp3?url";
 
 /**
@@ -31,7 +33,11 @@ function pickHoverBufferIndex(count: number): number {
   return idx;
 }
 
-const HOVER_SFX_URLS = [galleryHoverBeatUrl] as const;
+const HOVER_SFX_URLS = [
+  galleryHoverHeartbeat1Url,
+  galleryHoverHeartbeat2Url,
+  galleryHoverHeartbeat3Url,
+] as const;
 
 let preloadHintsInjected = false;
 let clickPreloadHintInjected = false;
