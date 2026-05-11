@@ -26,7 +26,8 @@ import {
 } from "@react-three/drei";
 import type { OrbitControls as StdOrbitControls } from "three-stdlib";
 import { motion, AnimatePresence } from "motion/react";
-import { X } from "lucide-react";
+import { useLocation, useNavigate, useParams } from "react-router";
+import { Heart, Share, X } from "lucide-react";
 import * as THREE from "three";
 import { useLanguage } from "../context/LanguageContext";
 import {
@@ -51,6 +52,10 @@ import {
 } from "../utils/galleryMedia";
 import { galleryYearScaleFactorsForProjectKeys } from "../utils/galleryPlanetYearScale";
 import {
+  normalizeManifestKeyPart,
+  projectKeyFromParts,
+} from "../utils/galleryProjectKey";
+import {
   playGalleryClickSound,
   playGalleryHoverChime,
   preloadGalleryHoverSfx,
@@ -71,7 +76,55 @@ if (import.meta.env.DEV) {
   THREE.Cache.enabled = false;
 }
 
-/** work/2 detail: ArtStation album link beside “Back to gallery”. */
+/** Legacy `?project=work%2Fslug` on `/` redirects to `/work/slug`. */
+const LEGACY_GALLERY_PROJECT_QUERY = "project";
+
+const GALLERY_FAVORITES_STORAGE_KEY = "portfolio-gallery-favorites-v1";
+
+/** Canonical piece URL path, e.g. `work/3` → `/work/3`. */
+function galleryProjectPath(projectKey: string): string {
+  const i = projectKey.indexOf("/");
+  if (i <= 0 || i >= projectKey.length - 1) return "/";
+  const folder = normalizeManifestKeyPart(projectKey.slice(0, i));
+  const slug = normalizeManifestKeyPart(projectKey.slice(i + 1));
+  return `/${encodeURIComponent(folder)}/${encodeURIComponent(slug)}`;
+}
+
+function absoluteGalleryPieceUrl(projectKey: string): string {
+  const rel = galleryProjectPath(projectKey);
+  const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+  if (!base) return `${window.location.origin}${rel}`;
+  return `${window.location.origin}${base}${rel}`;
+}
+
+function readGalleryFavoriteKeys(): Set<string> {
+  if (typeof localStorage === "undefined") return new Set();
+  try {
+    const raw = localStorage.getItem(GALLERY_FAVORITES_STORAGE_KEY);
+    if (!raw) return new Set();
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return new Set();
+    return new Set(
+      parsed.filter((x): x is string => typeof x === "string"),
+    );
+  } catch {
+    return new Set();
+  }
+}
+
+function persistGalleryFavoriteKeys(keys: Set<string>): void {
+  if (typeof localStorage === "undefined") return;
+  try {
+    localStorage.setItem(
+      GALLERY_FAVORITES_STORAGE_KEY,
+      JSON.stringify([...keys]),
+    );
+  } catch {
+    /* quota / private mode */
+  }
+}
+
+/** work/2 detail: ArtStation album link beside “Back to Space”. */
 const WORK2_ARTSTATION_ALBUM_URL =
   "https://www.artstation.com/yesimceren/albums/14104609";
 /** `false` iken ikon gösterilmez; tekrar açmak için `true` yap. */
@@ -3003,21 +3056,137 @@ export function Gallery3D({
     return cameraTupleForOrbitDistance(D);
   }, [orbitFramingRadius, orbitDefaultDistanceT]);
 
+  const navigate = useNavigate();
+  const location = useLocation();
+  const params = useParams();
+  const [favoriteKeys, setFavoriteKeys] = useState(readGalleryFavoriteKeys);
+  const [shareCopied, setShareCopied] = useState(false);
+  const shareCopiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+
   const closeModal = useCallback(() => {
-    setSelectedImage(null);
+    navigate(
+      { pathname: "/", hash: location.hash, search: "" },
+      { replace: true },
+    );
     onCloseModal?.();
-  }, [onCloseModal]);
+  }, [navigate, location.hash, onCloseModal]);
 
   const handlePick = useCallback(
     (image: GalleryImage) => {
-      prefetchDetailModalMedia(image.images);
-      setSelectedImage(image);
+      navigate(
+        {
+          pathname: galleryProjectPath(image.projectKey),
+          hash: location.hash,
+          search: "",
+        },
+        { replace: false },
+      );
       onOpenImage?.(image);
     },
-    [onOpenImage],
+    [navigate, location.hash, onOpenImage],
+  );
+
+  useLayoutEffect(() => {
+    if (location.pathname !== "/") return;
+    const sp = new URLSearchParams(location.search);
+    const legacy = sp.get(LEGACY_GALLERY_PROJECT_QUERY);
+    if (!legacy) return;
+    const image = images.find((img) => img.projectKey === legacy);
+    sp.delete(LEGACY_GALLERY_PROJECT_QUERY);
+    const qs = sp.toString();
+    if (!image) {
+      navigate({ pathname: "/", search: qs ? `?${qs}` : "" }, { replace: true });
+      return;
+    }
+    navigate(
+      {
+        pathname: galleryProjectPath(legacy),
+        search: qs ? `?${qs}` : "",
+      },
+      { replace: true },
+    );
+  }, [location.pathname, location.search, images, navigate]);
+
+  useLayoutEffect(() => {
+    const categoryFolder = params.categoryFolder;
+    const slug = params.slug;
+    if (!categoryFolder || !slug) {
+      setSelectedImage(null);
+      return;
+    }
+    const projectKey = projectKeyFromParts(categoryFolder, slug);
+    const image = images.find((img) => img.projectKey === projectKey);
+    if (!image) {
+      navigate("/", { replace: true });
+      return;
+    }
+    prefetchDetailModalMedia(image.images);
+    setSelectedImage(image);
+  }, [params.categoryFolder, params.slug, images, navigate]);
+
+  const toggleFavorite = useCallback((projectKey: string) => {
+    setFavoriteKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(projectKey)) next.delete(projectKey);
+      else next.add(projectKey);
+      persistGalleryFavoriteKeys(next);
+      return next;
+    });
+  }, []);
+
+  const dismissShareCopiedSoon = useCallback(() => {
+    if (shareCopiedTimerRef.current !== null) {
+      clearTimeout(shareCopiedTimerRef.current);
+    }
+    shareCopiedTimerRef.current = window.setTimeout(() => {
+      setShareCopied(false);
+      shareCopiedTimerRef.current = null;
+    }, 2000);
+  }, []);
+
+  useEffect(
+    () => () => {
+      if (shareCopiedTimerRef.current !== null) {
+        clearTimeout(shareCopiedTimerRef.current);
+      }
+    },
+    [],
   );
 
   const detailModalOpen = selectedImage !== null;
+
+  useEffect(() => {
+    if (!detailModalOpen) setShareCopied(false);
+  }, [detailModalOpen]);
+
+  const handleShareProject = useCallback(async () => {
+    if (selectedImage == null) return;
+    navigate(
+      {
+        pathname: galleryProjectPath(selectedImage.projectKey),
+        hash: location.hash,
+        search: "",
+      },
+      { replace: false },
+    );
+    const shareUrl = absoluteGalleryPieceUrl(selectedImage.projectKey);
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setShareCopied(true);
+      dismissShareCopiedSoon();
+    } catch {
+      window.prompt(messages.gallery.modalShareAriaLabel, shareUrl);
+    }
+  }, [
+    selectedImage,
+    navigate,
+    location.hash,
+    messages.gallery.modalShareAriaLabel,
+    dismissShareCopiedSoon,
+  ]);
+
   const detailModalScrollRef = useRef<HTMLDivElement>(null);
   const modalDetailWheelRootRef = useRef<HTMLDivElement>(null);
 
@@ -3242,6 +3411,45 @@ export function Gallery3D({
                   >
                     {galleryCopy.backToGallery}
                   </motion.button>
+                  <motion.button
+                    type="button"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => toggleFavorite(selectedImage.projectKey)}
+                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground"
+                    style={{ fontWeight: 500 }}
+                    aria-label={galleryCopy.modalFavoriteAriaLabel}
+                    aria-pressed={favoriteKeys.has(selectedImage.projectKey)}
+                  >
+                    <Heart
+                      className={cn(
+                        "h-[18px] w-[18px] shrink-0",
+                        favoriteKeys.has(selectedImage.projectKey) ?
+                          "fill-[#db544b] stroke-[#db544b] text-[#db544b]"
+                        : "fill-transparent stroke-primary-foreground text-primary-foreground",
+                      )}
+                      strokeWidth={2}
+                    />
+                  </motion.button>
+                  <motion.button
+                    type="button"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => void handleShareProject()}
+                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm tracking-wide text-primary-foreground"
+                    style={{ fontWeight: 500 }}
+                    aria-label={galleryCopy.modalShareAriaLabel}
+                  >
+                    <Share className="h-[18px] w-[18px]" strokeWidth={2} aria-hidden />
+                  </motion.button>
+                  {shareCopied ? (
+                    <span
+                      className="text-sm text-muted-foreground"
+                      aria-live="polite"
+                    >
+                      {galleryCopy.modalShareCopied}
+                    </span>
+                  ) : null}
                   {selectedImage.projectKey === "work/2" &&
                   WORK2_ARTSTATION_BUTTON_ENABLED ? (
                     <a

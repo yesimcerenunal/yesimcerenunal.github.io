@@ -22,7 +22,18 @@ export function FooterNav() {
           aria-label={messages.aria.primaryNavigation}
         >
           {links.map((link) => {
-            const active = location.pathname === link.path;
+            const segs = location.pathname
+              .replace(/\/+$/, "")
+              .split("/")
+              .filter(Boolean);
+            const isWorkDetail =
+              segs.length === 2 &&
+              segs[0] !== "about" &&
+              segs[0] !== "contact";
+            const active =
+              link.path === "/"
+                ? location.pathname === "/" || isWorkDetail
+                : location.pathname === link.path;
 
             return (
               <Link

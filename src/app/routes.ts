@@ -12,6 +12,8 @@ const routes = [
       { index: true, Component: Works },
       { path: "about", Component: About },
       { path: "contact", Component: Contact },
+      /** Portfolio piece deep link, e.g. `/work/3` — must stay after static segments. */
+      { path: ":categoryFolder/:slug", Component: Works },
     ],
   },
 ];

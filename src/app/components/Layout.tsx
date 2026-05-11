@@ -10,7 +10,12 @@ function LayoutShell() {
   const location = useLocation();
   const { pathname } = location;
   const { messages, locale } = useLanguage();
-  const isGallery = pathname === "/";
+  const pathSegments = pathname.replace(/\/+$/, "").split("/").filter(Boolean);
+  const isGalleryDetail =
+    pathSegments.length === 2 &&
+    pathSegments[0] !== "about" &&
+    pathSegments[0] !== "contact";
+  const isGallery = pathname === "/" || isGalleryDetail;
   const isAboutOrContact = pathname === "/about" || pathname === "/contact";
 
   useEffect(() => {

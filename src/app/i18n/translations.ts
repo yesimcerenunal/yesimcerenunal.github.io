@@ -100,6 +100,12 @@ export type TranslationMessages = {
     /** Year line when entry is missing or `year` is empty in copy (never use manifest). */
     modalYearFallback: string;
     backToGallery: string;
+    /** Detail modal: copy or system share the deep link (`?project=…`). */
+    modalShare: string;
+    modalShareAriaLabel: string;
+    modalShareCopied: string;
+    /** Heart toggle; pair with `aria-pressed` on the control. */
+    modalFavoriteAriaLabel: string;
     /** work/2 detail: ArtStation icon next to back (opens in new tab). */
     artStationAlbumAriaLabel: string;
     close: string;
@@ -192,7 +198,7 @@ const en: TranslationMessages = {
     languageSwitcher: "Language",
   },
   nav: {
-    gallery: "GALLERY",
+    gallery: "SPACE",
     about: "ABOUT ME",
     contact: "CONNECT",
   },
@@ -213,7 +219,11 @@ const en: TranslationMessages = {
     modalToolsLabel: "Tools",
     modalProjectFallback: "Project",
     modalYearFallback: "—",
-    backToGallery: "Back to gallery",
+    backToGallery: "Back to Space",
+    modalShare: "Share",
+    modalShareAriaLabel: "Share a link to this project",
+    modalShareCopied: "Link copied",
+    modalFavoriteAriaLabel: "Favorite",
     artStationAlbumAriaLabel: "ArtStation album (opens in new tab)",
     close: "Close",
     imageErrorAlt: "Error loading image",
@@ -264,7 +274,7 @@ const de: TranslationMessages = {
     languageSwitcher: "Sprache",
   },
   nav: {
-    gallery: "GALERIE",
+    gallery: "RAUM",
     about: "ÜBER MICH",
     contact: "VERNETZEN",
   },
@@ -289,7 +299,11 @@ const de: TranslationMessages = {
     modalToolsLabel: "Tools",
     modalProjectFallback: "Projekt",
     modalYearFallback: "—",
-    backToGallery: "Zurück zur Galerie",
+    backToGallery: "Zurück ins All",
+    modalShare: "Teilen",
+    modalShareAriaLabel: "Link zu diesem Projekt teilen",
+    modalShareCopied: "Link kopiert",
+    modalFavoriteAriaLabel: "Favorit",
     artStationAlbumAriaLabel: "ArtStation-Album (öffnet in neuem Tab)",
     close: "Schließen",
     imageErrorAlt: "Bild konnte nicht geladen werden",
@@ -340,7 +354,7 @@ const tr: TranslationMessages = {
     languageSwitcher: "Dil",
   },
   nav: {
-    gallery: "GALERİ",
+    gallery: "ALAN",
     about: "HAKKIMDA",
     contact: "İLETİŞİM",
   },
@@ -365,7 +379,11 @@ const tr: TranslationMessages = {
     modalToolsLabel: "Araçlar",
     modalProjectFallback: "Proje",
     modalYearFallback: "—",
-    backToGallery: "Galeriye dön",
+    backToGallery: "Uzaya dön",
+    modalShare: "Paylaş",
+    modalShareAriaLabel: "Bu projeye giden bağlantıyı paylaş",
+    modalShareCopied: "Bağlantı kopyalandı",
+    modalFavoriteAriaLabel: "Favori",
     artStationAlbumAriaLabel: "ArtStation albümü (yeni sekmede açılır)",
     close: "Kapat",
     imageErrorAlt: "Görüntü yüklenemedi",
