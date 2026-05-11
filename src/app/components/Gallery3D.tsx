@@ -124,7 +124,7 @@ function persistGalleryFavoriteKeys(keys: Set<string>): void {
   }
 }
 
-/** work/2 detail: ArtStation album link beside “Back to Space”. */
+/** work/2 detail: ArtStation album link beside the back control. */
 const WORK2_ARTSTATION_ALBUM_URL =
   "https://www.artstation.com/yesimceren/albums/14104609";
 /** `false` iken ikon gösterilmez; tekrar açmak için `true` yap. */
