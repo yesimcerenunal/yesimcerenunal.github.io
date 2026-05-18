@@ -564,32 +564,32 @@ function galleryProjectShellSeparation(
     return { angleRad: -0.38, yMul: -0.17, radialMul: 1 };
   }
   if (projectKey === "work/3") {
-    /** Geniş açı + Y + dış kabuğa itiş — work/5 ile aynı görüş hattında kalmayı kırar */
-    return { angleRad: 0.98, yMul: 0.55, radialMul: 1.16 };
+    /** VR — küme içinde; minimal açı/Y, merkeze sıkı kabuk */
+    return { angleRad: 0.32, yMul: 0.16, radialMul: 0.8 };
   }
   if (projectKey === "work/5") {
     return { angleRad: -0.98, yMul: -0.52, radialMul: 0.84 };
   }
   if (projectKey === "work/8") {
-    return { angleRad: 0.52, yMul: 0.3, radialMul: 1 };
+    return { angleRad: 0.1, yMul: 0.05, radialMul: 0.84 };
   }
   return { angleRad: 0, yMul: 0, radialMul: 1 };
 }
 
 function galleryProjectRadialPull(projectKey: string): number {
-  if (projectKey === "work/3") {
-    /** Önceki 0.13 ile merkeze çekiş 5’e göre fazla yakın duruma katkı yapabiliyordu */
-    return 0;
-  }
   if (projectKey === "work/1") {
     return 0;
   }
-  /** Western Union–FB (2), Jazz Fest (6), Juste Debout (7): kabukta dışta kalmasın diye merkeze çek. work/8 ayrı — work/5 ile çakışmayı azaltmak için çekim yok. */
+  /** Dış kabukta kopuk kalanlar — merkeze doğru (0–1, pozisyon × (1 − pull)). */
   if (
     projectKey === "work/2" ||
+    projectKey === "work/3" ||
     projectKey === "work/6" ||
-    projectKey === "work/7"
+    projectKey === "work/7" ||
+    projectKey === "work/8"
   ) {
+    if (projectKey === "work/3") return 0.34;
+    if (projectKey === "work/8") return 0.36;
     return 0.24;
   }
   return 0;
@@ -1898,8 +1898,14 @@ uniform vec3 uCoverGlow;`,
         0,
         1,
       );
-      if (image.projectKey === "work/3" || image.projectKey === "work/5") {
+      if (image.projectKey === "work/5") {
         sepZoomBlend = Math.max(sepZoomBlend, 0.82);
+      }
+      if (image.projectKey === "work/3") {
+        sepZoomBlend = Math.min(sepZoomBlend, 0.72);
+      }
+      if (image.projectKey === "work/8") {
+        sepZoomBlend = Math.min(sepZoomBlend, 0.68);
       }
       const sepAngleRad = sep.angleRad * sepZoomBlend;
       const sepYMul = sep.yMul * sepZoomBlend;
