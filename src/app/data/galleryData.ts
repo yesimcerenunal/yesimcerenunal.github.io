@@ -10,7 +10,7 @@ import {
   projectKeyFromParts,
   slugFromProjectKey,
 } from "../utils/galleryProjectKey";
-import { publicAsset } from "../utils/publicAsset";
+import { resolveGalleryMediaUrl } from "../utils/galleryMedia";
 import galleryManifest from "./gallery-manifest.json";
 import portfolioContentEn from "./portfolio-content-en.json";
 
@@ -72,7 +72,7 @@ function manifestEntryToGalleryImage(entry: GalleryManifestProject): GalleryImag
   const pk = projectKey(entry);
   return {
     projectKey: pk,
-    images: entry.images.map((p) => publicAsset(p)),
+    images: entry.images.map((p) => resolveGalleryMediaUrl(p)),
     category: resolveGalleryCategory(entry, pk),
   };
 }

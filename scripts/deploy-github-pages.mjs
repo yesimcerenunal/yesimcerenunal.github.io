@@ -38,16 +38,20 @@ function assetPathsFromIndexHtml() {
   return [...paths];
 }
 
-/** Vite also emits hashed files only referenced from the JS chunk (e.g. halo PNG). */
+/** Vite chunk’ları (ör. lazy MediaPipe `vision_bundle-*.js`) ana bundle’dan zincirle referanslanır. */
 function assetPathsFromBuiltJs(htmlAssetPaths) {
   const paths = new Set(htmlAssetPaths);
-  for (const rel of htmlAssetPaths) {
-    if (!rel.endsWith(".js")) continue;
+  const queue = htmlAssetPaths.filter((p) => p.endsWith(".js"));
+  while (queue.length > 0) {
+    const rel = queue.pop();
     const abs = resolve(root, rel);
     if (!existsSync(abs)) continue;
     const js = readFileSync(abs, "utf8");
     for (const m of js.matchAll(/\/(assets\/[^"'\s]+)/g)) {
-      paths.add(m[1]);
+      const dep = m[1];
+      if (paths.has(dep)) continue;
+      paths.add(dep);
+      if (dep.endsWith(".js")) queue.push(dep);
     }
   }
   return [...paths];
@@ -91,8 +95,12 @@ if (existsSync(manifestPath)) {
   }
   for (const rel of galleryFiles) {
     for (const p of [rel, join("public", rel)]) {
-      if (existsSync(resolve(root, p))) {
+      if (!existsSync(resolve(root, p))) continue;
+      try {
         run(`git add ${JSON.stringify(p)}`);
+      } catch (err) {
+        // Disk / LFS sorunlarında deploy’u tamamen düşürme (LFS videolar CDN’den servis edilebilir).
+        console.warn(`[deploy] git add atlandı (${p}):`, err?.message ?? err);
       }
     }
   }

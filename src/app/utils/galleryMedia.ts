@@ -1,6 +1,31 @@
 import { publicAsset } from "./publicAsset";
 import galleryManifest from "../data/gallery-manifest.json";
 
+/**
+ * GitHub Pages, Git LFS dosyalarını gerçek video yerine ~134 baytlık pointer olarak sunar.
+ * Bu yollar `.gitattributes` ile LFS’te; prod’da tam kalite için GitHub LFS CDN kullanılır.
+ */
+const GITHUB_LFS_MEDIA_BASE =
+  "https://media.githubusercontent.com/media/yescerspace/yescerspace.github.io/main";
+
+/** `gallery/<n>/1.mp4` — `.gitattributes` ile senkron tut. */
+const GITHUB_LFS_GALLERY_PATHS = new Set([
+  "gallery/12/1.mp4",
+  "gallery/14/1.mp4",
+]);
+
+/** Manifest yolu (`gallery/…`) → tarayıcı URL’si. LFS videolar prod’da CDN’e yönlendirilir. */
+export function resolveGalleryMediaUrl(path: string): string {
+  const raw = path?.trim() ?? "";
+  if (!raw) return publicAsset(path);
+  if (/^https?:\/\//i.test(raw)) return raw;
+  const normalized = raw.replace(/^public\//, "").replace(/^\//, "");
+  if (!import.meta.env.DEV && GITHUB_LFS_GALLERY_PATHS.has(normalized)) {
+    return `${GITHUB_LFS_MEDIA_BASE}/${normalized}`;
+  }
+  return publicAsset(normalized);
+}
+
 /** Video extensions for detail / texture detection */
 const VIDEO_RE = /\.(mp4|webm)(\?.*)?$/i;
 /** Raster images (hero + detail) */
