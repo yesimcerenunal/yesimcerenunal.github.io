@@ -98,8 +98,8 @@ function normalizeBulletText(text: string): string {
 
 const responsibilityListClass = cn(
   bodyClass,
-  "w-full max-w-none list-disc space-y-1 pl-10 marker:text-muted-foreground sm:space-y-1.5 sm:pl-12",
-  "[&_li]:hyphens-none [&_li]:break-normal [&_li]:whitespace-pre-line",
+  "box-border w-full min-w-0 max-w-none list-outside list-disc space-y-1.5 pl-16 marker:text-muted-foreground sm:pl-[4.25rem]",
+  "[&_li]:hyphens-none [&_li]:break-normal [&_li]:whitespace-pre-line [&_li]:leading-relaxed",
 );
 
 function DetailSection({
@@ -110,7 +110,7 @@ function DetailSection({
   children: ReactNode;
 }) {
   return (
-    <div className="flex w-full max-w-none flex-col gap-2 sm:gap-3">
+    <div className="flex w-full min-w-0 max-w-full flex-col gap-2 sm:gap-3">
       <span className={metaLabelClass}>{label}</span>
       {children}
     </div>
@@ -145,14 +145,55 @@ function MetaRow({
   );
 }
 
+function partitionBullets(bullets: string[]) {
+  const items: string[] = [];
+  const notes: string[] = [];
+
+  for (const raw of bullets) {
+    const text = normalizeBulletText(raw);
+    const noteMatch = text.match(/^(Note|Not|Hinweis)\s*:\s*(.+)$/is);
+    if (noteMatch) {
+      notes.push(noteMatch[2].trim());
+    } else {
+      items.push(text);
+    }
+  }
+
+  return { items, notes };
+}
+
+function ResponsibilityBullets({ bullets }: { bullets: string[] }) {
+  const { items, notes } = partitionBullets(bullets);
+
+  return (
+    <>
+      {items.length > 0 ? (
+        <ul className={responsibilityListClass}>
+          {items.map((item, bulletIndex) => (
+            <li key={bulletIndex}>{item}</li>
+          ))}
+        </ul>
+      ) : null}
+      {notes.map((note, noteIndex) => (
+        <p
+          key={`note-${noteIndex}`}
+          className={cn(bodyClass, "pl-16 whitespace-pre-line sm:pl-[4.25rem]")}
+        >
+          {note}
+        </p>
+      ))}
+    </>
+  );
+}
+
 function renderProseBlock(block: DescriptionBlock, index: number) {
   if (block.type === "note") {
     return (
       <p
         key={`note-${index}`}
-        className={cn(bodyClass, "whitespace-pre-line")}
+        className={cn(bodyClass, "pl-16 whitespace-pre-line sm:pl-[4.25rem]")}
       >
-        {block.label}: {block.text}
+        {block.text}
       </p>
     );
   }
@@ -161,7 +202,7 @@ function renderProseBlock(block: DescriptionBlock, index: number) {
     return (
       <p
         key={`paragraph-${index}`}
-        className={cn(bodyClass, "whitespace-pre-line")}
+        className={cn(bodyClass, "pl-16 whitespace-pre-line sm:pl-[4.25rem]")}
       >
         {block.text}
       </p>
@@ -205,8 +246,8 @@ export function ProjectDetailCopy({
     bulletBlocks.length > 0;
 
   return (
-    <div className="flex min-h-0 w-full max-w-none flex-col gap-2 sm:gap-4">
-      <h2 className="max-w-full text-[1.0625rem] leading-[1.2] tracking-tight text-foreground whitespace-normal sm:text-[clamp(1.0625rem,1rem+0.85vw,1.75rem)] sm:leading-[1.25] sm:whitespace-nowrap">
+    <div className="flex min-h-0 w-full min-w-0 max-w-full flex-col gap-2 sm:gap-4">
+      <h2 className="max-w-full text-[1.0625rem] leading-[1.2] tracking-tight text-foreground whitespace-normal sm:text-[clamp(1.0625rem,1rem+0.85vw,1.75rem)] sm:leading-[1.25]">
         {displayTitle}
       </h2>
 
@@ -231,16 +272,10 @@ export function ProjectDetailCopy({
       ) : null}
 
       {hasBodyContent ? (
-        <div className="mt-1 flex flex-col gap-2.5 sm:mt-2 sm:gap-4">
+        <div className="mt-1 flex w-full min-w-0 max-w-full flex-col gap-2.5 sm:mt-2 sm:gap-4">
           {sectionBlocks.map((block, index) => (
-            <DetailSection key={`section-${index}`} label={block.label}>
-              <ul className={responsibilityListClass}>
-                {block.bullets.map((item, bulletIndex) => (
-                  <li key={`${index}-${bulletIndex}`}>
-                    {normalizeBulletText(item)}
-                  </li>
-                ))}
-              </ul>
+            <DetailSection key={`section-${index}`} label={responsibilitiesLabel}>
+              <ResponsibilityBullets bullets={block.bullets} />
             </DetailSection>
           ))}
 
@@ -249,13 +284,7 @@ export function ProjectDetailCopy({
               key={`bullets-${index}`}
               label={responsibilitiesLabel}
             >
-              <ul className={responsibilityListClass}>
-                {block.items.map((item, bulletIndex) => (
-                  <li key={`${index}-${bulletIndex}`}>
-                    {normalizeBulletText(item)}
-                  </li>
-                ))}
-              </ul>
+              <ResponsibilityBullets bullets={block.items} />
             </DetailSection>
           ))}
 

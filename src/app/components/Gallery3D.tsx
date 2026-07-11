@@ -117,6 +117,8 @@ const GALLERY_FAVORITES_STORAGE_KEY = "portfolio-gallery-favorites-v1";
 const modalDetailActionPillClass =
   "inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border border-border bg-muted/50 text-sm font-medium tracking-wide text-muted-foreground transition-[background-color,border-color,color,opacity] duration-200 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.98]";
 
+/** sm+: inset-right + close pill + text gap before X — see modal scroll `pr`. Text col ~38–40rem (lg+). */
+
 /** Canonical piece URL path, e.g. `work/3` → `/work/3`. */
 function galleryProjectPath(projectKey: string): string {
   const i = projectKey.indexOf("/");
@@ -4079,7 +4081,11 @@ export function Gallery3D({
           >
             <div
               ref={modalDetailWheelRootRef}
-              className="absolute inset-0 flex h-full max-h-[100dvh] min-h-0 flex-col items-stretch overflow-y-auto overscroll-y-auto px-7 pb-4 pt-0 sm:items-start sm:justify-center sm:py-8 sm:pb-[max(2rem,env(safe-area-inset-bottom))] sm:pl-20 sm:pr-[calc(1.25rem+3rem)] lg:pl-24 lg:pr-[calc(1.25rem+3.25rem)]"
+              className={cn(
+                "absolute inset-0 flex h-full max-h-[100dvh] min-h-0 flex-col items-stretch overflow-y-auto overscroll-y-auto pb-4 pt-0",
+                "px-7 sm:items-start sm:justify-center sm:py-8 sm:pb-[max(2rem,env(safe-area-inset-bottom))] sm:pl-20 lg:pl-24",
+                "sm:pr-[calc(1.5rem+2.5rem+3rem)] lg:pr-[calc(2.5rem+2.5rem+3.5rem)]",
+              )}
               style={{
                 background: "var(--modal-backdrop)",
                 backdropFilter: "blur(20px)",
@@ -4123,7 +4129,7 @@ export function Gallery3D({
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.94, opacity: 0, y: 20 }}
               transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-              className="relative mx-auto mt-0 mb-0 flex w-full min-h-0 max-w-none flex-col gap-2 pb-4 sm:mx-0 sm:my-auto sm:ml-8 sm:gap-10 sm:pb-0 lg:ml-12 lg:grid lg:grid-cols-[minmax(0,560px)_minmax(0,1fr)] lg:items-stretch lg:gap-x-16 xl:gap-x-20"
+              className="relative mx-auto mt-0 mb-0 box-border flex w-full min-h-0 max-w-full flex-col gap-2 pb-4 sm:mx-0 sm:my-auto sm:gap-10 sm:pb-0 lg:grid lg:grid-cols-[minmax(0,520px)_minmax(0,38rem)] lg:items-start lg:gap-x-10 xl:grid-cols-[minmax(0,520px)_minmax(0,40rem)] xl:gap-x-12"
               onClick={(e: MouseEvent<HTMLDivElement>) => e.stopPropagation()}
             >
               <div className="min-h-0 w-full min-w-0 shrink-0 bg-app-shell-bg sm:min-h-[min(70vh,580px)] lg:col-start-1 lg:row-start-1 lg:relative lg:max-w-none lg:-translate-x-4 lg:self-stretch lg:min-h-[min(70vh,580px)] xl:-translate-x-5">
@@ -4146,13 +4152,13 @@ export function Gallery3D({
                   duration: 0.4,
                   ease: [0.25, 0.46, 0.45, 0.94],
                 }}
-                className="min-h-0 w-full min-w-0 sm:pt-0 lg:col-start-2 lg:row-start-1 lg:max-w-none"
+                className="box-border min-h-0 w-full min-w-0 max-w-full overflow-visible sm:max-w-[calc(100vw-10rem)] sm:pt-0 lg:col-start-2 lg:row-start-1 lg:max-w-[38rem] xl:max-w-[40rem]"
               >
                 <div
                   ref={detailInfoRef}
-                  className="flex min-h-0 w-full max-w-none flex-col gap-3 justify-start sm:gap-6 lg:gap-10"
+                  className="flex min-h-0 w-full min-w-0 max-w-full flex-col gap-3 justify-start sm:gap-6 lg:gap-10"
                 >
-                <div>
+                <div className="w-full min-w-0 max-w-full">
                   <p className="mb-1.5 text-[0.6875rem] uppercase tracking-[0.18em] text-muted-foreground sm:mb-3 sm:text-xs sm:tracking-[0.2em]">
                     {localizedCategory(messages, selectedImage.category)}
                   </p>

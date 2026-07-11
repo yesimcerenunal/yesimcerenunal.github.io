@@ -1,14 +1,16 @@
 {
   "work/1": {
     "category": "3D Environment",
-    "title": "3D Real-Time Cinematic Environment Production",
+    "title": "3D Real-Time Cinematic Environment",
+    "subtitle": "Production",
     "description": "Role: 3D Environment Artist\n\nResponsibilities:\n• Created a large-scale, fantasy-inspired library environment for a realistic animation film set in the Emberfall Kingdom\n• Designed the space to support a narrative moment where a princess narrates a tale, emphasizing atmosphere, scale, and storytelling through space\n• Modeled all environment props from scratch with clean, optimized UV maps for a high-quality real-time workflow\n• Edited the movie trailer, handling video editing and sound design to enhance cinematic tone and emotional impact\n• Note: Texturing, PBR material creation, and the princess character (animation and textures) were developed by other artists in the group",
     "year": "2025",
     "tools": "Unreal Engine, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/2": {
     "category": "3D Character",
-    "title": "3D Character Customization & Animation",
+    "title": "3D Character Customization",
+    "subtitle": "& Animation",
     "description": "Role: 3D Character Artist\n\nResponsibilities:\n• Created 3D character costumes and in-game assets including modeling, UV mapping, optimization, skin-weight painting, and texturing\n• Contributed to 2D assets, UI visuals, and illustrations for visual consistency across 30+ mobile game levels and 100+ characters\n• Played a key role in Fashion Battle production (120M+ downloads), collaborating with design, development, and production teams\n• Contributed to playtests, UX feedback, and quality control",
     "year": "2021-2024",
     "tools": "Unity, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
@@ -59,7 +61,8 @@
   },
   "work/9": {
     "category": "Motion",
-    "title": "Wholy Cow Beef Tallow Branding, Packaging and Campaign Design",
+    "title": "Wholy Cow Beef Tallow",
+    "subtitle": "Branding, Packaging & Campaign Design",
     "description": "Role: Brand & Packaging Designer\n\nResponsibilities:\n• Built a distinctive brand identity through logo and packaging design for Wholy Cow Beef Tallow\n• Explored and refined multiple label concepts aligned with the brand's natural positioning and target audience\n• Delivered packaging in two sizes (tall and small) communicating quality and trust\n• Developed AI-assisted motion and static visuals for social media campaigns extending brand presence",
     "year": "2026",
     "tools": "Adobe Illustrator & Photoshop, Premiere Pro, AI-assisted tools"
@@ -88,7 +91,7 @@
   "work/13": {
     "category": "3D PARTICLE SIMULATION",
     "title": "Birdie",
-    "description": "Role: Real-Time 3D Artist\n\nResponsibilities:\n• Explored the transition between organic 3D form and animation using real-time simulation\n• Combined translucent materials and layered particle behaviors for spatial, motion-driven structures\n• Created for installations focused on spatial perception and digital abstraction #noai",
+    "description": "Role: Real-Time 3D Artist\n\nResponsibilities:\n• Explored the transition between organic 3D form and animation using\nreal-time simulation\n• Combined translucent materials and layered particle behaviors for spatial,\nmotion-driven structures\n• Created for installations focused on spatial perception and digital abstraction",
     "year": "2026",
     "tools": "Touch Designer"
   },

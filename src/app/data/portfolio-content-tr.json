@@ -1,12 +1,14 @@
 {
   "work/1": {
-    "title": "3D Gerçek Zamanlı Sinematik Ortam Üretimi",
+    "title": "3D Gerçek Zamanlı Sinematik Ortam",
+    "subtitle": "Üretimi",
     "description": "Rol: 3D Environment Artist\n\nSorumluluklar:\n• Emberfall Krallığı'nda geçen gerçekçi bir animasyon filmi için büyük ölçekli, fantezi esintili kütüphane ortamı oluşturdum\n• Bir prensesin kütüphanede anlatı sunduğu anı desteklemek için atmosfer, ölçek ve mekân üzerinden hikâye anlatımına odaklandım\n• Yüksek kaliteli gerçek zamanlı iş akışı için tüm çevre objelerini sıfırdan modelledim ve optimize UV haritaları hazırladım\n• Sinematik ton ve duygusal etkiyi güçlendirmek için film fragmanını kurguladım; görüntü ve ses tasarımını yürüttüm\n• Not: Dokulama, PBR malzeme üretimi ve prenses karakteri (animasyon ve dokular) grup içindeki diğer sanatçılar tarafından geliştirildi",
     "year": "2025",
     "tools": "Unreal Engine, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/2": {
-    "title": "3D Karakter Özelleştirme ve Animasyon",
+    "title": "3D Karakter Özelleştirme",
+    "subtitle": "ve Animasyon",
     "description": "Rol: 3D Character Artist\n\nSorumluluklar:\n• Modelleme, UV açılımı, optimizasyon, skin-weight boyama ve texturing dahil 3D karakter kostümleri ve oyun içi varlıklar ürettim\n• 30'dan fazla mobil oyun seviyesi ve 100+ karakter boyunca görsel tutarlılık için 2D asset, UI görselleri ve illüstrasyonlara katkıda bulundum\n• Fashion Battle (120M+ indirme) üretiminde tasarım, yazılım ve prodüksiyon ekipleriyle yakın çalışarak önemli rol aldım\n• Playtest, UX geri bildirimi ve kalite kontrol süreçlerine katkı sağladım",
     "year": "2021-2024",
     "tools": "Unity, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
@@ -50,7 +52,8 @@
     "tools": "Adobe Photoshop, Premiere Pro & After Effects"
   },
   "work/9": {
-    "title": "Wholy Cow Beef Tallow Marka, Ambalaj ve Kampanya Tasarımı",
+    "title": "Wholy Cow Beef Tallow",
+    "subtitle": "Marka, Ambalaj ve Kampanya Tasarımı",
     "description": "Rol: Brand & Packaging Designer\n\nSorumluluklar:\n• Wholy Cow Beef Tallow için logo ve ambalaj tasarımıyla ayırt edici marka kimliği oluşturdum\n• Markanın doğal konumlandırması ve hedef kitlesiyle uyumlu etiket konseptleri geliştirdim\n• Kalite ve güveni ileten iki boyutlu ambalaj (yüksek ve küçük) tasarladım\n• Sosyal medya kampanyaları için yapay zekâ destekli hareketli ve statik görseller geliştirdim",
     "year": "2026",
     "tools": "Adobe Illustrator ve Photoshop, Premiere Pro, yapay zekâ destekli araçlar"
@@ -75,7 +78,7 @@
   },
   "work/13": {
     "title": "Birdie",
-    "description": "Rol: Real-Time 3D Artist\n\nSorumluluklar:\n• Gerçek zamanlı simülasyonla organik 3B form ile animasyon arasındaki geçişi inceledim\n• Yarı saydam malzemeler ve katmanlı parçacık davranışlarını birleştirdim\n• Mekânsal algı ve dijital soyutlamaya odaklı kurulumlar için üretildi #noai",
+    "description": "Rol: Real-Time 3D Artist\n\nSorumluluklar:\n• Gerçek zamanlı simülasyonla organik 3B form ile animasyon arasındaki geçişi inceledim\n• Yarı saydam malzemeler ve katmanlı parçacık davranışlarını birleştirdim\n• Mekânsal algı ve dijital soyutlamaya odaklı kurulumlar için üretildi",
     "year": "2026",
     "tools": "Touch Designer"
   },
