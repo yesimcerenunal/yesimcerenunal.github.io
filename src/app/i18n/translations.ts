@@ -26,16 +26,14 @@ const ABOUT_PROFICIENCIES = [
 ] as const;
 
 const ABOUT_SKILLS = [
-  "Vibe coding",
+  "Vibe Coding",
   "Generative Systems",
-  "Real-time Rendering",
   "VR Development",
-  "Video Editing",
-  "3D Modeling & Animation",
+  "Real-time Rendering",
+  "Environment Design",
+  "3D Modeling & Prop Design",
   "UV-mapping & Weight Painting",
   "Character Rigging & Animation",
-  "Environment Design",
-  "Prop Design",
 ] as const;
 
 /**
