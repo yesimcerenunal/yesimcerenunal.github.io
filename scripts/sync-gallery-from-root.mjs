@@ -50,6 +50,16 @@ function isVideoPosterCompanionFilename(name) {
   return /^\d+-\.(jpe?g|png|webp)$/i.test(String(name));
 }
 
+/** `00-thumb.webp` — 3D kart dokusu için küçük kapak; manifest slaytı değil. */
+function isCoverThumbFilename(name) {
+  return /^00-thumb\.webp$/i.test(String(name));
+}
+
+/** `<n>-web.webp` — detay modalı için optimize slayt; UI orijinalden türetir, manifest slaytı değil. */
+function isOptimizedSlideFilename(name) {
+  return /^\d+-web\.webp$/i.test(String(name));
+}
+
 /** Kaynak / ara encode — slayt değil. */
 function isGalleryAuxMediaFilename(name) {
   const n = String(name);
@@ -66,26 +76,12 @@ function hashFile(p) {
   return h.digest("hex");
 }
 
-/** GitHub Pages branch deploy does not smudge LFS — large videos use media CDN (same repo blob). */
-const GITHUB_MEDIA_REPO = "yesimcerenunal/yesimcerenunal.github.io";
-const GITHUB_MEDIA_REF = "main";
-const LARGE_VIDEO_MB = 95;
+/** GitHub Pages: büyük videolar `public/gallery/` + Git LFS (manifest yolu: `gallery/…`). */
 
 function manifestImagePath(relDir, file, srcDir, dstDir) {
   const relPath = `${relDir.replace(/\\/g, "/")}/${file}`;
-  const abs =
-    fs.existsSync(path.join(srcDir, file)) ?
-      path.join(srcDir, file)
-    : path.join(dstDir, file);
-  if (/\.mp4$/i.test(file) && fs.existsSync(abs)) {
-    const mb = fs.statSync(abs).size / (1024 * 1024);
-    if (mb > LARGE_VIDEO_MB) {
-      const publicPath = relPath.startsWith("gallery/") ?
-        `public/${relPath}`
-      : relPath;
-      return `https://media.githubusercontent.com/media/${GITHUB_MEDIA_REPO}/${GITHUB_MEDIA_REF}/${publicPath}`;
-    }
-  }
+  void srcDir;
+  void dstDir;
   return relPath;
 }
 
@@ -165,7 +161,11 @@ for (const proj of manifest.projects) {
   const finalList = naturalSort(
     [...new Set([...listFiles(srcDir), ...listFiles(dstDir)])],
   ).filter(
-    (f) => !isVideoPosterCompanionFilename(f) && !isGalleryAuxMediaFilename(f),
+    (f) =>
+      !isVideoPosterCompanionFilename(f) &&
+      !isCoverThumbFilename(f) &&
+      !isOptimizedSlideFilename(f) &&
+      !isGalleryAuxMediaFilename(f),
   );
   const relDir = rel.replace(/\\/g, "/");
   proj.images = finalList.map((file) =>
