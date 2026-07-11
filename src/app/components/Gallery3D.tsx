@@ -37,7 +37,14 @@ import {
 import gallerySunRayAssetUrl from "../assets/gallery-halo-grey-ring.png?url";
 import artstationIconUrl from "../assets/artstation.png?url";
 import { publicAsset } from "../utils/publicAsset";
+import {
+  adjustGalleryLikeCount,
+  defaultGalleryLikeCount,
+  persistGalleryLikeCounts,
+  readGalleryLikeCounts,
+} from "../utils/galleryLikeCounts";
 import { cn } from "./ui/utils";
+import { ProjectDetailCopy } from "./ProjectDetailCopy";
 import { logGalleryHeroLoadErrorsInDev } from "../utils/galleryDevValidation";
 import {
   clearGalleryDetailVideoPreload,
@@ -106,6 +113,9 @@ if (import.meta.env.DEV) {
 const LEGACY_GALLERY_PROJECT_QUERY = "project";
 
 const GALLERY_FAVORITES_STORAGE_KEY = "portfolio-gallery-favorites-v1";
+
+const modalDetailActionPillClass =
+  "inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border border-border bg-muted/50 text-sm font-medium tracking-wide text-muted-foreground transition-[background-color,border-color,color,opacity] duration-200 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.98]";
 
 /** Canonical piece URL path, e.g. `work/3` → `/work/3`. */
 function galleryProjectPath(projectKey: string): string {
@@ -3724,6 +3734,7 @@ export function Gallery3D({
   const location = useLocation();
   const params = useParams();
   const [favoriteKeys, setFavoriteKeys] = useState(readGalleryFavoriteKeys);
+  const [likeCounts, setLikeCounts] = useState(readGalleryLikeCounts);
   const [shareCopied, setShareCopied] = useState(false);
   const shareCopiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
@@ -3797,14 +3808,22 @@ export function Gallery3D({
   }, [params.categoryFolder, params.slug, images, navigate]);
 
   const toggleFavorite = useCallback((projectKey: string) => {
-    setFavoriteKeys((prev) => {
-      const next = new Set(prev);
-      if (next.has(projectKey)) next.delete(projectKey);
-      else next.add(projectKey);
-      persistGalleryFavoriteKeys(next);
-      return next;
+    const wasLiked = favoriteKeys.has(projectKey);
+    const nextFavorites = new Set(favoriteKeys);
+    if (wasLiked) nextFavorites.delete(projectKey);
+    else nextFavorites.add(projectKey);
+    setFavoriteKeys(nextFavorites);
+    persistGalleryFavoriteKeys(nextFavorites);
+    setLikeCounts((counts) => {
+      const updated = adjustGalleryLikeCount(
+        counts,
+        projectKey,
+        wasLiked ? -1 : 1,
+      );
+      persistGalleryLikeCounts(updated);
+      return updated;
     });
-  }, []);
+  }, [favoriteKeys]);
 
   const dismissShareCopiedSoon = useCallback(() => {
     if (shareCopiedTimerRef.current !== null) {
@@ -4060,7 +4079,7 @@ export function Gallery3D({
           >
             <div
               ref={modalDetailWheelRootRef}
-              className="absolute inset-0 flex flex-col items-stretch overflow-y-auto overscroll-y-auto px-7 pb-6 pt-0 sm:items-start sm:justify-center sm:pb-10 sm:pr-10 sm:pt-0 sm:pl-14 lg:pl-16"
+              className="absolute inset-0 flex h-full max-h-[100dvh] min-h-0 flex-col items-stretch overflow-y-auto overscroll-y-auto px-7 pb-4 pt-0 sm:items-start sm:justify-center sm:py-8 sm:pb-[max(2rem,env(safe-area-inset-bottom))] sm:pl-20 sm:pr-[calc(1.25rem+3rem)] lg:pl-24 lg:pr-[calc(1.25rem+3.25rem)]"
               style={{
                 background: "var(--modal-backdrop)",
                 backdropFilter: "blur(20px)",
@@ -4070,20 +4089,16 @@ export function Gallery3D({
               role="presentation"
             >
               <div
-                className="sticky top-0 z-30 -mx-7 mb-1 flex w-[calc(100%+3.5rem)] shrink-0 items-end justify-end bg-black px-7 pb-3 pt-[max(0.625rem,env(safe-area-inset-top))] sm:hidden"
+                className="sticky top-0 z-30 -mx-7 mb-1 flex w-[calc(100%+3.5rem)] shrink-0 items-end justify-end bg-black px-7 pb-1.5 pt-[max(0.625rem,env(safe-area-inset-top))] sm:hidden"
                 onClick={(e) => e.stopPropagation()}
               >
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="shrink-0 rounded-full bg-card p-2.5 text-foreground transition-transform active:scale-95"
-                  style={{
-                    boxShadow:
-                      "0 4px 24px color-mix(in oklch, oklch(0.05 0.02 268) 55%, transparent)",
-                  }}
+                  className={cn(modalDetailActionPillClass, "h-10 w-10")}
                   aria-label={galleryCopy.close}
                 >
-                  <X className="h-5 w-5 text-muted-foreground" />
+                  <X className="h-[18px] w-[18px] stroke-current" strokeWidth={2} />
                 </button>
               </div>
 
@@ -4093,14 +4108,13 @@ export function Gallery3D({
                   e.stopPropagation();
                   closeModal();
                 }}
-                className="fixed right-6 top-[max(1rem,env(safe-area-inset-top))] z-[60] hidden shrink-0 rounded-full bg-card p-2.5 text-foreground transition-transform hover:scale-105 sm:inline-flex lg:right-10 lg:top-10"
-                style={{
-                  boxShadow:
-                    "0 4px 24px color-mix(in oklch, oklch(0.05 0.02 268) 55%, transparent)",
-                }}
+                className={cn(
+                  modalDetailActionPillClass,
+                  "fixed right-6 top-[max(1.25rem,env(safe-area-inset-top))] z-[60] hidden h-10 w-10 sm:inline-flex lg:right-10 lg:top-8",
+                )}
                 aria-label={galleryCopy.close}
               >
-                <X className="h-5 w-5 text-muted-foreground" />
+                <X className="h-[18px] w-[18px] stroke-current" strokeWidth={2} />
               </button>
 
             <motion.div
@@ -4109,10 +4123,10 @@ export function Gallery3D({
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.94, opacity: 0, y: 20 }}
               transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-              className="relative mx-auto my-auto flex w-full max-w-6xl min-h-0 flex-col gap-10 pb-4 sm:mx-0 lg:grid lg:grid-cols-[minmax(0,560px)_minmax(0,28rem)] lg:items-stretch lg:gap-x-24"
+              className="relative mx-auto mt-0 mb-0 flex w-full min-h-0 max-w-none flex-col gap-2 pb-4 sm:mx-0 sm:my-auto sm:ml-8 sm:gap-10 sm:pb-0 lg:ml-12 lg:grid lg:grid-cols-[minmax(0,560px)_minmax(0,1fr)] lg:items-stretch lg:gap-x-16 xl:gap-x-20"
               onClick={(e: MouseEvent<HTMLDivElement>) => e.stopPropagation()}
             >
-              <div className="min-h-0 w-full min-w-0 shrink-0 bg-app-shell-bg lg:col-start-1 lg:row-start-1 lg:relative lg:max-w-none lg:self-stretch lg:min-h-[min(70vh,580px)]">
+              <div className="min-h-0 w-full min-w-0 shrink-0 bg-app-shell-bg sm:min-h-[min(70vh,580px)] lg:col-start-1 lg:row-start-1 lg:relative lg:max-w-none lg:-translate-x-4 lg:self-stretch lg:min-h-[min(70vh,580px)] xl:-translate-x-5">
                 <ProjectImageScroll
                   ref={detailModalScrollRef}
                   outerScrollRef={modalDetailWheelRootRef}
@@ -4120,7 +4134,7 @@ export function Gallery3D({
                   key={`${selectedImage.projectKey}|${selectedImage.images.join("|")}`}
                   urls={selectedImage.images}
                   heroAlt={selectedPortfolioCopy.title}
-                  className="min-h-[min(70vh,580px)] max-h-[min(70vh,580px)] lg:absolute lg:inset-0 lg:h-full lg:min-h-0 lg:max-h-none"
+                  className="min-h-[min(22vh,190px)] max-h-[min(22vh,190px)] sm:min-h-[min(70vh,580px)] sm:max-h-[min(70vh,580px)] lg:absolute lg:inset-0 lg:h-full lg:min-h-0 lg:max-h-none"
                 />
               </div>
 
@@ -4132,77 +4146,48 @@ export function Gallery3D({
                   duration: 0.4,
                   ease: [0.25, 0.46, 0.45, 0.94],
                 }}
-                className="min-h-0 w-full min-w-0 lg:col-start-2 lg:row-start-1 lg:max-w-none"
+                className="min-h-0 w-full min-w-0 sm:pt-0 lg:col-start-2 lg:row-start-1 lg:max-w-none"
               >
                 <div
                   ref={detailInfoRef}
-                  className="flex min-h-0 w-full flex-col gap-10 justify-start"
+                  className="flex min-h-0 w-full max-w-none flex-col gap-3 justify-start sm:gap-6 lg:gap-10"
                 >
                 <div>
-                  <p className="mb-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                  <p className="mb-1.5 text-[0.6875rem] uppercase tracking-[0.18em] text-muted-foreground sm:mb-3 sm:text-xs sm:tracking-[0.2em]">
                     {localizedCategory(messages, selectedImage.category)}
                   </p>
-                  <h2
-                    className={cn(
-                      "tracking-tight text-foreground",
-                      selectedPortfolioCopy.subtitle?.trim() ? "mb-1" : "mb-4",
-                    )}
-                    style={{ fontSize: "1.75rem", lineHeight: 1.25 }}
-                  >
-                    {selectedPortfolioCopy.title}
-                  </h2>
-                  {selectedPortfolioCopy.subtitle?.trim() ? (
-                    <p
-                      className="mb-4 tracking-tight text-foreground"
-                      style={{ fontSize: "1.75rem", lineHeight: 1.25 }}
-                    >
-                      {selectedPortfolioCopy.subtitle}
-                    </p>
-                  ) : null}
-                  <p className="whitespace-pre-line text-[0.95rem] leading-relaxed text-muted-foreground">
-                    {selectedPortfolioCopy.description}
-                  </p>
+                  <ProjectDetailCopy
+                    title={selectedPortfolioCopy.title}
+                    subtitle={selectedPortfolioCopy.subtitle}
+                    description={selectedPortfolioCopy.description}
+                    tools={selectedPortfolioCopy.tools}
+                    year={selectedPortfolioCopy.year}
+                    toolsLabel={galleryCopy.modalToolsLabel ?? "Tools"}
+                    yearLabel={galleryCopy.modalYear}
+                    responsibilitiesLabel={
+                      galleryCopy.modalResponsibilitiesLabel ?? "Responsibilities"
+                    }
+                  />
                 </div>
 
-                <div className="flex flex-col gap-6">
-                  {selectedPortfolioCopy.tools.trim() !== "" ? (
-                    <div className="flex flex-col gap-1.5 sm:flex-row sm:items-baseline sm:gap-4">
-                      <span className="shrink-0 text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                        {galleryCopy.modalToolsLabel ?? "Tools"}
-                      </span>
-                      <p className="text-[0.95rem] leading-relaxed text-muted-foreground sm:min-w-0 sm:flex-1">
-                        {selectedPortfolioCopy.tools}
-                      </p>
-                    </div>
-                  ) : null}
-                  <div className="flex flex-col gap-1.5 sm:flex-row sm:items-baseline sm:gap-4">
-                    <span className="shrink-0 text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                      {galleryCopy.modalYear}
-                    </span>
-                    <span className="text-[0.95rem] leading-relaxed text-muted-foreground tabular-nums sm:min-w-0 sm:flex-1">
-                      {selectedPortfolioCopy.year}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-3">
-                  <motion.button
+                <div className="flex flex-wrap items-center gap-3 max-sm:mb-2">
+                  <button
                     type="button"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
                     onClick={closeModal}
-                    className="w-fit rounded-full bg-primary px-6 py-2.5 text-sm tracking-wide text-primary-foreground"
-                    style={{ fontWeight: 500 }}
+                    className={cn(
+                      modalDetailActionPillClass,
+                      "w-fit px-5 py-2 text-xs uppercase sm:px-6 sm:py-2.5 sm:text-sm",
+                    )}
                   >
                     {galleryCopy.backToGallery}
-                  </motion.button>
-                  <motion.button
+                  </button>
+                  <button
                     type="button"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
                     onClick={() => toggleFavorite(selectedImage.projectKey)}
-                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground"
-                    style={{ fontWeight: 500 }}
+                    className={cn(
+                      modalDetailActionPillClass,
+                      "h-9 gap-1.5 pl-2.5 pr-3 sm:h-10 sm:gap-2 sm:pl-3 sm:pr-4",
+                    )}
                     aria-label={galleryCopy.modalFavoriteAriaLabel}
                     aria-pressed={favoriteKeys.has(selectedImage.projectKey)}
                   >
@@ -4211,22 +4196,23 @@ export function Gallery3D({
                         "h-[18px] w-[18px] shrink-0",
                         favoriteKeys.has(selectedImage.projectKey) ?
                           "fill-[#db544b] stroke-[#db544b] text-[#db544b]"
-                        : "fill-transparent stroke-primary-foreground text-primary-foreground",
+                        : "fill-transparent stroke-current text-current",
                       )}
                       strokeWidth={2}
                     />
-                  </motion.button>
-                  <motion.button
+                    <span className="min-w-[1.25rem] tabular-nums leading-none">
+                      {likeCounts[selectedImage.projectKey] ??
+                        defaultGalleryLikeCount(selectedImage.projectKey)}
+                    </span>
+                  </button>
+                  <button
                     type="button"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
                     onClick={() => void handleShareProject()}
-                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm tracking-wide text-primary-foreground"
-                    style={{ fontWeight: 500 }}
+                    className={cn(modalDetailActionPillClass, "h-9 w-9 sm:h-10 sm:w-10")}
                     aria-label={galleryCopy.modalShareAriaLabel}
                   >
-                    <Share className="h-[18px] w-[18px]" strokeWidth={2} aria-hidden />
-                  </motion.button>
+                    <Share className="h-[18px] w-[18px] stroke-current" strokeWidth={2} aria-hidden />
+                  </button>
                   {shareCopied ? (
                     <span
                       className="text-sm text-muted-foreground"
@@ -4258,6 +4244,14 @@ export function Gallery3D({
                 </div>
               </motion.div>
             </motion.div>
+            <div
+              className="w-full shrink-0 sm:hidden"
+              style={{
+                height:
+                  "max(4rem, calc(1.5rem + env(safe-area-inset-bottom, 0px)))",
+              }}
+              aria-hidden
+            />
             </div>
           </motion.div>
         ) : null}

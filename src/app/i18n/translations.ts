@@ -145,6 +145,8 @@ export type TranslationMessages = {
     modalYear: string;
     /** Label above the tools line in the project detail modal (shown with a trailing colon in UI). */
     modalToolsLabel: string;
+    /** Section header when description uses Responsibilities bullets (fallback for prose-only copy). */
+    modalResponsibilitiesLabel: string;
     /** Title when no `portfolio.projects[projectKey]` entry exists (never show raw `projectKey`). */
     modalProjectFallback: string;
     /** Year line when entry is missing or `year` is empty in copy (never use manifest). */
@@ -306,6 +308,7 @@ const en: TranslationMessages = {
     switchToCameraOff: "HANDS MODE OFF",
     modalYear: "Year",
     modalToolsLabel: "Tools",
+    modalResponsibilitiesLabel: "Responsibilities",
     modalProjectFallback: "Project",
     modalYearFallback: "—",
     backToGallery: "Back",
@@ -421,6 +424,7 @@ const de: TranslationMessages = {
     switchToCameraOff: "HANDS MODE AUS",
     modalYear: "Jahr",
     modalToolsLabel: "Tools",
+    modalResponsibilitiesLabel: "Aufgaben & Verantwortlichkeiten",
     modalProjectFallback: "Projekt",
     modalYearFallback: "—",
     backToGallery: "Zurück",
@@ -536,6 +540,7 @@ const tr: TranslationMessages = {
     switchToCameraOff: "HANDS MODE KAPAT",
     modalYear: "Yıl",
     modalToolsLabel: "Araçlar",
+    modalResponsibilitiesLabel: "Sorumluluklar",
     modalProjectFallback: "Proje",
     modalYearFallback: "—",
     backToGallery: "Geri",

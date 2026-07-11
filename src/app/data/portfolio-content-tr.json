@@ -1,97 +1,99 @@
 {
   "work/1": {
     "title": "3D Gerçek Zamanlı Sinematik Ortam Üretimi",
-    "description": "Gerçekçi bir animasyon filmi için büyük ölçekli, fantezi esintili bir kütüphane ortamının oluşturulmasından sorumluydum. Hikâye Emberfall Krallığı’nda geçiyor; bir prenses kütüphane mekânında izleyiciye bir anlatı sunuyor. Ortam, bu anlatı anını destekleyecek şekilde tasarlandı; atmosfer, ölçek ve mekân üzerinden hikâye anlatımı ön planda. Moodboard’dan mekânsal kompozisyona kadar tüm çevre objelerini sıfırdan modelledim; yüksek kaliteli gerçek zamanlı iş akışı ve karmaşık mimari detaylarda sürükleyici bir kütüphane alanı için temiz ve optimize UV haritaları hazırladım. Çevre üretiminin ötesinde film fragmanını kurguladım; görüntü ve ses tasarımıyla sinematik ton ve duygusal etkiyi güçlendirdim. Dokulama ve PBR malzeme üretimi ile prenses karakteri, animasyonu ve dokuları grup içindeki diğer sanatçılar tarafından geliştirildi.",
+    "description": "Rol: 3D Environment Artist\n\nSorumluluklar:\n• Emberfall Krallığı'nda geçen gerçekçi bir animasyon filmi için büyük ölçekli, fantezi esintili kütüphane ortamı oluşturdum\n• Bir prensesin kütüphanede anlatı sunduğu anı desteklemek için atmosfer, ölçek ve mekân üzerinden hikâye anlatımına odaklandım\n• Yüksek kaliteli gerçek zamanlı iş akışı için tüm çevre objelerini sıfırdan modelledim ve optimize UV haritaları hazırladım\n• Sinematik ton ve duygusal etkiyi güçlendirmek için film fragmanını kurguladım; görüntü ve ses tasarımını yürüttüm\n• Not: Dokulama, PBR malzeme üretimi ve prenses karakteri (animasyon ve dokular) grup içindeki diğer sanatçılar tarafından geliştirildi",
     "year": "2025",
     "tools": "Unreal Engine, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/2": {
     "title": "3D Karakter Özelleştirme ve Animasyon",
-    "description": "3D karakter kostümleri ve oyun içi varlıkların üretiminden sorumluydum; Blender ve Substance 3D Painter kullanarak modelleme, UV açılımı, optimizasyon, skin-weight boyama ve texturing süreçlerini yürüttüm. Ayrıca 30’dan fazla mobil oyun seviyesi ve 100+ karakter boyunca görsel tutarlılığı korumak adına 2D asset, UI görselleri ve illüstrasyon üretimine katkıda bulundum. Fashion Battle’ın (120M+ indirme) üretim sürecinde önemli rol alarak tasarım, yazılım ve prodüksiyon ekipleriyle yakın çalıştım; aynı zamanda playtest, UX geri bildirimi ve kalite kontrol süreçlerine katkı sağladım.",
+    "description": "Rol: 3D Character Artist\n\nSorumluluklar:\n• Modelleme, UV açılımı, optimizasyon, skin-weight boyama ve texturing dahil 3D karakter kostümleri ve oyun içi varlıklar ürettim\n• 30'dan fazla mobil oyun seviyesi ve 100+ karakter boyunca görsel tutarlılık için 2D asset, UI görselleri ve illüstrasyonlara katkıda bulundum\n• Fashion Battle (120M+ indirme) üretiminde tasarım, yazılım ve prodüksiyon ekipleriyle yakın çalışarak önemli rol aldım\n• Playtest, UX geri bildirimi ve kalite kontrol süreçlerine katkı sağladım",
     "year": "2021-2024",
     "tools": "Unity, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/3": {
-    "title": "VR Dövüş Oyunu Üretimi",
-    "description": "Boneheads Raid, oyuncuların kutsal bir idolü dalga dalga iskelet düşman saldırılarına karşı sürükleyici bir VR ortamında savunduğu bir VR oyun projesidir. Bu projede ortam yerleşimi, VFX, karakter rig ve animasyonundan sorumluydum. İskeletlerin kılıçları için dinamik ışık ve iz efektleri; Unity’de vuruş tepki animasyonları sırasında tetiklenen parçacık efektleri ile dövüş geri bildirimini güçlendirdim. Ayrıca anahtar kare animasyonlarıyla entegre özel doğum ve ölüm materyalleri geliştirerek iskeletlerin doğma ve ölüm anlarında görsel olarak etkileyici şekilde erimesini veya kaybolmasını sağladım.",
+    "title": "Boneheads Raid",
+    "subtitle": "VR Dövüş Oyunu",
+    "description": "Rol: 3D Environment & VFX Artist\n\nSorumluluklar:\n• VR dövüş arenası için ortam yerleşimini oluşturdum ve arena prop'larını modelledim\n• İskelet düşman karakterlerini rigledim ve animate ettim\n• Düşman kılıç silahları için dinamik ışık ve iz efektleri geliştirdim\n• Unity'de dövüş geri bildirimini güçlendirmek için vuruş tepkisi parçacık efektleri geliştirdim\n• Shader tabanlı özel doğum (\"birth\") ve ölüm materyalleri tasarladım",
     "year": "2024",
-    "tools": "Unity, Blender, Adobe Photoshop & Premiere Pro"
+    "tools": "Unity, Blender, Adobe Photoshop, Premiere Pro"
   },
   "work/4": {
-    "title": "Cozy Zen Oyun Tasarımı ve Geliştirmesi",
-    "description": "Cozy Zen, kış temalı bir Zen bahçesi kavramı üzerinden rahatlatıcı oyun deneyimlerini inceleyen yüksek lisans tez projemdir. Oyunculara hem sakin hem de sürükleyici bir etkileşimli ortam sunmayı hedefledim. Çok kısıtlı sürede hem teorik tezi hem de tam oynanabilir bir prototipi tek başıma geliştirdim. Animasyon, görsel tasarım ve oyun geliştirme dahil tüm üretim sürecinden sorumluydum; konsepti Blender ve Unity ile hayata geçirdim. Kodlama ve oyun mekaniği için Codex’ten yararlandım. Programlama temellerinden farklı mekanik denemelere ve kavramdan oynanabilir prototipe kadar her ayrıntıyı rafine etmek benim için çok öğretici bir yolculuk oldu.",
+    "title": "Cozy Zen",
+    "subtitle": "Oyun Tasarımı ve Geliştirmesi",
+    "description": "Rol: Game Designer & Developer\n\nSorumluluklar:\n• Kış temalı Zen bahçesi kavramı üzerinden rahatlatıcı oyun deneyimlerini inceleyen Cozy Zen yüksek lisans tez projesini geliştirdim\n• Çok kısıtlı sürede sakin ve sürükleyici bir etkileşimli ortam oluşturdum\n• Teorik tezi ve tam oynanabilir prototipi tek başıma ürettim\n• Blender ve Unity ile animasyon, görsel tasarım ve oyun geliştirme süreçlerini yürüttüm\n• Kodlama ve oyun mekaniği için Codex'ten yararlandım",
     "year": "2025",
     "tools": "Unity, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/5": {
     "title": "Spotify Albüm Canvas Tasarımı",
-    "description": "Hip hop albümü “Bulut”un (İngilizcede anlamı “cloud”, bulut) Spotify yayını için görsel kimliği tasarladım; albüm sunumu ve eşlik eden Canvas animasyonları dahil. Çalışmam, hip hop, sokak stili ve format ilhamlı kısa motion görselleri üzerinde yoğunlaştı; video kurgusu, motion tasarım ve ritim odaklı görsel anlatımı birleştirdim. Bu görseller dinleme deneyimini güçlendirmek ve albümün havası ile atmosferik tonuyla uyum sağlamak için hazırlandı. Tüm varlıklar platforma özgü kısıtlar ve kullanıcı etkileşim kalıpları gözetilerek optimize edildi; Spotify arayüzünde hem görsel etki hem sorunsuz entegrasyon sağlandı.",
+    "description": "Rol: Motion Designer\n\nSorumluluklar:\n• Hip hop albümü \"Bulut\"un Spotify yayını için albüm sunumu ve Canvas animasyonları dahil görsel kimlik tasarladım\n• Hip hop ve sokak stili ilhamlı kısa motion görselleri; video kurgusu, motion tasarım ve ritim odaklı anlatım\n• Dinleme deneyimini güçlendiren ve albümün atmosferiyle uyumlu görseller hazırladım\n• Spotify arayüzü ve platform kısıtlarına göre tüm varlıkları optimize ettim",
     "year": "2025",
     "tools": "Adobe Photoshop & Premiere Pro"
   },
   "work/6": {
     "title": "Jazz Fest Ticari Tasarım",
-    "description": "Bu projede caz festivali için ticari motion parçasında sorumlu olmanın yanı sıra sanat yönetmenliği yaptım; ritim odaklı kurgu, tipografi ve festival marka tonuyla uyumlu müzikle eşzamanlı görsel anlatımı birleştirdim. Motion tasarımın ötesinde, bu çalışmayı portfolyomda tutmayı seviyorum: yapay zekâ destekli araçlardan önce, geliştirmek istediklerimizi analog biçimde nasıl hayal edip, tasarlayıp ürettiğimizi bu projede topluyor. Ayrıca kampanyaya yönelik yüksek kaliteli görseller için makyajla model hazırlığı ve profesyonel çekim yönetimini de içeren tüm görsel üretim sürecinin kamera arkası videosunu da bulacaksınız. Nihai çıktı fotoğraf malzemesini motion tasarımla birleştirir; ritim, kompozisyon ve marka kimliği ön planda. Proje bir yarışmaya sunuldu ve “Mansion Award” ile onurlandırıldı.",
+    "description": "Rol: Art Director & Motion Designer\n\nSorumluluklar:\n• Caz festivali için ritim odaklı kurgu, tipografi ve müzikle eşzamanlı görsel anlatımlı ticari motion parçası yönettim ve ürettim\n• Kampanya görselleri için makyajla model hazırlığı ve profesyonel fotoğraf çekimi yönettim\n• Fotoğraf malzemesi ile motion tasarımı birleştirerek ritim, kompozisyon ve marka kimliğine odaklandım\n• Projeyi yarışmaya sundum ve \"Mansion Award\" ile onurlandırıldı",
     "year": "2019",
     "tools": "Adobe Photoshop & Premiere Pro"
   },
   "work/7": {
     "title": "Juste Debout Kampanya Tasarımı",
-    "description": "Juste Debout için kampanya görselleri ve motion içerik; hip hop ritimleri, sokak dansı kültürü ve dinamik anlatı odaklı. 2002’den beri dünyanın önde gelen hip hop dans etkinliklerinden biri olarak proje, küresel kimliği ve köklü tarihi yansıtan güçlü ve otantik bir görsel dil gerektirdi. Sosyal medya ve baskı için geniş bir varlık seti oluşturdum; her birini dijital platformlara göre uyarlayarak netlik, etki ve formatlar arası tutarlılık sağladım. Genel görsel yön, sahne enerjisini yakalarken tanınabilir bir kampanya kimliğini korumayı hedefledi.",
+    "description": "Rol: Campaign & Motion Designer\n\nSorumluluklar:\n• Juste Debout için hip hop ritimleri, sokak dansı kültürü ve dinamik anlatı odaklı kampanya görselleri ve motion içerik geliştirdim\n• Dijital platformlara uyarlanmış sosyal medya ve baskı varlıkları oluşturdum\n• Sahne enerjisini yakalayan ve tutarlı kampanya kimliğini koruyan görsel yön belirledim",
     "year": "2026",
     "tools": "Adobe Photoshop, Illustrator, Premiere Pro & After Effects"
   },
   "work/8": {
     "title": "Western Union Ticari Tasarım",
-    "description": "Western Union için ticari projelerde çalıştım; Adobe After Effects ile animasyonlu tanıtım materalleri ürettim. İçerik Yunanca, Gürcüce, Rusça ve Ukraynaca dahil birden çok dile yerelleştirilerek farklı kitlelere ulaşacak şekilde hazırlandı.",
+    "description": "Rol: Motion Designer\n\nSorumluluklar:\n• Western Union için Adobe After Effects ile animasyonlu tanıtım materyalleri ürettim\n• Yunanca, Gürcüce, Rusça ve Ukraynaca dahil birden çok dile yerelleştirdim\n• Farklı uluslararası kitlelere yönelik kampanya varlıkları teslim ettim",
     "year": "2019",
     "tools": "Adobe Photoshop, Premiere Pro & After Effects"
   },
   "work/9": {
     "title": "Wholy Cow Beef Tallow Marka, Ambalaj ve Kampanya Tasarımı",
-    "description": "Bu Wholy Cow Beef Tallow projesi, logo ve ambalaj tasarımıyla ayırt edici ve uyumlu bir marka kimliği oluşturmayı hedefledi. Markanın doğal konumlandırması ve hedef kitlesiyle uyum için birden fazla etiket konsepti üzerinde çalışıldı ve rafine edildi. Nihai sonuç, kalite ve güveni ileten sade, cesur ve otantik bir kimlik. Ambalaj iki boyutta sunuluyor: yüksek ve küçük. Bir girişim olarak Wholy Cow Ossewit üretime geçmeyi başardı ve şu anda Hollanda’da dağıtımda. Sosyal medya kampanyaları için yapay zekâ destekli hareketli ve statik görseller geliştirildi; markanın görünürlüğü yüksek etkili, modern reklam içeriğiyle genişletildi.",
+    "description": "Rol: Brand & Packaging Designer\n\nSorumluluklar:\n• Wholy Cow Beef Tallow için logo ve ambalaj tasarımıyla ayırt edici marka kimliği oluşturdum\n• Markanın doğal konumlandırması ve hedef kitlesiyle uyumlu etiket konseptleri geliştirdim\n• Kalite ve güveni ileten iki boyutlu ambalaj (yüksek ve küçük) tasarladım\n• Sosyal medya kampanyaları için yapay zekâ destekli hareketli ve statik görseller geliştirdim",
     "year": "2026",
     "tools": "Adobe Illustrator ve Photoshop, Premiere Pro, yapay zekâ destekli araçlar"
   },
   "work/10": {
     "title": "Illustrations",
-    "description": "Kişisel illüstrasyon çalışmaları — seri, kompozisyon, renk ve anlatı tonu.",
+    "description": "Rol: Illustrator\n\nSorumluluklar:\n• Seri, kompozisyon, renk ve anlatı tonunu keşfeden kişisel illüstrasyon çalışmaları",
     "year": "2019-2023",
     "tools": "Adobe Photoshop"
   },
   "work/11": {
     "title": "Yeni proje 1 --",
-    "description": "Yer tutucu — başlık, açıklama ve medyayı gallery/11/ içinde güncelleyin.",
+    "description": "Sorumluluklar:\n• Yer tutucu — başlık, açıklama ve medyayı gallery/11/ içinde güncelleyin.",
     "year": "",
     "tools": ""
   },
   "work/12": {
     "title": "A2: \"Hair\"",
-    "description": "Devam eden gerçek zamanlı görsel-işitsel serimin ikinci parçası. Daha iyi bir deneyim için sesi açmanız önerilir. Katmanlı RGBA renk yapılarıyla oluşturulan yarı saydam, ses tepkili bilgisayar grafikleri — bu kez low, mid ve high gibi farklı ses katmanlarının gerçek zamanlı etkileşimiyle şekillenen \"saç benzeri\" bir hissi araştırıyor. Büyük yatay LED ekranlar için tasarlandı. #noai\n\n🎶 LightBeatsMusic — House Groove Mirage",
+    "description": "Rol: Audiovisual Artist\n\nSorumluluklar:\n• Gerçek zamanlı görsel-işitsel serinin ikinci parçasını yarı saydam, ses tepkili bilgisayar grafikleriyle oluşturdum\n• Low, mid ve high ses katmanlarının gerçek zamanlı etkileşimiyle saç benzeri bir his araştıran katmanlı RGBA yapıları\n• Büyük yatay LED ekranlar için tasarlandı\n• Ses: LightBeatsMusic — House Groove Mirage #noai",
     "year": "2026",
     "tools": "Touch Designer, Adobe Premiere Pro"
   },
   "work/13": {
     "title": "Birdie",
-    "description": "Bu çalışma; gerçek zamanlı simülasyon, yarı saydam malzemeler ve katmanlı parçacık davranışlarıyla organik 3B form ile animasyon arasındaki geçişi inceler.\n\nMekânsal algı, hareket odaklı yapılar ve dijital soyutlamaya odaklı kurulumlar için üretildi. #noai",
+    "description": "Rol: Real-Time 3D Artist\n\nSorumluluklar:\n• Gerçek zamanlı simülasyonla organik 3B form ile animasyon arasındaki geçişi inceledim\n• Yarı saydam malzemeler ve katmanlı parçacık davranışlarını birleştirdim\n• Mekânsal algı ve dijital soyutlamaya odaklı kurulumlar için üretildi #noai",
     "year": "2026",
     "tools": "Touch Designer"
   },
   "work/14": {
     "title": "A1: \"Aura\"",
-    "description": "Devam eden görsel-işitsel serimin ilk parçası. Daha iyi bir deneyim için sesi açmanız önerilir. Bu çalışma; katmanlı RGBA renk yapıları, frekans güdümlü hareket ve deneysel görsel etkileşimler üzerinden yarı saydam, ses tepkili bilgisayar grafiklerini inceler. Ses, yarı saydamlık ve sentetik mekânsal algı arasındaki ilişkiye odaklanır. Büyük yatay LED ekranlar için tasarlandı.\n\n🎶 Watermello-Sport Techno",
+    "description": "Rol: Audiovisual Artist\n\nSorumluluklar:\n• Devam eden görsel-işitsel serinin ilk parçasını yarı saydam, ses tepkili bilgisayar grafikleriyle oluşturdum\n• Frekans güdümlü hareket ve deneysel görsel etkileşimlerle katmanlı RGBA yapıları kurdum\n• Ses, yarı saydamlık ve sentetik mekânsal algı arasındaki ilişkiye odaklandım\n• Büyük yatay LED ekranlar için tasarlandı\n• Ses: Watermello-Sport Techno",
     "year": "2026",
     "tools": "Touch Designer, Adobe Premiere Pro"
   },
   "work/15": {
     "title": "Yeni proje 5 --",
-    "description": "Yer tutucu — başlık, açıklama ve medyayı gallery/15/ içinde güncelleyin.",
+    "description": "Sorumluluklar:\n• Yer tutucu — başlık, açıklama ve medyayı gallery/15/ içinde güncelleyin.",
     "year": "",
     "tools": ""
   },
   "work/16": {
     "title": "Generative Visual Filters",
-    "description": "Bu üretken hareket izleme sistemleri; görüntü ve videoyu gerçek zamanlı işlemek için Touch Designer’da geliştirildi. Proje; görsel efektlerin nasıl katmanlanıp birleştirilebileceğini ve manipüle edilerek evrilen görsel kompozisyonlar üretilebileceğini inceler. Modüler yapılar, grafik ve prosedürel tekniklerle denemeyi teşvik ederken çeşitli görsel sonuçların hızlı üretimini mümkün kılar.",
+    "description": "Rol: Creative Technologist\n\nSorumluluklar:\n• TouchDesigner'da görüntü ve videoyu gerçek zamanlı işlemek için üretken hareket izleme sistemleri geliştirdim\n• Görsel efektlerin katmanlanması, birleştirilmesi ve manipülasyonuyla evrilen kompozisyonlar ürettim\n• Modüler yapılar ve prosedürel tekniklerle hızlı deneme ve çeşitli görsel sonuçlar sağladım",
     "year": "2026",
     "tools": "TouchDesigner, Premiere Pro"
   }

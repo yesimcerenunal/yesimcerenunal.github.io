@@ -2,14 +2,14 @@
   "work/1": {
     "category": "3D Environment",
     "title": "3D Real-Time Cinematic Environment Production",
-    "description": "Responsible for the creation of a large-scale, fantasy-inspired library environment for a realistic animation film. The story takes place in the Emberfall Kingdom, where a princess narrates a tale to the audience within the library setting. The environment was designed to support this narrative moment, emphasizing atmosphere, scale, and storytelling through space. From moodboard to spatial composition, I modeled all environment props from scratch, along with creating clean and optimized UV maps to ensure a high-quality real-time workflow with immersive library space in complex architectural details. Beyond environment production, I edited the movie trailer, handling both video editing and sound design to enhance the cinematic tone and emotional impact of the project. Texturing and PBR material creation, the princess character, including her animation and textures, was developed by other artists in our group.",
+    "description": "Role: 3D Environment Artist\n\nResponsibilities:\n• Created a large-scale, fantasy-inspired library environment for a realistic animation film set in the Emberfall Kingdom\n• Designed the space to support a narrative moment where a princess narrates a tale, emphasizing atmosphere, scale, and storytelling through space\n• Modeled all environment props from scratch with clean, optimized UV maps for a high-quality real-time workflow\n• Edited the movie trailer, handling video editing and sound design to enhance cinematic tone and emotional impact\n• Note: Texturing, PBR material creation, and the princess character (animation and textures) were developed by other artists in the group",
     "year": "2025",
     "tools": "Unreal Engine, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/2": {
     "category": "3D Character",
     "title": "3D Character Customization & Animation",
-    "description": "Responsible for creating 3D character costumes and in-game assets, including modeling, UV mapping, optimization, skin-weight painting, and texturing using Blender and Substance 3D Painter. Also contributed to 2D assets, UI visuals, and illustrations, ensuring visual consistency across 30+ mobile game levels and 100+ characters. Played a key role in the production of Fashion Battle (120M+ downloads), collaborating closely with design, development, and production teams, while also contributing to playtests, UX feedback, and quality control.",
+    "description": "Role: 3D Character Artist\n\nResponsibilities:\n• Created 3D character costumes and in-game assets including modeling, UV mapping, optimization, skin-weight painting, and texturing\n• Contributed to 2D assets, UI visuals, and illustrations for visual consistency across 30+ mobile game levels and 100+ characters\n• Played a key role in Fashion Battle production (120M+ downloads), collaborating with design, development, and production teams\n• Contributed to playtests, UX feedback, and quality control",
     "year": "2021-2024",
     "tools": "Unity, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
@@ -17,98 +17,99 @@
     "category": "Game Design",
     "title": "Boneheads Raid",
     "subtitle": "VR Combat Game",
-    "description": "Role: 3D Environment & VFX Artist\n\nResponsibilities:\n• Designed and built the environment layout for the VR combat arena\n• Rigged and animated the skeleton enemy characters\n• Created dynamic light and trail effects for enemy sword weapons\n• Developed hit-reaction particle effects to enhance combat feedback in Unity\n• Designed custom shader-based spawn (\"birth\") and death materials, synced with keyframe animations for a dissolve/vanish effect",
+    "description": "Role: 3D Environment & VFX Artist\n\nResponsibilities:\n• Built the environment layout for the VR combat arena and modeled arena props\n• Rigged and animated the skeleton enemy characters\n• Created dynamic light and trail effects for enemy sword weapons\n• Developed hit-reaction particle effects to enhance combat feedback in Unity\n• Designed custom shader-based spawn (\"birth\") and death materials",
     "year": "2024",
     "tools": "Unity, Blender, Adobe Photoshop, Premiere Pro"
   },
   "work/4": {
     "category": "Game Design",
-    "title": "Cozy Zen Game Design & Development",
-    "description": "Cozy Zen is my master thesis project that explores cozy game experiences through the concept of a winter Zen garden. The goal was to create a calming yet engaging interactive game environment that offers players a sense of relaxation and presence. Within a very limited timeframe, I independently developed both the theoretical thesis and a fully playable prototype. I was responsible for the entire production process, including animation, visual design, and game development, bringing the concept to life by using Blender and Unity. I also utilized Codex to support the coding process and gameplay implementation. The project itself became a highly rewarding and educational journey from learning programming fundamentals to experimenting with different mechanics and refining every detail from concept to playable prototype.",
+    "title": "Cozy Zen",
+    "subtitle": "Game Design & Development",
+    "description": "Role: Game Designer & Developer\n\nResponsibilities:\n• Developed Cozy Zen as a master thesis project exploring cozy game experiences through a winter Zen garden concept\n• Built a calming yet engaging interactive environment offering relaxation and presence within a very limited timeframe\n• Independently produced the theoretical thesis and a fully playable prototype\n• Handled animation, visual design, and game development using Blender and Unity\n• Used Codex to support coding and gameplay implementation from concept to playable prototype",
     "year": "2025",
     "tools": "Unity, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/5": {
     "category": "Motion",
     "title": "Spotify Album Canvas Design",
-    "description": "Designed the visual identity for the Spotify release of the hip hop album “Bulut” (meaning “cloud” in English), including the album presentation and accompanying Canvas animations. My work focused on creating short-form motion visuals inspired by hip hop, street style, format, combining video editing, motion design, and rhythm-driven visual storytelling. These visuals were crafted to enhance the listening experience while aligning with the album’s mood and atmospheric tone. All assets were optimized with platform-specific constraints and user interaction patterns in mind, ensuring both visual impact and seamless integration within Spotify’s interface.",
+    "description": "Role: Motion Designer\n\nResponsibilities:\n• Designed the visual identity for the Spotify release of hip hop album \"Bulut\", including album presentation and Canvas animations\n• Created short-form motion visuals inspired by hip hop and street style combining video editing, motion design, and rhythm-driven storytelling\n• Crafted visuals to enhance the listening experience while aligning with the album's mood and atmospheric tone\n• Optimized assets for platform-specific constraints and Spotify interface integration",
     "year": "2025",
     "tools": "Adobe Photoshop & Premiere Pro"
   },
   "work/6": {
     "category": "Motion",
     "title": "Jazz Fest Commercial Design",
-    "description": "In this project, I was the art director, who was also responsible for a commercial motion piece for a jazz festival, combining rhythm-based editing, typography, and music-synced visual storytelling aligned with the festival’s brand tone. Beyond motion design, I like to keep this project in my portfolio because this is how we dreamed, imagined, and created in an analog way the things we wanted to develop before AI-assisted tools emerged. Moreover, you will find a behind-the-scenes video of the full visual production process, including preparing the model through makeup styling and directing a professional photoshoot to create high-quality visual assets for the campaign. The final output integrated motion design with photographed material, focusing on rhythm, composition, and brand identity. The project was submitted to a competition and received the “Mansion Award” recognition.",
+    "description": "Role: Art Director & Motion Designer\n\nResponsibilities:\n• Directed and produced a commercial motion piece for a jazz festival with rhythm-based editing, typography, and music-synced visual storytelling\n• Prepared the model through makeup styling and directed a professional photoshoot for high-quality campaign visuals\n• Integrated motion design with photographed material, focusing on rhythm, composition, and brand identity\n• Submitted the project to a competition and received the \"Mansion Award\" recognition",
     "year": "2019",
     "tools": "Adobe Photoshop & Premiere Pro"
   },
   "work/7": {
     "category": "Motion",
     "title": "Juste Debout Campaign Design",
-    "description": "Developed campaign visuals and motion content for Juste Debout, focusing on hip hop rhythms, street dance culture, and dynamic storytelling. As one of the world’s leading hip hop dance events since 2002, the project required a strong and authentic visual language that reflects both its global identity and rich history. I created a range of social media and print assets, carefully adapting each for digital platforms to ensure clarity, impact, and consistency across formats. The overall visual direction aimed to capture the raw energy of the stage while maintaining a cohesive and recognizable campaign identity.",
+    "description": "Role: Campaign & Motion Designer\n\nResponsibilities:\n• Developed campaign visuals and motion content for Juste Debout focusing on hip hop rhythms, street dance culture, and dynamic storytelling\n• Created social media and print assets adapted for digital platforms to ensure clarity, impact, and consistency\n• Built a visual direction capturing the raw energy of the stage while maintaining a cohesive campaign identity",
     "year": "2026",
     "tools": "Adobe Photoshop, Illustrator, Premiere Pro & After Effects"
   },
   "work/8": {
     "category": "Motion",
     "title": "Western Union Commercial Design",
-    "description": "Worked on commercial projects for Western Union, producing animated promotional materials using Adobe After Effects. The content was localized into multiple languages, including Greek, Georgian, Russian, and Ukrainian, to effectively reach and engage diverse international audiences.",
+    "description": "Role: Motion Designer\n\nResponsibilities:\n• Produced animated promotional materials for Western Union using Adobe After Effects\n• Localized content into multiple languages including Greek, Georgian, Russian, and Ukrainian\n• Delivered campaign assets tailored to diverse international audiences",
     "year": "2019",
     "tools": "Adobe Photoshop, Premiere Pro & After Effects"
   },
   "work/9": {
     "category": "Motion",
     "title": "Wholy Cow Beef Tallow Branding, Packaging and Campaign Design",
-    "description": "This project for Wholy Cow Beef Tallow aimed to build a distinctive and cohesive brand identity through logo and packaging design. Multiple label concepts were explored and refined, aligning the visual direction with the brand’s natural positioning and target audience. The final result is a clean, bold, and authentic identity that communicates quality and trust. The packaging is available in two sizes: tall and small. As a startup, Wholy Cow Ossewit has successfully moved into production and is currently distributed in the Netherlands. AI-assisted motion and static visuals were developed for social media campaigns, extending the brand’s presence with high-impact, modern advertising content.",
+    "description": "Role: Brand & Packaging Designer\n\nResponsibilities:\n• Built a distinctive brand identity through logo and packaging design for Wholy Cow Beef Tallow\n• Explored and refined multiple label concepts aligned with the brand's natural positioning and target audience\n• Delivered packaging in two sizes (tall and small) communicating quality and trust\n• Developed AI-assisted motion and static visuals for social media campaigns extending brand presence",
     "year": "2026",
     "tools": "Adobe Illustrator & Photoshop, Premiere Pro, AI-assisted tools"
   },
   "work/10": {
     "category": "2D",
     "title": "Illustrations",
-    "description": "Personal illustration work exploring series, composition, color, and narrative tone.",
+    "description": "Role: Illustrator\n\nResponsibilities:\n• Personal illustration work exploring series, composition, color, and narrative tone",
     "year": "2019-2023",
     "tools": "Adobe Photoshop"
   },
   "work/11": {
     "category": "3D PARTICLE SIMULATION",
     "title": "New project 1 --",
-    "description": "Placeholder — replace title, description, and media in gallery/11/.",
+    "description": "Responsibilities:\n• Placeholder — replace title, description, and media in gallery/11/.",
     "year": "",
     "tools": ""
   },
   "work/12": {
     "category": "AUDIOVISUAL INTERACTIONS",
     "title": "A2: \"Hair\"",
-    "description": "The second piece in my real-time audiovisual series. For a better experience, sound on is recommended. Translucent, audio-reactive computer graphics built through layered RGBA color structures again, but this time it explores a \"hair-like\" sensation shaped by different sound layers like lows, mids, and highs interacting in real time. It was primarily designed for large horizontal LED screens. #noai\n\n🎶 LightBeatsMusic — House Groove Mirage",
+    "description": "Role: Audiovisual Artist\n\nResponsibilities:\n• Created the second piece in a real-time audiovisual series with translucent, audio-reactive computer graphics\n• Built layered RGBA color structures exploring a hair-like sensation shaped by lows, mids, and highs in real time\n• Designed primarily for large horizontal LED screens\n• Sound: LightBeatsMusic — House Groove Mirage #noai",
     "year": "2026",
     "tools": "Touch Designer, Adobe Premiere Pro"
   },
   "work/13": {
     "category": "3D PARTICLE SIMULATION",
     "title": "Birdie",
-    "description": "This art piece explores the transition between 3d organic form and animation using realtime simulation, translucent materials, and layered particle behaviors.\n\nCreated for installations focused on spatial perception, motion-driven structures, and digital abstraction. #noai",
+    "description": "Role: Real-Time 3D Artist\n\nResponsibilities:\n• Explored the transition between organic 3D form and animation using real-time simulation\n• Combined translucent materials and layered particle behaviors for spatial, motion-driven structures\n• Created for installations focused on spatial perception and digital abstraction #noai",
     "year": "2026",
     "tools": "Touch Designer"
   },
   "work/14": {
     "category": "AUDIOVISUAL INTERACTIONS",
     "title": "A1: \"Aura\"",
-    "description": "First piece from my ongoing audiovisual series. For a better experience, sound on is recommended. This work explores translucent, audioreactive computer graphics through layered RGBA color structures, frequency-driven motion, and experimental visual interactions. The project focuses on the relationship between sound, translucency, and synthetic spatial perception. It was primarily designed for large horizontal LED screens.\n\n🎶 Watermello-Sport Techno",
+    "description": "Role: Audiovisual Artist\n\nResponsibilities:\n• Created the first piece in an ongoing audiovisual series with translucent, audio-reactive computer graphics\n• Built layered RGBA structures with frequency-driven motion and experimental visual interactions\n• Focused on the relationship between sound, translucency, and synthetic spatial perception\n• Designed primarily for large horizontal LED screens\n• Sound: Watermello-Sport Techno",
     "year": "2026",
     "tools": "Touch Designer, Adobe Premiere Pro"
   },
   "work/15": {
     "category": "3D PARTICLE SIMULATION",
     "title": "New project 5 --",
-    "description": "Placeholder — replace title, description, and media in gallery/15/.",
+    "description": "Responsibilities:\n• Placeholder — replace title, description, and media in gallery/15/.",
     "year": "",
     "tools": ""
   },
   "work/16": {
     "category": "GENERATIVE MOTION TRACKING",
     "title": "Generative Visual Filters",
-    "description": "These generative motion tracking systems are developed in Touch Designer to process real-time image and video. The project explores how visual effects can be layered, combined, and manipulated to generate evolving visual compositions. Using modular structures, graphics and procedural techniques, it encourages experimentation while enabling the rapid creation of diverse visual outcomes.",
+    "description": "Role: Creative Technologist\n\nResponsibilities:\n• Developed generative motion tracking systems in TouchDesigner to process real-time image and video\n• Explored layering, combining, and manipulating visual effects to generate evolving compositions\n• Used modular structures and procedural techniques to enable rapid experimentation and diverse visual outcomes",
     "year": "2026",
     "tools": "TouchDesigner, Premiere Pro"
   }
