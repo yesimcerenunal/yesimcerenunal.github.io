@@ -34,7 +34,7 @@ The concept, animations, and implementation are original and created by me.
 
 © 2026
 
-This project, including its concept, visual design, animations,
-and implementation, is an original work created by Yesim Ceren.
+© 2026 Yesim Ceren. All rights reserved.
+This project, including its concept, visual design, animations, and implementation, is an original work created by Yeşim Ceren. No part of this project may be reproduced, distributed, or used in any form without prior written permission from the author.
 
 Unauthorized reproduction or redistribution is prohibited.
