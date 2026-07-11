@@ -578,7 +578,7 @@ const FILTERED_RING_SPACING_MULT_4PLUS = 1.52;
  * Cloud gallery: circular covers on a Fibonacci shell + drift.
  * Raised well above the original 0.46 so covers read clearly on screen.
  */
-const ALL_CLOUD_LAYOUT_SCALE = 1.08;
+const ALL_CLOUD_LAYOUT_SCALE = 1.14;
 /** Global cover scale on the shell (1 = nominal). */
 const GALLERY_COVER_GLOBAL_SCALE = 1;
 /** Extra radius for orbit / FOV framing so the 3D shell doesn’t clip. */
@@ -644,12 +644,13 @@ function slotHash01(slot: number, salt: number): number {
  * Seçili projeler: kırpma / hizalama için Y ve ölçek (grup uzayı; diğer gezegenlere dokunmaz).
  * `ringRadius` ile ölçeklenir — sabit ~0.1 ofset, kabukta görünür değişim yapmıyordu.
  * VR Experience: ekranda aşağı (Y−). Emberfall: yukarı (Y+) + hafif büyütme.
+ * `dx`: kamera düzlemine göre ekran X (negatif = sola).
  */
 function galleryProjectLayoutTweak(
   projectKey: string,
   depthScaleMul: number,
   ringRadiusLocal: number,
-): { dy: number; scaleMul: number } {
+): { dy: number; dx: number; scaleMul: number } {
   const k = Math.max(ringRadiusLocal, 0.35);
   const spread =
     ALL_CLOUD_PERSPECTIVE_CLAMP_MAX - ALL_CLOUD_PERSPECTIVE_CLAMP_MIN;
@@ -662,17 +663,35 @@ function galleryProjectLayoutTweak(
   if (projectKey === "work/3") {
     /** Hafif Y− (kırpma); fazlası work/5 ile ekranda üst üste bindiriyordu */
     const t = 0.22 + 0.78 * near01;
-    return { dy: -k * 0.1 * t, scaleMul: 1 };
+    return { dy: -k * 0.1 * t, dx: 0, scaleMul: 1 };
   }
   if (projectKey === "work/1") {
-    /** Emberfall */
-    return { dy: k * 0.2, scaleMul: 1.09 };
+    /** Emberfall — çekirdek kümesinden sol-üste. */
+    return { dy: k * 0.24, dx: 0, scaleMul: 1.09 };
   }
   if (projectKey === "work/9") {
     /** Wholy Cow / 2D Archive — hafif Y− (kabukta biraz aşağı) */
-    return { dy: -k * 0.14, scaleMul: 1 };
+    return { dy: -k * 0.14, dx: 0, scaleMul: 1 };
   }
-  return { dy: 0, scaleMul: 1 };
+  if (projectKey === "work/4") {
+    return { dy: -k * 0.3, dx: 0, scaleMul: 1 };
+  }
+  if (projectKey === "work/12") {
+    /** Ekran X− (sola); dikey konum kabuk yMul/dy ile. */
+    return { dy: -k * 0.26, dx: -k * 1.48, scaleMul: 1 };
+  }
+  if (projectKey === "work/13") {
+    return { dy: -k * 0.22, dx: 0, scaleMul: 1 };
+  }
+  if (projectKey === "work/14") {
+    /** work/4 arkasında minicik kalmasın — sağa/yukarı + biraz büyüt. */
+    return { dy: k * 0.2, dx: 0, scaleMul: 1.1 };
+  }
+  if (projectKey === "work/16") {
+    /** Orta kümeden ayrı; viewport içinde kalsın. */
+    return { dy: k * 0.38, dx: 0, scaleMul: 1 };
+  }
+  return { dy: 0, dx: 0, scaleMul: 1 };
 }
 
 /**
@@ -690,10 +709,12 @@ function galleryProjectShellSeparation(
     return { angleRad: 0, yMul: 0, radialMul: 1 };
   }
   if (projectKey === "work/1") {
-    return { angleRad: 0.38, yMul: 0.18, radialMul: 1 };
+    /** Çekirdek kümesinden sol-üste ayrı. */
+    return { angleRad: -1.14, yMul: 0.34, radialMul: 1.12 };
   }
   if (projectKey === "work/4") {
-    return { angleRad: -0.38, yMul: -0.17, radialMul: 1 };
+    /** Orta küme — work/12 & work/13’ten ayrı; work/14 ile üst üste binmesin. */
+    return { angleRad: -0.82, yMul: -0.46, radialMul: 1.12 };
   }
   if (projectKey === "work/3") {
     /** VR — küme içinde; minimal açı/Y, merkeze sıkı kabuk */
@@ -702,16 +723,28 @@ function galleryProjectShellSeparation(
   if (projectKey === "work/5") {
     return { angleRad: -0.98, yMul: -0.52, radialMul: 0.84 };
   }
-  if (projectKey === "work/8") {
+  if (projectKey === "work/11") {
     return { angleRad: 0.1, yMul: 0.05, radialMul: 0.84 };
   }
   /** Eski iş — kameradan uzak, dış kabukta kalsın. */
   if (projectKey === "work/2") {
     return { angleRad: 0.62, yMul: 0.08, radialMul: 1.22 };
   }
-  /** Yeni iş — görünür bölgede, merkeze yapışmasın. */
+  /** Sağ-alt band — ekran sola layoutTweak dx ile. */
   if (projectKey === "work/12") {
-    return { angleRad: -0.42, yMul: -0.12, radialMul: 1.08 };
+    return { angleRad: 0.92, yMul: -0.38, radialMul: 1.34 };
+  }
+  /** work/12 & work/16’dan ayrı — orta-alt band. */
+  if (projectKey === "work/13") {
+    return { angleRad: 0.2, yMul: -0.42, radialMul: 1.22 };
+  }
+  /** work/4’ün arkasında küçük nokta olarak kalmasın — sağ üst banda. */
+  if (projectKey === "work/14") {
+    return { angleRad: 0.86, yMul: 0.28, radialMul: 1.1 };
+  }
+  /** Son slot — çok sola, viewport içinde. */
+  if (projectKey === "work/16") {
+    return { angleRad: -1.22, yMul: 0.06, radialMul: 1.1 };
   }
   return { angleRad: 0, yMul: 0, radialMul: 1 };
 }
@@ -725,11 +758,14 @@ function galleryProjectRadialPull(projectKey: string): number {
     projectKey === "work/3" ||
     projectKey === "work/6" ||
     projectKey === "work/7" ||
-    projectKey === "work/8"
+    projectKey === "work/11"
   ) {
     if (projectKey === "work/3") return 0.34;
-    if (projectKey === "work/8") return 0.36;
+    if (projectKey === "work/11") return 0.36;
     return 0.24;
+  }
+  if (projectKey === "work/16") {
+    return 0;
   }
   return 0;
 }
@@ -960,7 +996,7 @@ const HOVER_LIFT = 0.19;
 /** Dünya birimi — hover’da kameraya doğru kaydırma (yakındaki disklerde de taban pay). */
 const HOVER_TOWARD_CAMERA_WORLD = 0.27;
 /** Uniform mesh scale — disc / box hero size in the shell (satellite “planets”). */
-const CARD_MESH_BASE_SCALE = 1.64;
+const CARD_MESH_BASE_SCALE = 1.76;
 /** Pull ring positions toward center for a tighter circle (after parallax) */
 const RING_RADIAL_COMPACT = 0.8;
 /**
@@ -2252,8 +2288,19 @@ uniform vec3 uCoverGlow;`,
       if (image.projectKey === "work/3") {
         sepZoomBlend = Math.min(sepZoomBlend, 0.72);
       }
-      if (image.projectKey === "work/8") {
+      if (image.projectKey === "work/11") {
         sepZoomBlend = Math.min(sepZoomBlend, 0.68);
+      }
+      /** Orta küme: açılışta tam separation (zoom ~0.5 iken yarım kalıp üst üste binmesin). */
+      if (
+        image.projectKey === "work/1" ||
+        image.projectKey === "work/4" ||
+        image.projectKey === "work/12" ||
+        image.projectKey === "work/13" ||
+        image.projectKey === "work/14" ||
+        image.projectKey === "work/16"
+      ) {
+        sepZoomBlend = Math.max(sepZoomBlend, 0.96);
       }
       const sepAngleRad = sep.angleRad * sepZoomBlend;
       const sepYMul = sep.yMul * sepZoomBlend;
@@ -2581,6 +2628,18 @@ uniform vec3 uCoverGlow;`,
         radius,
       );
       fy += tw.dy;
+      if (tw.dx !== 0) {
+        _toCamera.subVectors(camera.position, _orbitTarget);
+        _toCamera.y = 0;
+        const camLen = _toCamera.length();
+        if (camLen > 1e-6) {
+          _toCamera.multiplyScalar(1 / camLen);
+          const rightX = _toCamera.z;
+          const rightZ = -_toCamera.x;
+          fx += tw.dx * rightX;
+          fz += tw.dx * rightZ;
+        }
+      }
       layoutScaleMul = tw.scaleMul;
     } else {
       smoothDepthScaleRef.current = THREE.MathUtils.lerp(
@@ -3038,7 +3097,12 @@ function GalleryScene({
       byIndex.set(idxB, slotA);
     };
     swapProjects("work/2", "work/12");
-    swapProjects("work/5", "work/8");
+    // work/11 taslak (title `--`) → galeride yok; slot 3’te work/12 duruyor — proxy swap.
+    if (slotByProjectKey.has("work/11")) {
+      swapProjects("work/11", "work/13");
+    } else {
+      swapProjects("work/12", "work/13");
+    }
     return byIndex;
   }, [images, visibleIndices]);
 
@@ -4085,12 +4149,20 @@ export function Gallery3D({
                     {localizedCategory(messages, selectedImage.category)}
                   </p>
                   <h2
-                    className="mb-4 tracking-tight text-foreground"
+                    className={cn(
+                      "tracking-tight text-foreground",
+                      selectedPortfolioCopy.subtitle?.trim() ? "mb-1" : "mb-4",
+                    )}
                     style={{ fontSize: "1.75rem", lineHeight: 1.25 }}
                   >
                     {selectedPortfolioCopy.title}
                   </h2>
-                  <p className="text-[0.95rem] leading-relaxed text-muted-foreground">
+                  {selectedPortfolioCopy.subtitle?.trim() ? (
+                    <p className="mb-4 text-[1.05rem] leading-snug text-foreground/80">
+                      {selectedPortfolioCopy.subtitle}
+                    </p>
+                  ) : null}
+                  <p className="whitespace-pre-line text-[0.95rem] leading-relaxed text-muted-foreground">
                     {selectedPortfolioCopy.description}
                   </p>
                 </div>

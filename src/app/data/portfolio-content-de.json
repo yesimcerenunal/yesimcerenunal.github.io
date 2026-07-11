@@ -12,10 +12,11 @@
     "tools": "Unity, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/3": {
-    "title": "VR-Kampfspiel-Produktion",
-    "description": "Boneheads Raid ist ein VR-Spiel, in dem Spieler ein heiliges Idol gegen Wellen angreifender Skelettgegner in einer immersiven VR-Umgebung verteidigen. Ich war verantwortlich für Umgebungslayout, VFX, Character-Rigging und Animation. Ich erstellte dynamische Licht- und Schweif-Effekte für die Schwerter der Skelette sowie Partikeleffekte in Unity, die bei Trefferreaktions-Animationen ausgelöst werden, um das Kampffeedback zu verstärken. Zusätzlich entwickelte ich benutzerdefinierte Birth- und Death-Materialien, gekoppelt mit Keyframe-Animationen, damit Skelette beim Spawn und bei der Niederlage auf visuell ansprechende Weise zerfallen oder verschwinden.",
+    "title": "Boneheads Raid — VR-Kampfspiel",
+    "subtitle": "Role: 3D Environment & VFX Artist",
+    "description": "Aufgaben & Verantwortlichkeiten:\n\n• Gestaltung und Aufbau des Umgebungslayouts für die VR-Kampfarena\n• Rigging und Animation der Skelett-Gegner-Charaktere\n• Entwicklung dynamischer Licht- und Trail-Effekte für die Schwerter der Gegner\n• Erstellung von Hit-Reaction-Partikeleffekten zur Verstärkung des Kampf-Feedbacks in Unity\n• Design von individuellen, shaderbasierten Spawn- (\"Geburts-\") und Todesmaterialien, synchronisiert mit Keyframe-Animationen für einen Auflösungs-/Verschwindeeffekt",
     "year": "2024",
-    "tools": "Unity, Blender, Adobe Photoshop & Premiere Pro"
+    "tools": "Unity, Blender, Adobe Photoshop, Premiere Pro"
   },
   "work/4": {
     "title": "Cozy Zen — Spieldesign & -entwicklung",

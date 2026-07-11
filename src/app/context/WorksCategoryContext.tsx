@@ -7,9 +7,9 @@ import {
   type ReactNode,
 } from "react";
 
-/** Order is fixed for nav and URLs, names are case-sensitive (e.g. "Interactive / VR"). */
+/** Order is fixed for nav and URLs, names are case-sensitive (e.g. "Game Design"). */
 export const GALLERY_CATEGORIES = [
-  "Interactive / VR",
+  "Game Design",
   "Motion",
   "AUDIOVISUAL INTERACTIONS",
   "GENERATIVE MOTION TRACKING",

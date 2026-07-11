@@ -14,14 +14,15 @@
     "tools": "Unity, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/3": {
-    "category": "Interactive / VR",
-    "title": "VR Combat Game Environment & Animation Production",
-    "description": "Boneheads Raid is a VR game project where players defend a sacred idol against waves of attacking skeleton enemies in an immersive VR environment. In this project, I was responsible for environment layout, VFX, character rigging and animation. I created dynamic light and trail effects for the skeletons’ swords, as well as particle effects that are triggered during hit reaction animations in Unity, for enhancing the combat feedback. Additionally, I developed custom birth and death materials integrated with keyframe animations, allowing the skeletons to dissolve or vanish in a visually engaging way during their spawn and death moments.",
+    "category": "Game Design",
+    "title": "Boneheads Raid — VR Combat Game",
+    "subtitle": "Role: 3D Environment & VFX Artist",
+    "description": "Responsibilities:\n• Designed and built the environment layout for the VR combat arena\n• Rigged and animated the skeleton enemy characters\n• Created dynamic light and trail effects for enemy sword weapons\n• Developed hit-reaction particle effects to enhance combat feedback in Unity\n• Designed custom shader-based spawn (\"birth\") and death materials, synced with keyframe animations for a dissolve/vanish effect",
     "year": "2024",
-    "tools": "Unity, Blender, Adobe Photoshop & Premiere Pro"
+    "tools": "Unity, Blender, Adobe Photoshop, Premiere Pro"
   },
   "work/4": {
-    "category": "Interactive / VR",
+    "category": "Game Design",
     "title": "Cozy Zen Game Design & Development",
     "description": "Cozy Zen is my master thesis project that explores cozy game experiences through the concept of a winter Zen garden. The goal was to create a calming yet engaging interactive game environment that offers players a sense of relaxation and presence. Within a very limited timeframe, I independently developed both the theoretical thesis and a fully playable prototype. I was responsible for the entire production process, including animation, visual design, and game development, bringing the concept to life by using Blender and Unity. I also utilized Codex to support the coding process and gameplay implementation. The project itself became a highly rewarding and educational journey from learning programming fundamentals to experimenting with different mechanics and refining every detail from concept to playable prototype.",
     "year": "2025",

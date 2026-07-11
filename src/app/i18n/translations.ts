@@ -81,6 +81,8 @@ export type CategoryMessages = { all: string } & Record<GalleryCategory, string>
 /** Keys: `categoryFolder/slug` (see gallery-manifest.json). */
 export type PortfolioProjectCopy = {
   title: string;
+  /** Optional second line under the main title (e.g. role). */
+  subtitle?: string;
   description: string;
   year: string;
   /** Comma-separated or free-text tool names (e.g. "Adobe", "Blender, Unity"). */
@@ -221,11 +223,16 @@ function normalizePortfolioContentJson(
       typeof o.category === "string" && o.category.trim() !== ""
         ? o.category.trim()
         : undefined;
+    const subtitle =
+      typeof o.subtitle === "string" && o.subtitle.trim() !== ""
+        ? o.subtitle.trim()
+        : undefined;
     out[key] = {
       title: typeof o.title === "string" ? o.title : "",
       description: typeof o.description === "string" ? o.description : "",
       year: typeof o.year === "string" ? o.year : "",
       tools: typeof o.tools === "string" ? o.tools : "",
+      ...(subtitle !== undefined ? { subtitle } : {}),
       ...(category !== undefined ? { category } : {}),
     };
   }
@@ -237,7 +244,7 @@ const portfolioDe = normalizePortfolioContentJson(portfolioContentDe);
 const portfolioTr = normalizePortfolioContentJson(portfolioContentTr);
 
 const categoryEn: Record<GalleryCategory, string> = {
-  "Interactive / VR": "Interactive / VR",
+  "Game Design": "Game Design",
   Motion: "Motion",
   "AUDIOVISUAL INTERACTIONS": "AUDIOVISUAL INTERACTIONS",
   "GENERATIVE MOTION TRACKING": "GENERATIVE MOTION TRACKING",
@@ -409,7 +416,7 @@ const de: TranslationMessages = {
   },
   categories: {
     all: "Alle",
-    "Interactive / VR": "Interaktiv / VR",
+    "Game Design": "Game Design",
     Motion: "BEWEGTBILD",
     "AUDIOVISUAL INTERACTIONS": "AUDIOVISUELLE INTERAKTIONEN",
     "GENERATIVE MOTION TRACKING": "GENERATIVES MOTION TRACKING",
@@ -528,7 +535,7 @@ const tr: TranslationMessages = {
   },
   categories: {
     all: "Tümü",
-    "Interactive / VR": "Etkileşimli / VR",
+    "Game Design": "Oyun Tasarımı",
     Motion: "Hareket",
     "AUDIOVISUAL INTERACTIONS": "Görsel-işitsel etkileşimler",
     "GENERATIVE MOTION TRACKING": "Üretken hareket izleme",
@@ -661,6 +668,7 @@ export function portfolioProjectCopy(
     }
     return {
       title: titleOut,
+      ...(p.subtitle?.trim() ? { subtitle: p.subtitle.trim() } : {}),
       description: p.description ?? "",
       year: yearOut,
       tools: (p.tools ?? "").trim(),
