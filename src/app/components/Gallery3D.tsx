@@ -4043,14 +4043,8 @@ export function Gallery3D({
           </GalleryParallaxContext.Provider>
         </div>
 
-        <div className="flex w-full shrink-0 flex-col items-start gap-3.5 self-start pb-1 pt-1 sm:gap-4 sm:pb-1.5">
+        <div className="-translate-y-[2px] flex w-full shrink-0 flex-col items-start gap-3.5 self-start pb-1 pt-1 sm:gap-4 sm:pb-1.5">
           <GalleryHandControlButtons />
-          <p
-            className="pointer-events-none text-left text-[0.9375rem] font-medium italic leading-snug tracking-[0.12em] text-[#007FFF] sm:text-[1rem]"
-            aria-live="polite"
-          >
-            {galleryCopy.exploreHint}
-          </p>
         </div>
       </div>
 
@@ -4066,7 +4060,7 @@ export function Gallery3D({
           >
             <div
               ref={modalDetailWheelRootRef}
-              className="absolute inset-0 flex flex-col items-stretch overflow-y-auto overscroll-y-auto px-6 pb-6 pt-0 sm:items-start sm:justify-center sm:p-10"
+              className="absolute inset-0 flex flex-col items-stretch overflow-y-auto overscroll-y-auto px-7 pb-6 pt-0 sm:items-start sm:justify-center sm:pb-10 sm:pr-10 sm:pt-0 sm:pl-14 lg:pl-16"
               style={{
                 background: "var(--modal-backdrop)",
                 backdropFilter: "blur(20px)",
@@ -4076,7 +4070,7 @@ export function Gallery3D({
               role="presentation"
             >
               <div
-                className="sticky top-0 z-30 -mx-6 mb-1 flex w-[calc(100%+3rem)] shrink-0 items-end justify-end bg-black px-7 pb-3 pt-[max(0.625rem,env(safe-area-inset-top))] sm:hidden"
+                className="sticky top-0 z-30 -mx-7 mb-1 flex w-[calc(100%+3.5rem)] shrink-0 items-end justify-end bg-black px-7 pb-3 pt-[max(0.625rem,env(safe-area-inset-top))] sm:hidden"
                 onClick={(e) => e.stopPropagation()}
               >
                 <button
@@ -4158,7 +4152,10 @@ export function Gallery3D({
                     {selectedPortfolioCopy.title}
                   </h2>
                   {selectedPortfolioCopy.subtitle?.trim() ? (
-                    <p className="mb-4 text-[1.05rem] leading-snug text-foreground/80">
+                    <p
+                      className="mb-4 tracking-tight text-foreground"
+                      style={{ fontSize: "1.75rem", lineHeight: 1.25 }}
+                    >
                       {selectedPortfolioCopy.subtitle}
                     </p>
                   ) : null}

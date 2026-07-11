@@ -6,11 +6,11 @@ import { cn } from "../components/ui/utils";
 
 /** DE (and other non-EN locales): slightly smaller so longer copy fits the layout. */
 const aboutBioTextClassCompact =
-  "text-[0.9375rem] leading-relaxed text-[#007FFF] sm:text-[1rem]";
+  "text-[0.9375rem] leading-relaxed text-foreground sm:text-[1rem]";
 
 /** EN only: one step larger — shorter copy reads less cramped. */
 const aboutBioTextClassEn =
-  "text-[1rem] leading-relaxed text-[#007FFF] sm:text-[1.0625rem]";
+  "text-[1rem] leading-relaxed text-foreground sm:text-[1.0625rem]";
 
 const aboutSidebarHeadingClass =
   "text-[0.875rem] leading-relaxed text-foreground sm:text-[0.9375rem]";

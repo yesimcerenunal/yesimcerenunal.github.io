@@ -55,15 +55,11 @@ export function FooterNav() {
           })}
         </nav>
 
-        <div
-          className="flex select-none items-center gap-4 text-muted-foreground/35"
-          aria-hidden
+        <p
+          className="ml-auto shrink-0 text-right text-[0.75rem] leading-snug tracking-[0.02em] text-muted-foreground/70 sm:text-[0.8125rem] sm:whitespace-nowrap"
         >
-          <span className="inline-block h-2 w-2 rounded-full border border-dashed border-muted-foreground/40 opacity-80" />
-          <span className="text-xs leading-none tracking-[0.3em] text-muted-foreground/35">
-            ···
-          </span>
-        </div>
+          {messages.layout.copyright}
+        </p>
       </div>
     </footer>
   );

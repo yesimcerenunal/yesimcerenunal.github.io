@@ -6,7 +6,7 @@ import {
 import { cn } from "./ui/utils";
 
 const pillBaseClass =
-  "inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full px-5 py-2 text-xs font-medium tracking-wide transition-[background-color,border-color,color,opacity] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.98]";
+  "inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full px-6 py-2.5 text-sm font-medium tracking-wide transition-[background-color,border-color,color,opacity] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.98]";
 
 export function SwitchToCameraButton() {
   const { messages } = useLanguage();
@@ -28,8 +28,10 @@ export function SwitchToCameraButton() {
       }
       className={cn(
         pillBaseClass,
-        "shrink-0 border border-border bg-muted/50 px-4 py-1 text-foreground hover:bg-muted sm:px-5 sm:py-1.5",
-        enabled && "border-foreground/20 bg-muted",
+        "shrink-0 border border-border bg-muted/50 px-5 py-2 sm:px-6 sm:py-2.5",
+        enabled
+          ? "border-foreground/20 bg-muted text-foreground"
+          : "text-muted-foreground hover:bg-muted hover:text-foreground",
       )}
     >
       {enabled

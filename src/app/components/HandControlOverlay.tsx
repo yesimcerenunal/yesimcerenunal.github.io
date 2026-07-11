@@ -4,7 +4,7 @@ import { GalleryHandCameraPreview } from "./GalleryHandCameraPreview";
 import { HandGestureRulesPanel } from "./HandGestureRulesPanel";
 import { useGalleryHandControl } from "./galleryHandControl";
 
-/** Intro modal (kurallar alanı) + sol üst mini kamera. */
+/** Intro modal (kurallar alanı) + sol alt mini kamera (Hands Mode off butonunun üstü). */
 export function HandControlOverlay() {
   const hand = useGalleryHandControl();
   const { messages } = useLanguage();
@@ -25,7 +25,7 @@ export function HandControlOverlay() {
         </div>
       ) : (
         <div
-          className="pointer-events-none fixed right-7 top-[4.75rem] z-[99998] sm:right-12 sm:top-[5.25rem] lg:right-14"
+          className="pointer-events-none fixed bottom-[7.25rem] left-7 z-[99998] sm:bottom-[7.5rem] sm:left-12 lg:left-14"
           aria-live="polite"
         >
           <GalleryHandCameraPreview hand={hand} />
@@ -50,7 +50,7 @@ export function HandControlOverlay() {
             aria-modal
             aria-label={messages.layout.handGestureRulesDialogAria}
           >
-            <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-5 sm:pb-4">
+            <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 pr-8 sm:px-5 sm:pb-4 sm:pr-10">
               <HandGestureRulesPanel />
             </div>
             <div className="shrink-0 border-t border-foreground/10 px-4 py-4 sm:px-5 sm:py-4">

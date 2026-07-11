@@ -32,7 +32,7 @@ const ABOUT_SKILLS = [
   "VR Development",
   "Video Editing",
   "3D Modeling & Animation",
-  "Uv-mapping & Weight Painting",
+  "UV-mapping & Weight Painting",
   "Character Rigging & Animation",
   "Environment Design",
   "Prop Design",
@@ -120,6 +120,7 @@ export type TranslationMessages = {
     handModeRotate: string;
     handModeDetail: string;
     gestureControlOff: string;
+    copyright: string;
   };
   /** Accessibility labels (not visible copy). */
   aria: {
@@ -266,16 +267,11 @@ const en: TranslationMessages = {
     handGestureRulesDialogAria: "Hand gesture rules",
     handGestureRulesBookTitle: "RULE BOOK",
     handGestureRules: [
-      { emojis: ["🖐️"], label: "Start position" },
-      { emojis: ["✋", "↔️"], label: "Travel" },
-      { emojis: ["☝️"], label: "Choose" },
-      { emojis: ["👌"], label: "Click (thumb + index)" },
-      { emojis: ["✊"], label: "Close" },
-      {
-        emojis: ["☝️", "👌"],
-        label: "Point at the bottom menu, then pick to change page",
-      },
-      { emojis: [], imageKey: "escKey", label: "Camera Off" },
+      { emojis: ["✋", "↔️"], label: "TRAVEL" },
+      { emojis: ["☝️"], label: "CHOOSE" },
+      { emojis: ["👌"], label: "CLICK (THUMB + INDEX)" },
+      { emojis: ["✊"], label: "CLOSE" },
+      { emojis: [], imageKey: "escKey", label: "QUIT" },
     ],
     handGestureRulesStart: "Start",
     handModeFree: "waiting",
@@ -283,6 +279,7 @@ const en: TranslationMessages = {
     handModeRotate: "rotate",
     handModeDetail: "project",
     gestureControlOff: "Turn off gesture control",
+    copyright: "© 2026 Yesim Ceren. All rights reserved.",
   },
   aria: {
     primaryNavigation: "Primary",
@@ -307,8 +304,8 @@ const en: TranslationMessages = {
   },
   gallery: {
     exploreHint: "Drag, scroll.. You're in control!",
-    switchToCamera: "Enter Hands Mode 👋",
-    switchToCameraOff: "Camera Off",
+    switchToCamera: "✋ ENTER HANDS MODE 🤚",
+    switchToCameraOff: "HANDS MODE OFF",
     modalYear: "Year",
     modalToolsLabel: "Tools",
     modalProjectFallback: "Project",
@@ -379,16 +376,11 @@ const de: TranslationMessages = {
     handGestureRulesDialogAria: "Handgesten-Regeln",
     handGestureRulesBookTitle: "REGELBUCH",
     handGestureRules: [
-      { emojis: ["🖐️"], label: "Startposition" },
-      { emojis: ["✋", "↔️"], label: "Steuern" },
-      { emojis: ["☝️"], label: "Auswählen" },
-      { emojis: ["👌"], label: "Klicken (Daumen + Zeigefinger)" },
-      { emojis: ["✊"], label: "Schließen" },
-      {
-        emojis: ["☝️", "👌"],
-        label: "Auf das untere Menü zeigen, dann wählen zum Seitenwechsel",
-      },
-      { emojis: [], imageKey: "escKey", label: "Kamera aus" },
+      { emojis: ["✋", "↔️"], label: "STEUERN" },
+      { emojis: ["☝️"], label: "AUSWÄHLEN" },
+      { emojis: ["👌"], label: "KLICKEN (DAUMEN + ZEIGEFINGER)" },
+      { emojis: ["✊"], label: "SCHLIESSEN" },
+      { emojis: [], imageKey: "escKey", label: "BEENDEN" },
     ],
     handGestureRulesStart: "Start",
     handModeFree: "warten",
@@ -396,6 +388,7 @@ const de: TranslationMessages = {
     handModeRotate: "drehen",
     handModeDetail: "projekt",
     gestureControlOff: "Gestensteuerung ausschalten",
+    copyright: "© 2026 Yesim Ceren. Alle Rechte vorbehalten.",
   },
   aria: {
     primaryNavigation: "Hauptnavigation",
@@ -426,8 +419,8 @@ const de: TranslationMessages = {
   },
   gallery: {
     exploreHint: "Scrollen, ziehen… deine Kontrolle, einfach volle!",
-    switchToCamera: "Hands Mode starten 👋",
-    switchToCameraOff: "Kamera Stopp",
+    switchToCamera: "✋ HANDS MODE STARTEN 🤚",
+    switchToCameraOff: "HANDS MODE AUS",
     modalYear: "Jahr",
     modalToolsLabel: "Tools",
     modalProjectFallback: "Projekt",
@@ -498,16 +491,11 @@ const tr: TranslationMessages = {
     handGestureRulesDialogAria: "El jesti kuralları",
     handGestureRulesBookTitle: "KURAL KİTABI",
     handGestureRules: [
-      { emojis: ["🖐️"], label: "Başlangıç pozisyonu" },
-      { emojis: ["✋", "↔️"], label: "Gezin" },
-      { emojis: ["☝️"], label: "Seç" },
-      { emojis: ["👌"], label: "Tıkla (başparmak + işaret)" },
-      { emojis: ["✊"], label: "Kapat" },
-      {
-        emojis: ["☝️", "👌"],
-        label: "Alt menüyü işaret et, sonra seçerek sayfa değiştir",
-      },
-      { emojis: [], imageKey: "escKey", label: "Kamerayı kapat" },
+      { emojis: ["✋", "↔️"], label: "GEZİN" },
+      { emojis: ["☝️"], label: "SEÇ" },
+      { emojis: ["👌"], label: "TIKLA (BAŞPARMAK + İŞARET)" },
+      { emojis: ["✊"], label: "KAPAT" },
+      { emojis: [], imageKey: "escKey", label: "ÇIK" },
     ],
     handGestureRulesStart: "Başla",
     handModeFree: "bekleme",
@@ -515,6 +503,7 @@ const tr: TranslationMessages = {
     handModeRotate: "döndür",
     handModeDetail: "proje",
     gestureControlOff: "Jest kontrolünü kapat",
+    copyright: "© 2026 Yeşim Ceren. Tüm hakları saklıdır.",
   },
   aria: {
     primaryNavigation: "Birincil gezinme",
@@ -545,8 +534,8 @@ const tr: TranslationMessages = {
   },
   gallery: {
     exploreHint: "Kaydır, sürükle.. kontrol sende!",
-    switchToCamera: "Hands Mode'a Gir 👋",
-    switchToCameraOff: "Kamerayı Kapat",
+    switchToCamera: "✋ HANDS MODE'A GİR 🤚",
+    switchToCameraOff: "HANDS MODE KAPAT",
     modalYear: "Yıl",
     modalToolsLabel: "Araçlar",
     modalProjectFallback: "Proje",

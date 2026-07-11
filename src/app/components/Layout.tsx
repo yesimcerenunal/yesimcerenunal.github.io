@@ -64,10 +64,18 @@ function LayoutShell() {
             <Link
               to="/"
               lang="en"
-              className="brand-title inline-block text-[calc(1rem+1pt)] leading-none tracking-[0.14em] text-[#007FFF] transition-opacity hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#007FFF] sm:text-[calc(1.375rem+1pt)] sm:leading-normal sm:tracking-[0.22em]"
+              className="brand-title inline-block text-[calc(1.125rem+1pt)] uppercase leading-none tracking-[0.14em] text-foreground transition-opacity hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground sm:text-[calc(1.5rem+1pt)] sm:leading-normal sm:tracking-[0.22em]"
             >
               {messages.layout.brandName}
             </Link>
+            {isGallery ? (
+              <p
+                className="pointer-events-none mt-1 text-left text-[0.8125rem] font-medium italic leading-snug tracking-[0.1em] text-muted-foreground sm:mt-1.5 sm:whitespace-nowrap sm:text-[0.875rem] sm:tracking-[0.12em]"
+                aria-live="polite"
+              >
+                {messages.gallery.exploreHint}
+              </p>
+            ) : null}
           </div>
           <div className="shrink-0">
             <LanguageSwitcher />

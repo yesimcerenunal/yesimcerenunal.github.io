@@ -18,7 +18,7 @@ function RuleGlyphs({ rule }: { rule: HandGestureRuleItem }) {
 
   return (
     <div
-      className="flex flex-row flex-nowrap items-center justify-end gap-px"
+      className="flex flex-row flex-nowrap items-center justify-start gap-px"
       aria-hidden
     >
       {rule.imageKey ? (
@@ -60,15 +60,15 @@ export function HandGestureRulesPanel() {
         <h3 className="mb-3 text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-foreground/65">
           {layout.handGestureRulesBookTitle}
         </h3>
-        <div className="flex gap-x-5">
+        <div className="flex w-fit max-w-full gap-x-4">
           <div
-            className="flex w-[3.75rem] shrink-0 flex-col items-end gap-3"
+            className="flex shrink-0 flex-col items-start gap-3"
             role="list"
           >
             {rules.map((rule, index) => (
               <div
                 key={`glyph-${rule.label}-${index}`}
-                className="flex min-h-7 items-center justify-end"
+                className="flex min-h-7 items-center justify-start"
                 role="listitem"
               >
                 <RuleGlyphs rule={rule} />
@@ -78,7 +78,7 @@ export function HandGestureRulesPanel() {
 
           <div className="w-px shrink-0 self-stretch bg-foreground/25" aria-hidden />
 
-          <div className="flex min-w-0 flex-1 flex-col gap-3">
+          <div className="flex shrink-0 flex-col gap-3">
             {rules.map((rule, index) => (
               <p
                 key={`label-${rule.label}-${index}`}
