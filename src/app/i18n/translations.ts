@@ -143,6 +143,10 @@ export type TranslationMessages = {
     switchToCamera: string;
     switchToCameraOff: string;
     modalYear: string;
+    /** Label for the role line in the project detail modal (meta row, same style as tools/year). */
+    modalRoleLabel: string;
+    /** Label for sound credit below responsibilities (Sound:/Klang:/Ses: in copy). */
+    modalSoundLabel: string;
     /** Label above the tools line in the project detail modal (shown with a trailing colon in UI). */
     modalToolsLabel: string;
     /** Section header when description uses Responsibilities bullets (fallback for prose-only copy). */
@@ -246,6 +250,7 @@ const portfolioTr = normalizePortfolioContentJson(portfolioContentTr);
 
 const categoryEn: Record<GalleryCategory, string> = {
   "ANIMATION PROJECT": "ANIMATION PROJECT",
+  "GAME DESIGN PROJECT": "GAME DESIGN PROJECT",
   "Game Design": "Game Design",
   Motion: "Motion",
   "AUDIOVISUAL INTERACTIONS": "AUDIOVISUAL INTERACTIONS",
@@ -308,6 +313,8 @@ const en: TranslationMessages = {
     switchToCamera: "✋ ENTER HANDS MODE 🤚",
     switchToCameraOff: "HANDS MODE OFF",
     modalYear: "Year",
+    modalRoleLabel: "Role",
+    modalSoundLabel: "Sound",
     modalToolsLabel: "Tools",
     modalResponsibilitiesLabel: "Responsibilities",
     modalProjectFallback: "Project",
@@ -412,6 +419,7 @@ const de: TranslationMessages = {
   categories: {
     all: "Alle",
     "ANIMATION PROJECT": "Animationsprojekt",
+    "GAME DESIGN PROJECT": "Spieldesign-Projekt",
     "Game Design": "Spieldesign",
     Motion: "BEWEGTBILD",
     "AUDIOVISUAL INTERACTIONS": "AUDIOVISUELLE INTERAKTIONEN",
@@ -425,6 +433,8 @@ const de: TranslationMessages = {
     switchToCamera: "✋ HANDS MODE STARTEN 🤚",
     switchToCameraOff: "HANDS MODE AUS",
     modalYear: "Jahr",
+    modalRoleLabel: "Rolle",
+    modalSoundLabel: "Klang",
     modalToolsLabel: "Tools",
     modalResponsibilitiesLabel: "Aufgaben",
     modalProjectFallback: "Projekt",
@@ -529,6 +539,7 @@ const tr: TranslationMessages = {
   categories: {
     all: "Tümü",
     "ANIMATION PROJECT": "Animasyon Projesi",
+    "GAME DESIGN PROJECT": "Oyun Tasarımı Projesi",
     "Game Design": "Oyun Tasarımı",
     Motion: "Hareket",
     "AUDIOVISUAL INTERACTIONS": "Görsel-işitsel etkileşimler",
@@ -542,6 +553,8 @@ const tr: TranslationMessages = {
     switchToCamera: "✋ HANDS MODE'A GİR 🤚",
     switchToCameraOff: "HANDS MODE KAPAT",
     modalYear: "Yıl",
+    modalRoleLabel: "Rol",
+    modalSoundLabel: "Ses",
     modalToolsLabel: "Araçlar",
     modalResponsibilitiesLabel: "Sorumluluklar",
     modalProjectFallback: "Proje",

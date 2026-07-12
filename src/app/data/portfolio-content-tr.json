@@ -1,8 +1,8 @@
 {
   "work/1": {
-    "title": "Emberfall Kingdom Animation Trailer",
+    "title": "Kingdom Animation Trailer",
     "subtitle": "Environment Design",
-    "description": "Rol: 3D Environment Artist\n\nSorumluluklar:\n• Animasyon render'ı için büyük ölçekli, fantezi esintili 3D kütüphane ortamı tasarladım\n• Atmosfer, ölçek ve hikâye anlatımına odaklanarak kilit bir anlatı anı etrafında mekânı kurdum\n• Moodboard'dan final kompozisyona tüm çevre objelerini ve yerleşimi tasarladım\n• Yüksek kaliteli texture için temiz, optimize UV haritaları oluşturdum\n• Sinematik ton ve duygusal etki için video kurgusu ve ses tasarımı dahil film fragmanını kurguladım",
+    "description": "Rol: 3D Environment & Sound Artist\n\nSorumluluklar:\n• Animasyon render'ı için büyük ölçekli, fantezi esintili 3D kütüphane ortamı tasarladım\n• Atmosfer, ölçek ve hikâye anlatımına odaklanarak kilit bir anlatı anı etrafında mekânı kurdum\n• Moodboard'dan final kompozisyona tüm çevre objelerini ve yerleşimi tasarladım\n• Yüksek kaliteli texture için temiz, optimize UV haritaları oluşturdum\n• Sinematik ton ve duygusal etki için video kurgusu ve ses tasarımı dahil film fragmanını kurguladım",
     "year": "2025",
     "tools": "Unreal Engine, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
@@ -71,8 +71,9 @@
     "tools": ""
   },
   "work/12": {
-    "title": "A2: \"Hair\"",
-    "description": "Rol: Audiovisual Artist\n\nSorumluluklar:\n• Gerçek zamanlı görsel-işitsel serinin ikinci parçasını yarı saydam, ses tepkili bilgisayar grafikleriyle oluşturdum\n• Low, mid ve high ses katmanlarının gerçek zamanlı etkileşimiyle saç benzeri bir his araştıran katmanlı RGBA yapıları\n• Büyük yatay LED ekranlar için tasarlandı\n• Ses: LightBeatsMusic — House Groove Mirage #noai",
+    "title": "Hair",
+    "subtitle": "Generative Music FX",
+    "description": "Rol: Audiovisual Artist\n\nSorumluluklar:\n• Yarı saydam, ses tepkili grafiklerle bir audiovisual seri oluşturdum\n• Frekans güdümlü hareket ve deneysel görsel etkileşimlerle katmanlı RGBA yapıları geliştirdim\n• Ses, yarı saydamlık ve sentetik mekânsal algı arasındaki ilişkiyi inceledim\n• Büyük ölçekli yatay LED ekranlar için görselleri tasarladım\n• Ses: LightBeatsMusic — House Groove Mirage",
     "year": "2026",
     "tools": "Touch Designer, Adobe Premiere Pro"
   },
@@ -83,8 +84,9 @@
     "tools": "Touch Designer"
   },
   "work/14": {
-    "title": "A1: \"Aura\"",
-    "description": "Rol: Audiovisual Artist\n\nSorumluluklar:\n• Devam eden görsel-işitsel serinin ilk parçasını yarı saydam, ses tepkili bilgisayar grafikleriyle oluşturdum\n• Frekans güdümlü hareket ve deneysel görsel etkileşimlerle katmanlı RGBA yapıları kurdum\n• Ses, yarı saydamlık ve sentetik mekânsal algı arasındaki ilişkiye odaklandım\n• Büyük yatay LED ekranlar için tasarlandı\n• Ses: Watermello-Sport Techno",
+    "title": "Aura",
+    "subtitle": "Generative Music FX",
+    "description": "Rol: Audiovisual Artist\n\nSorumluluklar:\n• Yarı saydam, ses tepkili grafiklerle bir audiovisual seri oluşturdum\n• Frekans güdümlü hareket ve deneysel görsel etkileşimlerle katmanlı RGBA yapıları geliştirdim\n• Ses, yarı saydamlık ve sentetik mekânsal algı arasındaki ilişkiyi inceledim\n• Büyük ölçekli yatay LED ekranlar için görselleri tasarladım\n• Ses: Watermello — Sport Techno",
     "year": "2026",
     "tools": "Touch Designer, Adobe Premiere Pro"
   },

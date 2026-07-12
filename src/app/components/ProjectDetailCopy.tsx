@@ -78,9 +78,6 @@ function parseProjectDescription(description: string): DescriptionBlock[] {
 const bodyClass =
   "text-[0.875rem] leading-snug text-muted-foreground sm:text-[0.95rem] sm:leading-relaxed";
 
-const roleLineClass =
-  "text-[0.9375rem] leading-snug italic text-muted-foreground sm:text-[1.0625rem] sm:leading-relaxed sm:text-[1.125rem]";
-
 const metaLabelClass =
   "shrink-0 text-[0.6875rem] uppercase leading-none tracking-[0.16em] text-muted-foreground sm:text-xs sm:tracking-[0.18em]";
 
@@ -88,6 +85,9 @@ const metaRowLabelClass = cn(metaLabelClass, "self-start sm:self-center");
 
 const metaValueClass =
   "m-0 min-w-0 w-full text-[0.875rem] leading-snug text-muted-foreground sm:text-[0.95rem] sm:leading-none";
+
+const roleValueClass =
+  "text-[0.9375rem] leading-snug italic sm:text-[1.0625rem] sm:leading-relaxed sm:text-[1.125rem]";
 
 function normalizeBulletText(text: string): string {
   return text
@@ -122,11 +122,13 @@ function MetaRow({
   children,
   className,
   inline = false,
+  valueClassName,
 }: {
   label: string;
   children: ReactNode;
   className?: string;
   inline?: boolean;
+  valueClassName?: string;
 }) {
   return (
     <div
@@ -140,7 +142,7 @@ function MetaRow({
       <span className={cn(metaRowLabelClass, inline && "self-center")}>
         {label}
       </span>
-      <div className={metaValueClass}>{children}</div>
+      <div className={cn(metaValueClass, valueClassName)}>{children}</div>
     </div>
   );
 }
@@ -148,22 +150,34 @@ function MetaRow({
 function partitionBullets(bullets: string[]) {
   const items: string[] = [];
   const notes: string[] = [];
+  const sounds: string[] = [];
 
   for (const raw of bullets) {
     const text = normalizeBulletText(raw);
     const noteMatch = text.match(/^(Note|Not|Hinweis)\s*:\s*(.+)$/is);
     if (noteMatch) {
       notes.push(noteMatch[2].trim());
-    } else {
-      items.push(text);
+      continue;
     }
+    const soundMatch = text.match(/^(Sound|Klang|Ses)\s*:\s*(.+)$/is);
+    if (soundMatch) {
+      sounds.push(soundMatch[2].trim());
+      continue;
+    }
+    items.push(text);
   }
 
-  return { items, notes };
+  return { items, notes, sounds };
 }
 
-function ResponsibilityBullets({ bullets }: { bullets: string[] }) {
-  const { items, notes } = partitionBullets(bullets);
+function ResponsibilityBullets({
+  bullets,
+  soundLabel,
+}: {
+  bullets: string[];
+  soundLabel: string;
+}) {
+  const { items, notes, sounds } = partitionBullets(bullets);
 
   return (
     <>
@@ -182,6 +196,11 @@ function ResponsibilityBullets({ bullets }: { bullets: string[] }) {
           {note}
         </p>
       ))}
+      {sounds[0] ? (
+        <MetaRow className="mt-1 sm:mt-2" label={soundLabel}>
+          {sounds[0]}
+        </MetaRow>
+      ) : null}
     </>
   );
 }
@@ -220,7 +239,9 @@ export function ProjectDetailCopy({
   year,
   toolsLabel,
   yearLabel,
+  roleLabel,
   responsibilitiesLabel,
+  soundLabel,
 }: {
   title: string;
   subtitle?: string;
@@ -229,7 +250,9 @@ export function ProjectDetailCopy({
   year: string;
   toolsLabel: string;
   yearLabel: string;
+  roleLabel: string;
   responsibilitiesLabel: string;
+  soundLabel: string;
 }) {
   const displayTitle =
     subtitle?.trim() ? `${title.trim()} — ${subtitle.trim()}` : title.trim();
@@ -252,12 +275,14 @@ export function ProjectDetailCopy({
       </h2>
 
       {roleBlocks.map((block, index) => (
-        <p
+        <MetaRow
           key={`role-${index}`}
-          className={cn(roleLineClass, "-mt-0.5 mb-1 sm:-mt-1 sm:mb-2")}
+          className="mb-1 sm:mb-2"
+          label={roleLabel}
+          valueClassName={roleValueClass}
         >
           {block.text}
-        </p>
+        </MetaRow>
       ))}
 
       {tools.trim() !== "" ? (
@@ -275,7 +300,10 @@ export function ProjectDetailCopy({
         <div className="mt-1 flex w-full min-w-0 max-w-full flex-col gap-2.5 sm:mt-2 sm:gap-4">
           {sectionBlocks.map((block, index) => (
             <DetailSection key={`section-${index}`} label={responsibilitiesLabel}>
-              <ResponsibilityBullets bullets={block.bullets} />
+              <ResponsibilityBullets
+                bullets={block.bullets}
+                soundLabel={soundLabel}
+              />
             </DetailSection>
           ))}
 
@@ -284,7 +312,10 @@ export function ProjectDetailCopy({
               key={`bullets-${index}`}
               label={responsibilitiesLabel}
             >
-              <ResponsibilityBullets bullets={block.items} />
+              <ResponsibilityBullets
+                bullets={block.items}
+                soundLabel={soundLabel}
+              />
             </DetailSection>
           ))}
 

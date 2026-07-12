@@ -1,8 +1,8 @@
 {
   "work/1": {
-    "title": "Emberfall Kingdom Animation Trailer",
+    "title": "Kingdom Animation Trailer",
     "subtitle": "Environment Design",
-    "description": "Rolle: 3D Environment Artist\n\nAufgaben:\n• Gestaltung einer großformatigen, fantasy-inspirierten 3D-Bibliotheksumgebung für ein Animations-Rendering\n• Aufbau des Raums um einen zentralen narrativen Moment mit Fokus auf Atmosphäre, Maßstab und Storytelling\n• Gestaltung aller Umgebungs-Props und des Layouts, vom Moodboard bis zur finalen Komposition\n• Erstellung sauberer, optimierter UV-Karten für hochwertige Texturierung\n• Schnitt des Filmtrailers inklusive Videobearbeitung und Sounddesign für cineastischen Ton und emotionale Wirkung",
+    "description": "Rolle: 3D Environment & Sound Artist\n\nAufgaben:\n• Gestaltung einer großformatigen, fantasy-inspirierten 3D-Bibliotheksumgebung für ein Animations-Rendering\n• Aufbau des Raums um einen zentralen narrativen Moment mit Fokus auf Atmosphäre, Maßstab und Storytelling\n• Gestaltung aller Umgebungs-Props und des Layouts, vom Moodboard bis zur finalen Komposition\n• Erstellung sauberer, optimierter UV-Karten für hochwertige Texturierung\n• Schnitt des Filmtrailers inklusive Videobearbeitung und Sounddesign für cineastischen Ton und emotionale Wirkung",
     "year": "2025",
     "tools": "Unreal Engine, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
@@ -71,8 +71,9 @@
     "tools": ""
   },
   "work/12": {
-    "title": "A2: \"Hair\"",
-    "description": "Rolle: Audiovisual Artist\n\nAufgaben & Verantwortlichkeiten:\n• Zweites Werk einer Echtzeit-Audiovisual-Serie mit transluzenten, audio-reaktiven Computergrafiken\n• Geschichtete RGBA-Farbstrukturen mit „hair-like“-Anmutung durch Lows, Mids und Highs in Echtzeit\n• Primär für große horizontale LED-Screens konzipiert\n• Sound: LightBeatsMusic — House Groove Mirage #noai",
+    "title": "Hair",
+    "subtitle": "Generative Musik-FX",
+    "description": "Rolle: Audiovisueller Künstler\n\nAufgaben:\n• Erstellung einer audiovisuellen Serie mit transluzenten, audioreaktiven Grafiken\n• Entwicklung geschichteter RGBA-Strukturen mit frequenzgesteuerter Bewegung und experimentellen visuellen Interaktionen\n• Untersuchung der Beziehung zwischen Klang, Transluzenz und synthetischer Raumwahrnehmung\n• Gestaltung der visuellen Inhalte für großformatige, horizontale LED-Screens\n• Klang: LightBeatsMusic — House Groove Mirage",
     "year": "2026",
     "tools": "Touch Designer, Adobe Premiere Pro"
   },
@@ -83,8 +84,9 @@
     "tools": "Touch Designer"
   },
   "work/14": {
-    "title": "A1: \"Aura\"",
-    "description": "Rolle: Audiovisual Artist\n\nAufgaben & Verantwortlichkeiten:\n• Erstes Werk einer fortlaufenden Audiovisual-Serie mit transluzenten, audioreaktiven Computergrafiken\n• Geschichtete RGBA-Strukturen mit frequenzgetriebener Bewegung und experimentellen visuellen Interaktionen\n• Fokus auf die Beziehung zwischen Klang, Transluzenz und synthetischer Raumwahrnehmung\n• Primär für große horizontale LED-Screens konzipiert\n• Sound: Watermello-Sport Techno",
+    "title": "Aura",
+    "subtitle": "Generative Musik-FX",
+    "description": "Rolle: Audiovisueller Künstler\n\nAufgaben:\n• Erstellung einer audiovisuellen Serie mit transluzenten, audioreaktiven Grafiken\n• Entwicklung geschichteter RGBA-Strukturen mit frequenzgesteuerter Bewegung und experimentellen visuellen Interaktionen\n• Untersuchung der Beziehung zwischen Klang, Transluzenz und synthetischer Raumwahrnehmung\n• Gestaltung der visuellen Inhalte für großformatige, horizontale LED-Screens\n• Klang: Watermello — Sport Techno",
     "year": "2026",
     "tools": "Touch Designer, Adobe Premiere Pro"
   },

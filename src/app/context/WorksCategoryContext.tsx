@@ -10,6 +10,7 @@ import {
 /** Order is fixed for nav and URLs, names are case-sensitive (e.g. "Game Design"). */
 export const GALLERY_CATEGORIES = [
   "ANIMATION PROJECT",
+  "GAME DESIGN PROJECT",
   "Game Design",
   "Motion",
   "AUDIOVISUAL INTERACTIONS",

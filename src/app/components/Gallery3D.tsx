@@ -170,7 +170,30 @@ const WORK2_ARTSTATION_ALBUM_URL =
 const WORK2_ARTSTATION_BUTTON_ENABLED = false;
 
 /** Initial playback level (0–1) when a clip loads; audience can change it with the player controls. */
-const DETAIL_VIDEO_VOLUME = 0.2;
+const DETAIL_VIDEO_VOLUME = 0.15;
+/** work/12 (Hair) & work/14 (Aura): louder masters — keep noticeably lower than default. */
+const DETAIL_VIDEO_VOLUME_LOUD_AV = 0.05;
+
+const DETAIL_VIDEO_QUIETER_PROJECT_KEYS = new Set(["work/12", "work/14"]);
+
+function detailVideoVolumeForProject(projectKey: string | undefined): number {
+  if (projectKey && DETAIL_VIDEO_QUIETER_PROJECT_KEYS.has(projectKey)) {
+    return DETAIL_VIDEO_VOLUME_LOUD_AV;
+  }
+  return DETAIL_VIDEO_VOLUME;
+}
+
+function applyDetailVideoVolume(
+  v: HTMLVideoElement,
+  projectKey: string | undefined,
+): number {
+  const volume = detailVideoVolumeForProject(projectKey);
+  if (Number.isFinite(volume)) {
+    v.volume = Math.min(1, Math.max(0, volume));
+    v.dataset.portfolioTargetVolume = String(v.volume);
+  }
+  return v.volume;
+}
 /** Tek kare/video çok uzun olmasın; kaydırırken aralıklı kolon hissi kalsın. */
 const DETAIL_MEDIA_MAX_HEIGHT_CLASS = "max-h-[min(50vh,420px)]";
 const DETAIL_MEDIA_SURFACE_CLASS = cn(
@@ -214,8 +237,14 @@ function detailMediaClass(
 
 function pauseDetailVideoElement(v: HTMLVideoElement): void {
   delete v.dataset.detailPlayPending;
+  delete v.dataset.detailUserPaused;
+  v.dataset.detailPlayGen = String(Number(v.dataset.detailPlayGen ?? 0) + 1);
+  v.dataset.detailPausedBySync = "1";
   v.pause();
   v.muted = true;
+  queueMicrotask(() => {
+    delete v.dataset.detailPausedBySync;
+  });
 }
 
 /** Stop every `<video>` under a modal root (close / unmount). */
@@ -229,24 +258,64 @@ function pauseAllDetailVideosIn(root: ParentNode | null | undefined): void {
 function tryPlayDetailVideo(
   v: HTMLVideoElement,
   shouldBlockPlay?: () => boolean,
+  projectKey?: string,
 ): void {
   if (!v.isConnected || shouldBlockPlay?.()) return;
-  v.volume = DETAIL_VIDEO_VOLUME;
+  if (v.dataset.detailUserPaused === "1") return;
+
+  const playGen = String(Number(v.dataset.detailPlayGen ?? 0) + 1);
+  v.dataset.detailPlayGen = playGen;
+  const appliedVolume = applyDetailVideoVolume(v, projectKey);
   if (v.preload !== "auto") {
     v.preload = "auto";
   }
   const attempt = () => {
-    if (!v.isConnected || shouldBlockPlay?.()) return;
+    if (
+      !v.isConnected ||
+      shouldBlockPlay?.() ||
+      v.dataset.detailPlayGen !== playGen ||
+      v.dataset.detailUserPaused === "1"
+    ) {
+      return;
+    }
     v.muted = true;
     void v.play()
       .then(() => {
-        if (!v.isConnected || shouldBlockPlay?.()) return;
+        if (
+          !v.isConnected ||
+          shouldBlockPlay?.() ||
+          v.dataset.detailPlayGen !== playGen ||
+          v.dataset.detailUserPaused === "1"
+        ) {
+          return;
+        }
         v.muted = false;
-        v.volume = DETAIL_VIDEO_VOLUME;
+        v.volume = appliedVolume;
       })
       .catch(() => {
-        if (!v.isConnected || shouldBlockPlay?.()) return;
-        void v.play().catch(() => {});
+        if (
+          !v.isConnected ||
+          shouldBlockPlay?.() ||
+          v.dataset.detailPlayGen !== playGen
+        ) {
+          return;
+        }
+        v.muted = true;
+        v.volume = appliedVolume;
+        void v.play()
+          .then(() => {
+            if (
+              !v.isConnected ||
+              shouldBlockPlay?.() ||
+              v.dataset.detailPlayGen !== playGen ||
+              v.dataset.detailUserPaused === "1"
+            ) {
+              return;
+            }
+            v.muted = false;
+            v.volume = appliedVolume;
+          })
+          .catch(() => {});
       });
   };
   attempt();
@@ -257,7 +326,13 @@ function tryPlayDetailVideo(
     "canplay",
     () => {
       delete v.dataset.detailPlayPending;
-      if (!v.isConnected || shouldBlockPlay?.()) return;
+      if (
+        !v.isConnected ||
+        shouldBlockPlay?.() ||
+        v.dataset.detailPlayGen !== playGen
+      ) {
+        return;
+      }
       attempt();
     },
     { once: true },
@@ -270,6 +345,15 @@ function detailVideoVisibility(r: DOMRect, viewH: number): number {
 
 /** Klip ekranda yeterince görünüyorsa oynat; kaydırıp geçince dur. */
 const DETAIL_VIDEO_MIN_VISIBLE_PX = 72;
+/** Portre klip üstte az görünürken (mobil metin kaydırma) sesin devam etmesini engeller. */
+const DETAIL_VIDEO_MIN_VISIBLE_RATIO = 0.4;
+
+function detailVideoShouldAutoplay(rect: DOMRect, viewH: number): boolean {
+  const visible = detailVideoVisibility(rect, viewH);
+  const height = rect.height;
+  if (visible < DETAIL_VIDEO_MIN_VISIBLE_PX || height <= 0) return false;
+  return visible / height >= DETAIL_VIDEO_MIN_VISIBLE_RATIO;
+}
 
 function pickDetailVideoPlayIndex(
   detailUrls: readonly string[],
@@ -286,8 +370,7 @@ function pickDetailVideoPlayIndex(
       const wrap = itemEls[fullscreenIndex];
       if (
         wrap &&
-        detailVideoVisibility(wrap.getBoundingClientRect(), viewH) >
-          DETAIL_VIDEO_MIN_VISIBLE_PX
+        detailVideoShouldAutoplay(wrap.getBoundingClientRect(), viewH)
       ) {
         return fullscreenIndex;
       }
@@ -301,14 +384,16 @@ function pickDetailVideoPlayIndex(
     if (!u || failed[u] || !isVideoUrl(srcFor(u))) continue;
     const wrap = itemEls[i];
     if (!wrap) continue;
-    const visible = detailVideoVisibility(wrap.getBoundingClientRect(), viewH);
+    const rect = wrap.getBoundingClientRect();
+    if (!detailVideoShouldAutoplay(rect, viewH)) continue;
+    const visible = detailVideoVisibility(rect, viewH);
     if (visible > bestVisible) {
       bestVisible = visible;
       bestI = i;
     }
   }
 
-  return bestVisible >= DETAIL_VIDEO_MIN_VISIBLE_PX ? bestI : -1;
+  return bestI >= 0 ? bestI : -1;
 }
 
 function syncDetailVideoPlayback(
@@ -318,6 +403,7 @@ function syncDetailVideoPlayback(
   itemEls: readonly (HTMLElement | null)[],
   videoEls: readonly (HTMLVideoElement | null)[],
   fullscreenIndex: number | null = null,
+  projectKey?: string,
 ): void {
   const playIndex = pickDetailVideoPlayIndex(
     detailUrls,
@@ -333,7 +419,11 @@ function syncDetailVideoPlayback(
     const u = detailUrls[i];
     if (!u || failed[u] || !isVideoUrl(srcFor(u))) continue;
     if (i === playIndex) {
-      tryPlayDetailVideo(v);
+      if (v.dataset.detailUserPaused !== "1") {
+        tryPlayDetailVideo(v, undefined, projectKey);
+      } else {
+        applyDetailVideoVolume(v, projectKey);
+      }
     } else {
       pauseDetailVideoElement(v);
     }
@@ -3402,8 +3492,9 @@ const ProjectImageScroll = forwardRef(function ProjectImageScroll(
       itemRefs.current,
       videoRefs.current,
       fullscreenVideoIndexRef.current,
+      playbackSyncKey,
     );
-  }, [detailUrls, srcFor, failed]);
+  }, [detailUrls, srcFor, failed, playbackSyncKey]);
 
   const playbackRafRef = useRef(0);
   const schedulePlaybackSync = useCallback(() => {
@@ -3594,27 +3685,42 @@ const ProjectImageScroll = forwardRef(function ProjectImageScroll(
                   aria-label={label}
                   onLoadedMetadata={(e) => {
                     const v = e.currentTarget;
+                    applyDetailVideoVolume(v, playbackSyncKey);
                     rememberMediaDims(url, v.videoWidth, v.videoHeight);
                     markDetailMediaReady(url);
                     schedulePlaybackSync();
                   }}
                   onLoadedData={(e) => {
                     const v = e.currentTarget;
-                    if (v.dataset.portfolioDefaultVolume !== "1") {
-                      v.dataset.portfolioDefaultVolume = "1";
-                      v.volume = DETAIL_VIDEO_VOLUME;
-                    }
+                    applyDetailVideoVolume(v, playbackSyncKey);
                     markDetailMediaReady(url);
                     schedulePlaybackSync();
                   }}
                   onCanPlay={() => {
                     schedulePlaybackSync();
                   }}
-                  onPlay={() => {
-                    schedulePlaybackSync();
+                  onPlaying={(e) => {
+                    const v = e.currentTarget;
+                    if (v.dataset.detailPausedBySync === "1") return;
+                    const target = detailVideoVolumeForProject(playbackSyncKey);
+                    if (Math.abs(v.volume - target) > 0.001) {
+                      v.volume = target;
+                      v.dataset.portfolioTargetVolume = String(target);
+                    }
                   }}
-                  onPause={() => {
-                    schedulePlaybackSync();
+                  onPlay={(e) => {
+                    const v = e.currentTarget;
+                    if (v.dataset.detailPausedBySync === "1") return;
+                    delete v.dataset.detailUserPaused;
+                    applyDetailVideoVolume(v, playbackSyncKey);
+                  }}
+                  onPause={(e) => {
+                    const v = e.currentTarget;
+                    if (v.dataset.detailPausedBySync === "1") return;
+                    v.dataset.detailUserPaused = "1";
+                    v.dataset.detailPlayGen = String(
+                      Number(v.dataset.detailPlayGen ?? 0) + 1,
+                    );
                   }}
                   onError={() => {
                     setFailed((f) => ({ ...f, [url]: true }));
@@ -4145,6 +4251,8 @@ export function Gallery3D({
                     year={selectedPortfolioCopy.year}
                     toolsLabel={galleryCopy.modalToolsLabel ?? "Tools"}
                     yearLabel={galleryCopy.modalYear}
+                    roleLabel={galleryCopy.modalRoleLabel ?? "Role"}
+                    soundLabel={galleryCopy.modalSoundLabel ?? "Sound"}
                     responsibilitiesLabel={
                       galleryCopy.modalResponsibilitiesLabel ?? "Responsibilities"
                     }

@@ -1,9 +1,9 @@
 {
   "work/1": {
     "category": "ANIMATION PROJECT",
-    "title": "Emberfall Kingdom Animation Trailer",
+    "title": "Kingdom Animation Trailer",
     "subtitle": "Environment Design",
-    "description": "Role: 3D Environment Artist\n\nResponsibilities:\n• Designed a large-scale, fantasy-inspired 3D library environment for an animation rendering\n• Built the space around a key narrative moment, with focus on atmosphere, scale, and storytelling\n• Designed all environment props and layout, from moodboard to final composition\n• Created clean, optimized UV maps for high-quality texturing\n• Edited the movie trailer, including video editing and sound design for cinematic tone and emotional impact",
+    "description": "Role: 3D Environment & Sound Artist\n\nResponsibilities:\n• Designed a large-scale, fantasy-inspired 3D library environment for an animation rendering\n• Built the space around a key narrative moment, with focus on atmosphere, scale, and storytelling\n• Designed all environment props and layout, from moodboard to final composition\n• Created clean, optimized UV maps for high-quality texturing\n• Edited the movie trailer, including video editing and sound design for cinematic tone and emotional impact",
     "year": "2025",
     "tools": "Unreal Engine, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
@@ -16,7 +16,7 @@
     "tools": "Unity, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/3": {
-    "category": "Game Design",
+    "category": "GAME DESIGN PROJECT",
     "title": "Boneheads Raid",
     "subtitle": "VR Game Design",
     "description": "Role: 3D Environment & VFX Artist\n\nResponsibilities:\n• Built the environment layout for the VR combat arena\n• Modeled and rigged the skeleton enemy characters\n• Animated enemy attack and hit reaction sequences\n• Created dynamic light and trail effects for enemy weapons\n• Developed hit reaction particle effects for combat feedback in Unity\n• Designed shader based spawn and death materials for enemy characters",
@@ -24,7 +24,7 @@
     "tools": "Unity, Blender, Adobe Photoshop, Premiere Pro"
   },
   "work/4": {
-    "category": "Game Design",
+    "category": "GAME DESIGN PROJECT",
     "title": "Cozy Zen",
     "subtitle": "Game Design & Development",
     "description": "Role: Game Designer & Developer\n\nResponsibilities:\n• Developed a fully playable PC game prototype as a master's thesis project after researching cozy game experiences through a winter Zen garden concept\n• Programmed the full gameplay codes and interactions in Unity\n• Designed a complete 3D environment with interactive buttons, letting players build their own zen garden by choosing and placing items\n• Designed main character, material shaders and prop animations",
@@ -83,8 +83,9 @@
   },
   "work/12": {
     "category": "AUDIOVISUAL INTERACTIONS",
-    "title": "A2: \"Hair\"",
-    "description": "Role: Audiovisual Artist\n\nResponsibilities:\n• Created the second piece in a real-time audiovisual series with translucent, audio-reactive computer graphics\n• Built layered RGBA color structures exploring a hair-like sensation shaped by lows, mids, and highs in real time\n• Designed primarily for large horizontal LED screens\n• Sound: LightBeatsMusic — House Groove Mirage #noai",
+    "title": "Hair",
+    "subtitle": "Generative Music FX",
+    "description": "Role: Audiovisual Artist\n\nResponsibilities:\n• Created an audiovisual series featuring translucent, audio-reactive graphics\n• Developed layered RGBA structures with frequency-driven motion and experimental visual interactions\n• Explored the relationship between sound, translucency, and synthetic spatial perception\n• Designed the visuals for large-scale horizontal LED screens\n• Sound: LightBeatsMusic — House Groove Mirage",
     "year": "2026",
     "tools": "Touch Designer, Adobe Premiere Pro"
   },
@@ -97,8 +98,9 @@
   },
   "work/14": {
     "category": "AUDIOVISUAL INTERACTIONS",
-    "title": "A1: \"Aura\"",
-    "description": "Role: Audiovisual Artist\n\nResponsibilities:\n• Created the first piece in an ongoing audiovisual series with translucent, audio-reactive computer graphics\n• Built layered RGBA structures with frequency-driven motion and experimental visual interactions\n• Focused on the relationship between sound, translucency, and synthetic spatial perception\n• Designed primarily for large horizontal LED screens\n• Sound: Watermello-Sport Techno",
+    "title": "Aura",
+    "subtitle": "Generative Music FX",
+    "description": "Role: Audiovisual Artist\n\nResponsibilities:\n• Created an audiovisual series featuring translucent, audio-reactive graphics\n• Developed layered RGBA structures with frequency-driven motion and experimental visual interactions\n• Explored the relationship between sound, translucency, and synthetic spatial perception\n• Designed the visuals for large-scale horizontal LED screens\n• Sound: Watermello — Sport Techno",
     "year": "2026",
     "tools": "Touch Designer, Adobe Premiere Pro"
   },
