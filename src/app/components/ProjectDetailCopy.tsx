@@ -8,6 +8,9 @@ type DescriptionBlock =
   | { type: "bullets"; items: string[] }
   | { type: "paragraph"; text: string };
 
+/** Hide Tools row in project detail until copy is finalized. */
+const SHOW_PROJECT_TOOLS = false;
+
 const ROLE_LINE = /^(Role|Rolle|Rol|Görev)\s*:\s*(.+)$/is;
 const NOTE_LINE = /^(Note|Not|Hinweis)\s*:\s*(.+)$/is;
 const SECTION_LINE =
@@ -285,7 +288,7 @@ export function ProjectDetailCopy({
         </MetaRow>
       ))}
 
-      {tools.trim() !== "" ? (
+      {SHOW_PROJECT_TOOLS && tools.trim() !== "" ? (
         <MetaRow className="mb-1 sm:mb-2" label={toolsLabel}>
           {tools}
         </MetaRow>

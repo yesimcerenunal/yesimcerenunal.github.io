@@ -14,6 +14,7 @@ export const GALLERY_CATEGORIES = [
   "Game Design",
   "Motion",
   "AUDIOVISUAL INTERACTIONS",
+  "VISUAL FX STUDIES",
   "GENERATIVE MOTION TRACKING",
   "3D Archive",
   "2D Archive",
