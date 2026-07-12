@@ -25,27 +25,13 @@ const fieldClass =
 
 const labelClass = "block text-[0.8rem] font-medium text-foreground/85";
 
+/** Matches `SwitchToCameraButton` pill (ENTER HANDS MODE). */
 const emailCtaBaseClass =
-  "inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full px-5 py-2 text-xs font-medium tracking-wide transition-[background-color,border-color,color,opacity] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.98]";
+  "inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border border-border bg-muted/50 px-5 py-2 text-sm font-medium tracking-wide text-muted-foreground transition-[background-color,border-color,color,opacity] duration-200 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.98] sm:px-6 sm:py-2.5";
 
-const emailMailtoPrimaryClass = cn(
+const emailCtaActiveClass = cn(
   emailCtaBaseClass,
-  "min-w-[8.5rem] bg-primary text-primary-foreground hover:opacity-90",
-);
-
-const emailMailtoAckClass = cn(
-  emailCtaBaseClass,
-  "min-w-[8.5rem] border border-border bg-muted/50 text-foreground hover:bg-muted",
-);
-
-const emailCopyPrimaryClass = cn(
-  emailCtaBaseClass,
-  "w-[8rem] bg-primary text-primary-foreground hover:opacity-90",
-);
-
-const emailCopyChipClass = cn(
-  emailCtaBaseClass,
-  "w-[8rem] border border-border bg-muted/50 text-foreground hover:bg-muted",
+  "border-foreground/20 bg-muted text-foreground hover:bg-muted hover:text-foreground",
 );
 
 /** Matches project detail ROLE value (`ProjectDetailCopy`). */
@@ -154,7 +140,7 @@ export function Contact() {
             <div className="flex max-w-full flex-wrap items-center gap-x-2 gap-y-2.5 text-sm text-foreground">
               <a
                 href={mailtoHref}
-                className={emailMeAck ? emailMailtoAckClass : emailMailtoPrimaryClass}
+                className={emailMeAck ? emailCtaActiveClass : emailCtaBaseClass}
                 onClick={onMailtoClick}
               >
                 {c.emailCta}
@@ -164,9 +150,9 @@ export function Contact() {
                 type="button"
                 onClick={copyEmailToClipboard}
                 className={cn(
-                  emailCopied ? emailCopyChipClass : emailCopyPrimaryClass,
+                  emailCopied ? emailCtaActiveClass : emailCtaBaseClass,
                   emailCopied ? "cursor-default" : "cursor-pointer",
-                  locale === "de" && "w-auto min-w-[11rem] whitespace-nowrap",
+                  locale === "de" && "min-w-[11rem] whitespace-nowrap",
                 )}
               >
                 {emailCopied ? c.emailCopiedFeedback : c.copyEmail}
