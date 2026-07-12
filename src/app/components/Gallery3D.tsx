@@ -27,7 +27,7 @@ import {
 import type { OrbitControls as StdOrbitControls } from "three-stdlib";
 import { motion, AnimatePresence } from "motion/react";
 import { useLocation, useNavigate, useParams } from "react-router";
-import { Heart, Share, X } from "lucide-react";
+import { Heart, Share } from "lucide-react";
 import * as THREE from "three";
 import { useLanguage } from "../context/LanguageContext";
 import {
@@ -86,6 +86,7 @@ import { GalleryHandZoomBridge } from "./GalleryHandZoomBridge";
 import { GalleryOrbitWheelSmooth } from "./GalleryOrbitWheelSmooth";
 import { GalleryHandModalEffect } from "./GalleryHandModalEffect";
 import { GalleryHandControlButtons } from "./GalleryHandControlButtons";
+import { useRegisterGalleryDetailClose } from "./galleryDetailClose";
 import { useGalleryHandControl } from "./galleryHandControl";
 import {
   DEFAULT_GALLERY_PARALLAX,
@@ -3754,6 +3755,8 @@ export function Gallery3D({
     onCloseModal?.();
   }, [navigate, location.hash, onCloseModal]);
 
+  useRegisterGalleryDetailClose(closeModal);
+
   const handlePick = useCallback(
     (image: GalleryImage) => {
       prefetchDetailModalMedia(image.images);
@@ -4082,7 +4085,8 @@ export function Gallery3D({
             <div
               ref={modalDetailWheelRootRef}
               className={cn(
-                "absolute inset-0 flex h-full max-h-[100dvh] min-h-0 flex-col items-stretch overflow-y-auto overscroll-y-auto pb-4 pt-0",
+                "absolute inset-0 flex h-full max-h-[100dvh] min-h-0 flex-col items-stretch overflow-y-auto overscroll-y-auto pb-4",
+                "pt-[var(--site-header-height,0px)]",
                 "px-7 sm:items-start sm:justify-center sm:py-8 sm:pb-[max(2rem,env(safe-area-inset-bottom))] sm:pl-20 lg:pl-24",
                 "sm:pr-[calc(1.5rem+2.5rem+3rem)] lg:pr-[calc(2.5rem+2.5rem+3.5rem)]",
               )}
@@ -4094,35 +4098,6 @@ export function Gallery3D({
               onClick={closeModal}
               role="presentation"
             >
-              <div
-                className="sticky top-0 z-30 -mx-7 mb-1 flex w-[calc(100%+3.5rem)] shrink-0 items-end justify-end bg-black px-7 pb-1.5 pt-[max(0.625rem,env(safe-area-inset-top))] sm:hidden"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className={cn(modalDetailActionPillClass, "h-10 w-10")}
-                  aria-label={galleryCopy.close}
-                >
-                  <X className="h-[18px] w-[18px] stroke-current" strokeWidth={2} />
-                </button>
-              </div>
-
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  closeModal();
-                }}
-                className={cn(
-                  modalDetailActionPillClass,
-                  "fixed right-6 top-[max(1.25rem,env(safe-area-inset-top))] z-[60] hidden h-10 w-10 sm:inline-flex lg:right-10 lg:top-8",
-                )}
-                aria-label={galleryCopy.close}
-              >
-                <X className="h-[18px] w-[18px] stroke-current" strokeWidth={2} />
-              </button>
-
             <motion.div
               key="modal-card"
               initial={{ scale: 0.94, opacity: 0, y: 20 }}

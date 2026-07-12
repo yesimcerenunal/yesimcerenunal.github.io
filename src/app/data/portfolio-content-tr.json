@@ -1,8 +1,8 @@
 {
   "work/1": {
-    "title": "3D Gerçek Zamanlı Sinematik Ortam",
-    "subtitle": "Üretimi",
-    "description": "Rol: 3D Environment Artist\n\nSorumluluklar:\n• Emberfall Krallığı'nda geçen gerçekçi bir animasyon filmi için büyük ölçekli, fantezi esintili kütüphane ortamı oluşturdum\n• Bir prensesin kütüphanede anlatı sunduğu anı desteklemek için atmosfer, ölçek ve mekân üzerinden hikâye anlatımına odaklandım\n• Yüksek kaliteli gerçek zamanlı iş akışı için tüm çevre objelerini sıfırdan modelledim ve optimize UV haritaları hazırladım\n• Sinematik ton ve duygusal etkiyi güçlendirmek için film fragmanını kurguladım; görüntü ve ses tasarımını yürüttüm\n• Not: Dokulama, PBR malzeme üretimi ve prenses karakteri (animasyon ve dokular) grup içindeki diğer sanatçılar tarafından geliştirildi",
+    "title": "Emberfall Kingdom Animation Trailer",
+    "subtitle": "Environment Design",
+    "description": "Rol: 3D Environment Artist\n\nSorumluluklar:\n• Animasyon render'ı için büyük ölçekli, fantezi esintili 3D kütüphane ortamı tasarladım\n• Atmosfer, ölçek ve hikâye anlatımına odaklanarak kilit bir anlatı anı etrafında mekânı kurdum\n• Moodboard'dan final kompozisyona tüm çevre objelerini ve yerleşimi tasarladım\n• Yüksek kaliteli texture için temiz, optimize UV haritaları oluşturdum\n• Sinematik ton ve duygusal etki için video kurgusu ve ses tasarımı dahil film fragmanını kurguladım",
     "year": "2025",
     "tools": "Unreal Engine, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
@@ -15,15 +15,15 @@
   },
   "work/3": {
     "title": "Boneheads Raid",
-    "subtitle": "VR Dövüş Oyunu",
-    "description": "Rol: 3D Environment & VFX Artist\n\nSorumluluklar:\n• VR dövüş arenası için ortam yerleşimini oluşturdum ve arena prop'larını modelledim\n• İskelet düşman karakterlerini rigledim ve animate ettim\n• Düşman kılıç silahları için dinamik ışık ve iz efektleri geliştirdim\n• Unity'de dövüş geri bildirimini güçlendirmek için vuruş tepkisi parçacık efektleri geliştirdim\n• Shader tabanlı özel doğum (\"birth\") ve ölüm materyalleri tasarladım",
+    "subtitle": "VR Oyun Tasarımı",
+    "description": "Rol: 3D Environment & VFX Artist\n\nSorumluluklar:\n• VR dövüş arenası için ortam yerleşimini oluşturdum\n• İskelet düşman karakterlerini modelledim ve rigledim\n• Düşman saldırı ve vuruş tepkisi animasyon dizilerini animate ettim\n• Düşman silahları için dinamik ışık ve iz efektleri oluşturdum\n• Unity'de dövüş geri bildirimi için vuruş tepkisi parçacık efektleri geliştirdim\n• Düşman karakterler için shader tabanlı doğum ve ölüm materyalleri tasarladım",
     "year": "2024",
     "tools": "Unity, Blender, Adobe Photoshop, Premiere Pro"
   },
   "work/4": {
     "title": "Cozy Zen",
     "subtitle": "Oyun Tasarımı ve Geliştirmesi",
-    "description": "Rol: Game Designer & Developer\n\nSorumluluklar:\n• Kış temalı Zen bahçesi kavramı üzerinden rahatlatıcı oyun deneyimlerini inceleyen Cozy Zen yüksek lisans tez projesini geliştirdim\n• Çok kısıtlı sürede sakin ve sürükleyici bir etkileşimli ortam oluşturdum\n• Teorik tezi ve tam oynanabilir prototipi tek başıma ürettim\n• Blender ve Unity ile animasyon, görsel tasarım ve oyun geliştirme süreçlerini yürüttüm\n• Kodlama ve oyun mekaniği için Codex'ten yararlandım",
+    "description": "Rol: Game Designer & Developer\n\nSorumluluklar:\n• Kış temalı Zen bahçesi kavramı üzerinden rahatlatıcı oyun deneyimlerini araştırdıktan sonra yüksek lisans tez projesi olarak tam oynanabilir bir PC oyun prototipi geliştirdim\n• Unity'de tüm oynanış kodlarını ve etkileşimleri programladım\n• Oyuncuların öğe seçip yerleştirerek kendi zen bahçelerini kurabildiği, interaktif butonlara sahip eksiksiz bir 3D ortam tasarladım\n• Ana karakter, materyal shader'ları ve prop animasyonları tasarladım",
     "year": "2025",
     "tools": "Unity, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },

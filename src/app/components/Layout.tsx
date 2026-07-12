@@ -1,8 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { Link, Outlet, useLocation } from "react-router";
 import { LanguageProvider, useLanguage } from "../context/LanguageContext";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { FooterNav } from "./FooterNav";
+import {
+  GalleryDetailCloseButton,
+  GalleryDetailCloseProvider,
+} from "./galleryDetailClose";
 import { HandControlOverlay } from "./HandControlOverlay";
 import { ShellHandNavBridge } from "./ShellHandNavBridge";
 import { GalleryHandControlProvider, resetGalleryHandControlState, useGalleryHandControl } from "./galleryHandControl";
@@ -32,6 +36,7 @@ function LayoutShell() {
   const location = useLocation();
   const { pathname } = location;
   const { messages, locale } = useLanguage();
+  const headerRef = useRef<HTMLElement>(null);
   const pathSegments = pathname.replace(/\/+$/, "").split("/").filter(Boolean);
   const isGalleryDetail =
     pathSegments.length === 2 &&
@@ -53,11 +58,39 @@ function LayoutShell() {
     syncDocumentCanonical(pathname);
   }, [pathname]);
 
+  useLayoutEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+
+    const syncHeaderHeight = () => {
+      document.documentElement.style.setProperty(
+        "--site-header-height",
+        `${el.offsetHeight}px`,
+      );
+    };
+
+    syncHeaderHeight();
+    const observer = new ResizeObserver(syncHeaderHeight);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [isGalleryDetail]);
+
   return (
     <div className="flex h-dvh max-h-dvh min-h-0 overflow-hidden bg-background">
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-        <header className="flex shrink-0 items-start justify-between gap-5 px-7 pb-1 pt-5 sm:items-baseline sm:gap-6 sm:px-12 sm:pb-1.5 sm:pt-6 lg:px-14 lg:pt-7">
-          <div className="flex min-w-0 flex-1 flex-col pr-2">
+        <header
+          ref={headerRef}
+          className={cn(
+            "flex shrink-0 items-start justify-between gap-5 px-7 pb-1 pt-5 sm:items-baseline sm:gap-6 sm:px-12 sm:pb-1.5 sm:pt-6 lg:px-14 lg:pt-7",
+            isGalleryDetail && "relative z-[70] justify-end",
+          )}
+        >
+          <div
+            className={cn(
+              "flex min-w-0 flex-1 flex-col pr-2",
+              isGalleryDetail && "hidden",
+            )}
+          >
             {/*
               `lang="en"`: root `<html>` stays `lang="en"` for typography; Latin brand stays stable.
             */}
@@ -77,8 +110,14 @@ function LayoutShell() {
               </p>
             ) : null}
           </div>
-          <div className="shrink-0">
+          <div
+            className={cn(
+              "flex shrink-0 flex-col items-end",
+              isGalleryDetail ? "gap-6 sm:gap-7" : "gap-2",
+            )}
+          >
             <LanguageSwitcher />
+            {isGalleryDetail ? <GalleryDetailCloseButton /> : null}
           </div>
         </header>
 
@@ -118,7 +157,9 @@ export function Layout() {
   return (
     <LanguageProvider>
       <GalleryHandControlProvider>
-        <LayoutShell />
+        <GalleryDetailCloseProvider>
+          <LayoutShell />
+        </GalleryDetailCloseProvider>
       </GalleryHandControlProvider>
     </LanguageProvider>
   );

@@ -245,6 +245,7 @@ const portfolioDe = normalizePortfolioContentJson(portfolioContentDe);
 const portfolioTr = normalizePortfolioContentJson(portfolioContentTr);
 
 const categoryEn: Record<GalleryCategory, string> = {
+  "ANIMATION PROJECT": "ANIMATION PROJECT",
   "Game Design": "Game Design",
   Motion: "Motion",
   "AUDIOVISUAL INTERACTIONS": "AUDIOVISUAL INTERACTIONS",
@@ -410,7 +411,8 @@ const de: TranslationMessages = {
   },
   categories: {
     all: "Alle",
-    "Game Design": "Game Design",
+    "ANIMATION PROJECT": "Animationsprojekt",
+    "Game Design": "Spieldesign",
     Motion: "BEWEGTBILD",
     "AUDIOVISUAL INTERACTIONS": "AUDIOVISUELLE INTERAKTIONEN",
     "GENERATIVE MOTION TRACKING": "GENERATIVES MOTION TRACKING",
@@ -424,7 +426,7 @@ const de: TranslationMessages = {
     switchToCameraOff: "HANDS MODE AUS",
     modalYear: "Jahr",
     modalToolsLabel: "Tools",
-    modalResponsibilitiesLabel: "Aufgaben & Verantwortlichkeiten",
+    modalResponsibilitiesLabel: "Aufgaben",
     modalProjectFallback: "Projekt",
     modalYearFallback: "—",
     backToGallery: "Zurück",
@@ -526,6 +528,7 @@ const tr: TranslationMessages = {
   },
   categories: {
     all: "Tümü",
+    "ANIMATION PROJECT": "Animasyon Projesi",
     "Game Design": "Oyun Tasarımı",
     Motion: "Hareket",
     "AUDIOVISUAL INTERACTIONS": "Görsel-işitsel etkileşimler",

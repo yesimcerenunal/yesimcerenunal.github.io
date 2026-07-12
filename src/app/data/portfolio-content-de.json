@@ -1,8 +1,8 @@
 {
   "work/1": {
-    "title": "3D-Echtzeit-Filmische Umgebungsproduktion",
-    "subtitle": "Produktion",
-    "description": "Rolle: 3D Environment Artist\n\nAufgaben & Verantwortlichkeiten:\n• Erstellung einer großformatigen, fantasy-inspirierten Bibliotheksumgebung für einen realistischen Animationsfilm im Königreich Emberfall\n• Gestaltung des Raums für einen narrativen Moment, in dem eine Prinzessin eine Erzählung vorträgt — mit Fokus auf Atmosphäre, Maßstab und Storytelling durch den Raum\n• Modellierung aller Umgebungs-Props von Grund auf mit sauberen, optimierten UV-Karten für einen hochwertigen Echtzeit-Workflow\n• Schnitt des Filmtrailers inklusive Videobearbeitung und Sounddesign zur Verstärkung der cineastischen Wirkung\n• Hinweis: Texturierung, PBR-Materialien sowie die Prinzessin-Figur (Animation und Texturen) wurden von anderen Künstlerinnen und Künstlern in der Gruppe umgesetzt",
+    "title": "Emberfall Kingdom Animation Trailer",
+    "subtitle": "Environment Design",
+    "description": "Rolle: 3D Environment Artist\n\nAufgaben:\n• Gestaltung einer großformatigen, fantasy-inspirierten 3D-Bibliotheksumgebung für ein Animations-Rendering\n• Aufbau des Raums um einen zentralen narrativen Moment mit Fokus auf Atmosphäre, Maßstab und Storytelling\n• Gestaltung aller Umgebungs-Props und des Layouts, vom Moodboard bis zur finalen Komposition\n• Erstellung sauberer, optimierter UV-Karten für hochwertige Texturierung\n• Schnitt des Filmtrailers inklusive Videobearbeitung und Sounddesign für cineastischen Ton und emotionale Wirkung",
     "year": "2025",
     "tools": "Unreal Engine, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
@@ -15,15 +15,15 @@
   },
   "work/3": {
     "title": "Boneheads Raid",
-    "subtitle": "VR-Kampfspiel",
-    "description": "Rolle: 3D Environment & VFX Artist\n\nAufgaben & Verantwortlichkeiten:\n• Aufbau des Umgebungslayouts für die VR-Kampfarena und Modellierung der Arena-Props\n• Rigging und Animation der Skelett-Gegner-Charaktere\n• Entwicklung dynamischer Licht- und Trail-Effekte für die Schwerter der Gegner\n• Erstellung von Hit-Reaction-Partikeleffekten zur Verstärkung des Kampf-Feedbacks in Unity\n• Design individueller, shaderbasierter Spawn- (\"Geburts-\") und Todesmaterialien",
+    "subtitle": "VR Game Design",
+    "description": "Rolle: 3D Environment & VFX Artist\n\nAufgaben:\n• Aufbau des Umgebungslayouts für die VR Kampfarena\n• Modellierung und Rigging der Skelett Gegner Charaktere\n• Animation von Angriffs und Hit Reaction Sequenzen der Gegner\n• Entwicklung dynamischer Licht und Trail Effekte für die Waffen der Gegner\n• Entwicklung von Hit Reaction Partikeleffekten für das Kampf Feedback in Unity\n• Design shaderbasierter Spawn und Todesmaterialien für die Gegner Charaktere",
     "year": "2024",
     "tools": "Unity, Blender, Adobe Photoshop, Premiere Pro"
   },
   "work/4": {
     "title": "Cozy Zen",
     "subtitle": "Spieldesign & -entwicklung",
-    "description": "Rolle: Game Designer & Developer\n\nAufgaben & Verantwortlichkeiten:\n• Entwicklung von Cozy Zen als Masterarbeit-Projekt über gemütliche Spielerlebnisse im Konzept eines winterlichen Zen-Gartens\n• Schaffung einer beruhigenden und zugleich einnehmenden interaktiven Umgebung in sehr begrenzter Zeit\n• Eigenständige Produktion der theoretischen Arbeit und eines voll spielbaren Prototyps\n• Verantwortung für Animation, visuelles Design und Spielentwicklung mit Blender und Unity\n• Nutzung von Codex zur Unterstützung bei Programmierung und Gameplay-Umsetzung",
+    "description": "Rolle: Game Designer & Developer\n\nAufgaben:\n• Entwicklung eines vollständig spielbaren PC-Spielprototyps im Rahmen einer Masterarbeit, nach vorheriger Recherche zu \"Cozy Games\" anhand eines winterlichen Zen-Garten-Konzepts\n• Programmierung der gesamten Gameplay-Logik und Interaktionen in Unity\n• Gestaltung einer vollständigen 3D-Umgebung mit interaktiven Buttons, mit denen Spieler ihren eigenen Zen-Garten durch Auswahl und Platzierung von Objekten gestalten können\n• Gestaltung der Hauptfigur, Material-Shader und Prop-Animationen",
     "year": "2025",
     "tools": "Unity, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
