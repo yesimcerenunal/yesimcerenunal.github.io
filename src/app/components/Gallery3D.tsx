@@ -36,6 +36,7 @@ import {
 } from "../i18n/translations";
 import gallerySunRayAssetUrl from "../assets/gallery-halo-grey-ring.png?url";
 import artstationIconUrl from "../assets/artstation.png?url";
+import { GUMROAD_PROFILE_URL } from "../config/contact";
 import { publicAsset } from "../utils/publicAsset";
 import {
   adjustGalleryLikeCount,
@@ -169,6 +170,14 @@ const WORK2_ARTSTATION_ALBUM_URL =
 /** `false` iken ikon gösterilmez; tekrar açmak için `true` yap. */
 const WORK2_ARTSTATION_BUTTON_ENABLED = false;
 
+/** Hair, Aura & generative FX projects — Gumroad CTA in detail modal. */
+const GUMROAD_FX_PROJECT_KEYS = new Set([
+  "work/12",
+  "work/13",
+  "work/14",
+  "work/16",
+]);
+
 /** Initial playback level (0–1) when a clip loads; audience can change it with the player controls. */
 const DETAIL_VIDEO_VOLUME = 0.15;
 /** work/12 (Hair) & work/14 (Aura): louder masters — keep noticeably lower than default. */
@@ -200,9 +209,9 @@ const DETAIL_MEDIA_SURFACE_CLASS = cn(
   "mx-auto block h-auto w-full max-w-full object-contain",
   DETAIL_MEDIA_MAX_HEIGHT_CLASS,
 );
-/** Dikey video referansı: 720×1280 → kolonda ~360×640. */
-const DETAIL_PORTRAIT_MEDIA_WIDTH_CLASS = "w-[min(100%,360px)]";
-const DETAIL_PORTRAIT_MEDIA_HEIGHT_CLASS = "max-h-[min(72vh,640px)]";
+/** Dikey video referansı: 720×1280 → kolonda ~280×498. */
+const DETAIL_PORTRAIT_MEDIA_WIDTH_CLASS = "w-[min(100%,280px)]";
+const DETAIL_PORTRAIT_MEDIA_HEIGHT_CLASS = "max-h-[min(58vh,500px)]";
 const DETAIL_PORTRAIT_ASPECT_CLASS = "aspect-[720/1280]";
 
 type DetailMediaDims = { w: number; h: number };
@@ -4255,6 +4264,16 @@ export function Gallery3D({
                     soundLabel={galleryCopy.modalSoundLabel ?? "Sound"}
                     responsibilitiesLabel={
                       galleryCopy.modalResponsibilitiesLabel ?? "Responsibilities"
+                    }
+                    gumroadEffectsNote={
+                      GUMROAD_FX_PROJECT_KEYS.has(selectedImage.projectKey)
+                        ? galleryCopy.modalGumroadEffectsNote
+                        : undefined
+                    }
+                    gumroadHref={
+                      GUMROAD_FX_PROJECT_KEYS.has(selectedImage.projectKey)
+                        ? GUMROAD_PROFILE_URL
+                        : undefined
                     }
                   />
                 </div>

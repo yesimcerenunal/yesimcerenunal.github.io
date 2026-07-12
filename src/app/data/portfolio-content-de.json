@@ -78,8 +78,8 @@
     "tools": "Touch Designer, Adobe Premiere Pro"
   },
   "work/13": {
-    "title": "Birdie",
-    "description": "Rolle: Real-Time FX Artist\n\nAufgaben:\n• Erforschung des Übergangs zwischen organischen 3D-Formen und Bewegung durch generative visuelle Systeme\n• Vergleich unterschiedlicher visueller Behandlungen — scribble-basiert und partikelbasiert — am selben animierten 3D-Modell\n• Kombination von 3D-Skulpturmodellen mit glitch-basierten Effekten; Erforschung transluzenter, audioreaktiver Wellenformstrukturen\n• Rekonstruktion von 2D-Bildern in rotierbare, partikelbasierte 3D-Formen mit Echtzeit-Simulation und prozeduralen Workflows\n• Entwickelt für Installationen und Studien mit Fokus auf Raumwahrnehmung und digitale Abstraktion",
+    "title": "3D/2D — Generative FX Studies",
+    "description": "Rolle: Real-Time FX Artist\n\nAufgaben:\n• Erforschung organischer 3D-Formen, 2D-Bilder und Motion-FX durch generative visuelle Systeme\n• Vergleich unterschiedlicher visueller Stile innerhalb von Kompositionen\n• Gestaltung von Glitch-, Scribble-, Partikel-, transluzenten und reaktiven Echtzeiteffekten\n• Erstellung von Arbeiten für Installationen im Bereich Raumwahrnehmung und digitaler LED-Interaktionen",
     "year": "2026",
     "tools": "Touch Designer, Blender"
   },
@@ -97,9 +97,9 @@
     "tools": ""
   },
   "work/16": {
-    "title": "Generative Visual Filters",
-    "description": "Rolle: Creative Technologist\n\nAufgaben & Verantwortlichkeiten:\n• Entwicklung generativer Motion-Tracking-Systeme in TouchDesigner für Echtzeit-Bild- und Videoverarbeitung\n• Erforschung von Schichtung, Kombination und Manipulation visueller Effekte für evolvierende Kompositionen\n• Modulare Strukturen und prozedurale Techniken für schnelle Experimente und vielfältige Ergebnisse",
+    "title": "Video/Image — Generative FX Studies",
+    "description": "Rolle: Real-Time FX Artist\n\nAufgaben:\n• Entwicklung generativer Motion-Tracking-Systeme zur Echtzeit-Bild- und Videoverarbeitung\n• Schichtung und Kombination visueller Effekte zur Erzeugung sich entwickelnder Kompositionen\n• Einsatz modularer, prozeduraler Techniken zur schnellen Experimentierung und Erzeugung vielfältiger visueller Ergebnisse",
     "year": "2026",
-    "tools": "TouchDesigner, Premiere Pro"
+    "tools": "Touch Designer"
   }
 }

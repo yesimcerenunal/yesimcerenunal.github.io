@@ -16,7 +16,7 @@
     "tools": "Unity, Blender, Substance 3D Painter, Adobe Photoshop & Premiere Pro"
   },
   "work/3": {
-    "category": "GAME DESIGN PROJECT",
+    "category": "GAME DESIGN",
     "title": "Boneheads Raid",
     "subtitle": "VR Game Design",
     "description": "Role: 3D Environment & VFX Artist\n\nResponsibilities:\n• Built the environment layout for the VR combat arena\n• Modeled and rigged the skeleton enemy characters\n• Animated enemy attack and hit reaction sequences\n• Created dynamic light and trail effects for enemy weapons\n• Developed hit reaction particle effects for combat feedback in Unity\n• Designed shader based spawn and death materials for enemy characters",
@@ -24,7 +24,7 @@
     "tools": "Unity, Blender, Adobe Photoshop, Premiere Pro"
   },
   "work/4": {
-    "category": "GAME DESIGN PROJECT",
+    "category": "GAME DESIGN",
     "title": "Cozy Zen",
     "subtitle": "Game Design & Development",
     "description": "Role: Game Designer & Developer\n\nResponsibilities:\n• Developed a fully playable PC game prototype as a master's thesis project after researching cozy game experiences through a winter Zen garden concept\n• Programmed the full gameplay codes and interactions in Unity\n• Designed a complete 3D environment with interactive buttons, letting players build their own zen garden by choosing and placing items\n• Designed main character, material shaders and prop animations",
@@ -82,7 +82,7 @@
     "tools": ""
   },
   "work/12": {
-    "category": "AUDIOVISUAL INTERACTIONS",
+    "category": "REAL-TIME INTERACTION DESIGN",
     "title": "Hair",
     "subtitle": "Generative Music FX",
     "description": "Role: Audiovisual Artist\n\nResponsibilities:\n• Created an audiovisual series featuring translucent, audio-reactive graphics\n• Developed layered RGBA structures with frequency-driven motion and experimental visual interactions\n• Explored the relationship between sound, translucency, and synthetic spatial perception\n• Designed the visuals for large-scale horizontal LED screens\n• Sound: LightBeatsMusic — House Groove Mirage",
@@ -90,14 +90,14 @@
     "tools": "Touch Designer, Adobe Premiere Pro"
   },
   "work/13": {
-    "category": "VISUAL FX STUDIES",
-    "title": "Birdie",
-    "description": "Role: Real-Time FX Artist\n\nResponsibilities:\n• Explored the transition between organic 3D forms and motion through generative visual systems\n• Compared different visual treatments — scribble-based and particle-based — applied to the same animated 3D model\n• Combined 3D sculptural models with glitch-based effects, exploring translucent, audio-reactive waveform structures\n• Reconstructed 2D images into rotatable particle-based 3D forms using real-time simulation and procedural workflows\n• Created for installations and studies focused on spatial perception and digital abstraction",
+    "category": "REAL-TIME INTERACTION DESIGN",
+    "title": "3D/2D — Generative FX Studies",
+    "description": "Role: Real-Time FX Artist\n\nResponsibilities:\n• Explored organic 3D forms, 2D images, and motion FX through generative visual systems\n• Compared different visual styles across compositions\n• Designed glitch, scribble, particle, translucent, and reactive real-time effects\n• Created works for installations exploring spatial perception and digital LED interactions",
     "year": "2026",
     "tools": "Touch Designer, Blender"
   },
   "work/14": {
-    "category": "AUDIOVISUAL INTERACTIONS",
+    "category": "REAL-TIME INTERACTION DESIGN",
     "title": "Aura",
     "subtitle": "Generative Music FX",
     "description": "Role: Audiovisual Artist\n\nResponsibilities:\n• Created an audiovisual series featuring translucent, audio-reactive graphics\n• Developed layered RGBA structures with frequency-driven motion and experimental visual interactions\n• Explored the relationship between sound, translucency, and synthetic spatial perception\n• Designed the visuals for large-scale horizontal LED screens\n• Sound: Watermello — Sport Techno",
@@ -112,10 +112,10 @@
     "tools": ""
   },
   "work/16": {
-    "category": "GENERATIVE MOTION TRACKING",
-    "title": "Generative Visual Filters",
-    "description": "Role: Creative Technologist\n\nResponsibilities:\n• Developed generative motion tracking systems in TouchDesigner to process real-time image and video\n• Explored layering, combining, and manipulating visual effects to generate evolving compositions\n• Used modular structures and procedural techniques to enable rapid experimentation and diverse visual outcomes",
+    "category": "REAL-TIME INTERACTION DESIGN",
+    "title": "Video/Image — Generative FX Studies",
+    "description": "Role: Real-Time FX Artist\n\nResponsibilities:\n• Developed generative motion tracking systems for real-time image and video processing\n• Layered and combined visual effects to generate evolving compositions\n• Used modular, procedural techniques to enable rapid experimentation and diverse visual outcomes",
     "year": "2026",
-    "tools": "TouchDesigner, Premiere Pro"
+    "tools": "Touch Designer"
   }
 }

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import gumroadIconUrl from "../assets/gumroad.png?url";
 import { cn } from "./ui/utils";
 
 type DescriptionBlock =
@@ -245,6 +246,8 @@ export function ProjectDetailCopy({
   roleLabel,
   responsibilitiesLabel,
   soundLabel,
+  gumroadEffectsNote,
+  gumroadHref,
 }: {
   title: string;
   subtitle?: string;
@@ -256,6 +259,8 @@ export function ProjectDetailCopy({
   roleLabel: string;
   responsibilitiesLabel: string;
   soundLabel: string;
+  gumroadEffectsNote?: string;
+  gumroadHref?: string;
 }) {
   const displayTitle =
     subtitle?.trim() ? `${title.trim()} — ${subtitle.trim()}` : title.trim();
@@ -330,6 +335,31 @@ export function ProjectDetailCopy({
                 )}
               </div>
             </DetailSection>
+          ) : null}
+          {gumroadEffectsNote && gumroadHref ? (
+            <p
+              className={cn(
+                bodyClass,
+                "pl-16 whitespace-normal sm:pl-[4.25rem]",
+              )}
+            >
+              <a
+                href={gumroadHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex max-w-full items-center gap-2.5 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
+                <img
+                  src={gumroadIconUrl}
+                  alt=""
+                  width={24}
+                  height={24}
+                  className="h-6 w-6 shrink-0 rounded-md object-contain"
+                  decoding="async"
+                />
+                <span className="min-w-0 leading-snug">{gumroadEffectsNote}</span>
+              </a>
+            </p>
           ) : null}
         </div>
       ) : null}

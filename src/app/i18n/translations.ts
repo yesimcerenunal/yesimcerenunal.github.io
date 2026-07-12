@@ -164,6 +164,8 @@ export type TranslationMessages = {
     modalFavoriteAriaLabel: string;
     /** work/2 detail: ArtStation icon next to back (opens in new tab). */
     artStationAlbumAriaLabel: string;
+    /** Hair, Aura & FX projects: note below responsibilities linking to Gumroad. */
+    modalGumroadEffectsNote: string;
     close: string;
     /** Alt text when an image fails to load (fallback UI). */
     imageErrorAlt: string;
@@ -250,11 +252,9 @@ const portfolioTr = normalizePortfolioContentJson(portfolioContentTr);
 
 const categoryEn: Record<GalleryCategory, string> = {
   "ANIMATION PROJECT": "ANIMATION PROJECT",
-  "GAME DESIGN PROJECT": "GAME DESIGN PROJECT",
-  "Game Design": "Game Design",
+  "GAME DESIGN": "GAME DESIGN",
   Motion: "Motion",
-  "AUDIOVISUAL INTERACTIONS": "AUDIOVISUAL INTERACTIONS",
-  "VISUAL FX STUDIES": "VISUAL FX STUDIES",
+  "REAL-TIME INTERACTION DESIGN": "REAL-TIME INTERACTION DESIGN",
   "GENERATIVE MOTION TRACKING": "GENERATIVE MOTION TRACKING",
   "3D Archive": "3D Archive",
   "2D Archive": "2D Archive",
@@ -326,20 +326,21 @@ const en: TranslationMessages = {
     modalShareCopied: "Link copied",
     modalFavoriteAriaLabel: "Favorite",
     artStationAlbumAriaLabel: "ArtStation album (opens in new tab)",
+    modalGumroadEffectsNote:
+      "You can explore more effects on my Gumroad page",
     close: "Close",
     imageErrorAlt: "Error loading image",
   },
   about: {
     lead:
-      "Hi, I'm Ceren. I'm a Cologne-based creative technologist, motion designer, and 3D artist working across interactive media, real-time graphics, and digital experiences.",
+      "Hi, I'm Ceren. I'm a Cologne-based real-time FX artist who uses 2D/3D visual assets to create visual FX, generative systems, and real-time environmental experiences.",
     p2:
       "I received my M.A. in 3D Animation for Film & Games from TH Köln in 2025, and my B.A. in Graphic Design from Bilkent University in 2019.",
     p3:
-      "My journey started in graphic design, where visuals were meant to stay still. That didn't last very long.",
+      "My journey started in graphic design, where visuals were meant to stay still. That didn't last very long. I continued my career as a 3D environment artist and character artist for long years.",
     p4:
-      "I became fascinated by what happens when design starts to move, react, and invite participation. That curiosity gradually led me into animation, game development, immersive media, and interactive experiences, where I explored how motion, rhythm, and interaction shape the way people experience digital worlds.",
-    p5:
-      "Today, I focus on creative technology, audio-reactive visuals, generative systems, and real-time environments. I enjoy learning new tools, experimenting with visual systems, and building experiences that feel alive.",
+      "Today, I'm more interested in motion, reaction, and participation. That curiosity made me a creative technologist, VFX magician, and digital explorer where I found my authentic real self ✨",
+    p5: "",
     proficienciesTitle: "Proficiencies:",
     proficiencies: ABOUT_PROFICIENCIES,
     skillsTitle: "Skills:",
@@ -347,7 +348,7 @@ const en: TranslationMessages = {
   },
   contact: {
     headline:
-      "Did you hear my heartbeat while viewing my artworks?\n\nIf so, let's connect now! Email is the quickest way to get in touch.",
+      "Did you hear my heartbeat while viewing my artworks?\n\nGot a project in mind? Let's talk. Reach out via social media or email!",
     description: "",
     emailCta: "Email Me",
     emailInlineOr: "or",
@@ -420,11 +421,9 @@ const de: TranslationMessages = {
   categories: {
     all: "Alle",
     "ANIMATION PROJECT": "Animationsprojekt",
-    "GAME DESIGN PROJECT": "Spieldesign-Projekt",
-    "Game Design": "Spieldesign",
+    "GAME DESIGN": "SPIELDESIGN",
     Motion: "BEWEGTBILD",
-    "AUDIOVISUAL INTERACTIONS": "AUDIOVISUELLE INTERAKTIONEN",
-    "VISUAL FX STUDIES": "VISUAL-FX-STUDIEN",
+    "REAL-TIME INTERACTION DESIGN": "REALTIME-INTERAKTIONSDESIGN",
     "GENERATIVE MOTION TRACKING": "GENERATIVES MOTION TRACKING",
     "3D Archive": "3D-Archiv",
     "2D Archive": "2D-Archiv",
@@ -447,20 +446,21 @@ const de: TranslationMessages = {
     modalShareCopied: "Link kopiert",
     modalFavoriteAriaLabel: "Favorit",
     artStationAlbumAriaLabel: "ArtStation-Album (öffnet in neuem Tab)",
+    modalGumroadEffectsNote:
+      "Weitere Effekte findest du auf meiner Gumroad-Seite",
     close: "Schließen",
     imageErrorAlt: "Bild konnte nicht geladen werden",
   },
   about: {
     lead:
-      "Hallo, ich bin Ceren. Ich bin Creative Technologist, Motion Designerin und 3D Artist aus Köln und arbeite mit interaktiven Medien, Echtzeitgrafiken und digitalen Erlebnissen.",
+      "Hallo, ich bin Ceren. Ich bin eine in Köln ansässige Real-Time-FX-Künstlerin, die mit 2D/3D-Visual-Assets arbeitet, um Visual FX, generative Systeme und Echtzeit-Umgebungserlebnisse zu schaffen.",
     p2:
-      "2025 habe ich meinen Master of Arts in 3D Animation for Film & Games an der TH Köln abgeschlossen, meinen Bachelor in Grafikdesign habe ich 2019 an der Bilkent Universität gemacht.",
+      "Meinen M.A. in 3D Animation for Film & Games habe ich 2025 an der TH Köln erhalten, meinen B.A. in Grafikdesign 2019 an der Bilkent University.",
     p3:
-      "Meine Reise begann im Grafikdesign, in einer Welt, in der Bilder stillstehen sollten. Das hat jedoch nicht lange angehalten.",
+      "Meine Reise begann im Grafikdesign, wo Visuals dazu gedacht waren, still zu bleiben. Das hielt nicht lange an. Ich setzte meine Karriere über viele Jahre als 3D-Environment-Artist und Charakterkünstlerin fort.",
     p4:
-      "Ich wurde fasziniert davon, was passiert, wenn Design beginnt sich zu bewegen, zu reagieren und zur Interaktion einzuladen. Diese Neugier führte mich Schritt für Schritt in Richtung Animation, Game Development, immersive Medien und interaktive Erlebnisse, wo ich untersucht habe, wie Motion, Rhythmus und Interaktion die Art und Weise prägen, wie Menschen digitale Welten erleben.",
-    p5:
-      "Heute konzentriere ich mich auf Creative Technology, audio-reaktive Visuals, generative Systeme und Echtzeitumgebungen. Ich lerne gerne neue Tools, experimentiere mit visuellen Systemen und entwickle Erfahrungen, die sich lebendig anfühlen.",
+      "Heute interessiere ich mich mehr für Bewegung, Reaktion und Teilhabe. Diese Neugier machte mich zu einer Creative Technologistin, VFX-Magierin und digitalen Entdeckerin, in der ich mein authentisches wahres Selbst gefunden habe ✨",
+    p5: "",
     proficienciesTitle: "Softwarekenntnisse:",
     proficiencies: ABOUT_PROFICIENCIES,
     skillsTitle: "Fachkompetenzen:",
@@ -468,7 +468,7 @@ const de: TranslationMessages = {
   },
   contact: {
     headline:
-      "Haben Sie meinen Herzschlag gehört, während Sie meine Arbeiten angesehen haben?\n\nWenn ja, lassen Sie uns jetzt in Kontakt treten! E-Mail ist der schnellste Weg, mich zu erreichen.",
+      "Haben Sie meinen Herzschlag gehört, während Sie meine Arbeiten angesehen haben?\n\nHaben Sie ein Projekt im Sinn? Lassen Sie uns reden. Schreiben Sie mir über Social Media oder E-Mail!",
     description: "",
     emailCta: "E-Mail schreiben",
     emailInlineOr: "oder",
@@ -541,11 +541,9 @@ const tr: TranslationMessages = {
   categories: {
     all: "Tümü",
     "ANIMATION PROJECT": "Animasyon Projesi",
-    "GAME DESIGN PROJECT": "Oyun Tasarımı Projesi",
-    "Game Design": "Oyun Tasarımı",
+    "GAME DESIGN": "Oyun Tasarımı",
     Motion: "Hareket",
-    "AUDIOVISUAL INTERACTIONS": "Görsel-işitsel etkileşimler",
-    "VISUAL FX STUDIES": "Görsel FX çalışmaları",
+    "REAL-TIME INTERACTION DESIGN": "Gerçek zamanlı etkileşim tasarımı",
     "GENERATIVE MOTION TRACKING": "Üretken hareket izleme",
     "3D Archive": "3D arşiv",
     "2D Archive": "2D arşiv",
@@ -568,6 +566,8 @@ const tr: TranslationMessages = {
     modalShareCopied: "Bağlantı kopyalandı",
     modalFavoriteAriaLabel: "Favori",
     artStationAlbumAriaLabel: "ArtStation albümü (yeni sekmede açılır)",
+    modalGumroadEffectsNote:
+      "Daha fazla efekti Gumroad sayfamda keşfedebilirsin",
     close: "Kapat",
     imageErrorAlt: "Görüntü yüklenemedi",
   },
@@ -587,7 +587,7 @@ const tr: TranslationMessages = {
   },
   contact: {
     headline:
-      "Çalışmalarımı incelerken kalp atışlarımı duydunuz mu?\n\nEğer öyleyse, hadi iletişime geçelim! Bana ulaşmanın en hızlı yolu şimdilik e-posta.",
+      "Çalışmalarımı incelerken kalp atışlarımı duydunuz mu?\n\nAklınızda bir proje mi var? Konuşalım. Sosyal medya veya e-posta ile ulaşabilirsiniz!",
     description: "",
     emailCta: "E-posta gönder",
     emailInlineOr: "veya",

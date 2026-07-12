@@ -48,6 +48,14 @@ const emailCopyChipClass = cn(
   "w-[8rem] border border-border bg-muted/50 text-foreground hover:bg-muted",
 );
 
+/** Matches project detail ROLE value (`ProjectDetailCopy`). */
+const contactHeadlineLeadClass =
+  "text-[0.9375rem] leading-snug italic text-muted-foreground sm:text-[1.0625rem] sm:leading-relaxed sm:text-[1.125rem]";
+
+/** Slightly smaller than project detail title (`ProjectDetailCopy` h2). */
+const contactHeadlineTitleClass =
+  "max-w-full text-[0.9375rem] leading-[1.25] tracking-tight text-foreground whitespace-normal sm:text-[clamp(0.9375rem,0.9rem+0.65vw,1.5rem)] sm:leading-[1.3]";
+
 function ContactSocialRow({
   href,
   ariaLabel,
@@ -105,6 +113,10 @@ export function Contact() {
     }
   }, []);
 
+  const headlineParts = c.headline.split(/\n\n+/);
+  const headlineLead = headlineParts[0]?.trim() ?? "";
+  const headlineRest = headlineParts.slice(1).join("\n\n").trim();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -114,9 +126,14 @@ export function Contact() {
     >
       <div className="space-y-8 leading-relaxed text-muted-foreground">
         <div className="space-y-6">
-          <p className="whitespace-pre-line text-[0.9375rem] font-normal italic leading-relaxed text-[#007FFF] sm:text-[1rem]">
-            {c.headline}
-          </p>
+          <div className="space-y-4">
+            {headlineLead ? (
+              <p className={contactHeadlineLeadClass}>{headlineLead}</p>
+            ) : null}
+            {headlineRest ? (
+              <p className={contactHeadlineTitleClass}>{headlineRest}</p>
+            ) : null}
+          </div>
           {c.description.trim() ? (
             <p className="text-base text-muted-foreground">{c.description}</p>
           ) : null}

@@ -78,8 +78,8 @@
     "tools": "Touch Designer, Adobe Premiere Pro"
   },
   "work/13": {
-    "title": "Birdie",
-    "description": "Rol: Real-Time FX Artist\n\nSorumluluklar:\n• Üretken görsel sistemler aracılığıyla organik 3B formlar ile hareket arasındaki geçişi inceledim\n• Aynı animasyonlu 3B modele uygulanan farklı görsel işlemleri — çizgi/karalama tabanlı ve parçacık tabanlı — karşılaştırdım\n• 3B heykel modellerini glitch tabanlı efektlerle birleştirerek yarı saydam, ses tepkili dalga formu yapılarını keşfettim\n• 2B görselleri gerçek zamanlı simülasyon ve prosedürel iş akışlarıyla döndürülebilir parçacık tabanlı 3B formlara dönüştürdüm\n• Mekânsal algı ve dijital soyutlamaya odaklı kurulumlar ve çalışmalar için ürettim",
+    "title": "3D/2D — Generative FX Studies",
+    "description": "Rol: Real-Time FX Artist\n\nSorumluluklar:\n• Üretken görsel sistemler aracılığıyla organik 3B formlar, 2B görseller ve motion FX keşfettim\n• Kompozisyonlar arasında farklı görsel stilleri karşılaştırdım\n• Glitch, scribble, parçacık, yarı saydam ve reaktif gerçek zamanlı efektler tasarladım\n• Mekânsal algı ve dijital LED etkileşimlerini keşfeden kurulumlar için eserler ürettim",
     "year": "2026",
     "tools": "Touch Designer, Blender"
   },
@@ -97,9 +97,9 @@
     "tools": ""
   },
   "work/16": {
-    "title": "Generative Visual Filters",
-    "description": "Rol: Creative Technologist\n\nSorumluluklar:\n• TouchDesigner'da görüntü ve videoyu gerçek zamanlı işlemek için üretken hareket izleme sistemleri geliştirdim\n• Görsel efektlerin katmanlanması, birleştirilmesi ve manipülasyonuyla evrilen kompozisyonlar ürettim\n• Modüler yapılar ve prosedürel tekniklerle hızlı deneme ve çeşitli görsel sonuçlar sağladım",
+    "title": "Video/Image — Generative FX Studies",
+    "description": "Rol: Real-Time FX Artist\n\nSorumluluklar:\n• Gerçek zamanlı görüntü ve video işleme için üretken hareket izleme sistemleri geliştirdim\n• Evrilen kompozisyonlar üretmek için görsel efektleri katmanladım ve birleştirdim\n• Hızlı deneme ve çeşitli görsel sonuçlar için modüler, prosedürel teknikler kullandım",
     "year": "2026",
-    "tools": "TouchDesigner, Premiere Pro"
+    "tools": "Touch Designer"
   }
 }

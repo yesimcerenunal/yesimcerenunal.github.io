@@ -7,14 +7,12 @@ import {
   type ReactNode,
 } from "react";
 
-/** Order is fixed for nav and URLs, names are case-sensitive (e.g. "Game Design"). */
+/** Order is fixed for nav and URLs, names are case-sensitive. */
 export const GALLERY_CATEGORIES = [
   "ANIMATION PROJECT",
-  "GAME DESIGN PROJECT",
-  "Game Design",
+  "GAME DESIGN",
   "Motion",
-  "AUDIOVISUAL INTERACTIONS",
-  "VISUAL FX STUDIES",
+  "REAL-TIME INTERACTION DESIGN",
   "GENERATIVE MOTION TRACKING",
   "3D Archive",
   "2D Archive",
