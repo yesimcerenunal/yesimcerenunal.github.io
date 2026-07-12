@@ -9,6 +9,7 @@ import {
 } from "react";
 import type { ClassifiedHand } from "../utils/handGestures";
 import type { HandGestureState } from "../utils/handGestureEventBus";
+import { DEV_CAMERA_RECORDING_ENABLED } from "../config/devFeatures";
 
 export type HandedLabel = "left" | "right";
 export type HandPoint = { x: number; y: number };
@@ -226,9 +227,13 @@ export function stopGalleryCameraStream(
   if (hand.videoRef.current) hand.videoRef.current.srcObject = null;
 }
 
-export function resetGalleryHandControlState(
+export async function resetGalleryHandControlState(
   hand: GalleryHandControlContextValue,
-): void {
+): Promise<void> {
+  if (import.meta.env.DEV && DEV_CAMERA_RECORDING_ENABLED) {
+    const { stopDevCameraRecording } = await import("../dev/cameraRecording");
+    await stopDevCameraRecording();
+  }
   stopGalleryCameraStream(hand);
   hand.setHintOpen(false);
   hand.setEnabled(false);
@@ -243,7 +248,7 @@ export function toggleGalleryCameraControl(
   hand: GalleryHandControlContextValue,
 ): void {
   if (hand.enabled) {
-    resetGalleryHandControlState(hand);
+    void resetGalleryHandControlState(hand);
     return;
   }
   hand.setTrackingError(null);

@@ -6,6 +6,8 @@ import {
   type GalleryHandControlContextValue,
 } from "./galleryHandControl";
 import { cn } from "./ui/utils";
+import { DEV_CAMERA_RECORDING_ENABLED } from "../config/devFeatures";
+import { DevCameraRecordingBridge } from "../dev/DevCameraRecordingBridge";
 
 type GalleryHandCameraPreviewProps = {
   hand: GalleryHandControlContextValue;
@@ -65,7 +67,11 @@ export function GalleryHandCameraPreview({
   if (!hand.enabled) return null;
 
   return (
-    <div
+    <>
+      {import.meta.env.DEV && DEV_CAMERA_RECORDING_ENABLED ? (
+        <DevCameraRecordingBridge hand={hand} />
+      ) : null}
+      <div
       className={cn(
         "relative overflow-hidden",
         large
@@ -111,6 +117,7 @@ export function GalleryHandCameraPreview({
           {hand.trackingError}
         </div>
       ) : null}
-    </div>
+      </div>
+    </>
   );
 }

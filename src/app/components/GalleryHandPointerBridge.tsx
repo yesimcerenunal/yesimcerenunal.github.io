@@ -9,6 +9,7 @@ import {
 } from "../utils/galleryHoverSfx";
 import { prefetchDetailModalMedia } from "../utils/galleryMedia";
 import { aimFromHandSample, pinchAimFromHandSample } from "../utils/handAim";
+import { isHandFooterNavEngaged } from "../utils/handFooterNav";
 
 type GalleryHandPointerBridgeProps = {
   modalOpen: boolean;
@@ -134,6 +135,18 @@ export function GalleryHandPointerBridge({
 
     const s = hand.sampleRef.current;
     const now = performance.now();
+    const footerNavEngaged = isHandFooterNavEngaged(s);
+
+    if (footerNavEngaged) {
+      if (hoveredRef.current !== null) {
+        setHoveredIndex(null);
+        hoveredRef.current = null;
+      }
+      lastHoverRef.current = null;
+      pickLockedRef.current = false;
+      return;
+    }
+
     const aim = aimFromHandSample(
       s.pointerActive,
       s.pointerX,

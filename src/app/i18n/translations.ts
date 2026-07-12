@@ -269,7 +269,7 @@ const en: TranslationMessages = {
     cameraControlOn: "camera control on",
     handGestureAwaitPalm: "🎉 Hands Mode Activated! 🎉",
     handGestureArmedHint:
-      "🖐️ up: reset · 🖐️ ↔️↕️: steer (center=stop) · ☝️: point · 👌: pick · detail 🖐️ ↕️: scroll · ✊: close",
+      "🖐️ up: reset · 🖐️ ↔️↕️: steer (center=stop) · ☝️: point · 👌: pick planet · ☝️ hold menu: page · detail 🖐️ ↕️: scroll · ✊: close",
     handGestureRulesBookAria: "Show hand gesture rules",
     handGestureRulesDialogAria: "Hand gesture rules",
     handGestureRulesBookTitle: "RULE BOOK",
@@ -348,7 +348,7 @@ const en: TranslationMessages = {
   },
   contact: {
     headline:
-      "Did you hear my heartbeat while viewing my artworks?\n\nGot a project in mind? Let's talk. Reach out via social media or email!",
+      "Did you hear my heartbeat while viewing my artworks?\n\nGot a project in mind? Let's talk. Reach me out via social media or email!",
     description: "",
     emailCta: "Email Me",
     emailInlineOr: "or",
@@ -382,7 +382,7 @@ const de: TranslationMessages = {
     cameraControlOn: "camera control on",
     handGestureAwaitPalm: "🎉 Hands Mode aktiviert! 🎉",
     handGestureArmedHint:
-      "🖐️ hoch: Reset · 🖐️ ↔️↕️: steuern (Mitte=Stopp) · ☝️: zeigen · 👌: wählen · Detail 🖐️ ↕️: scrollen · ✊: schließen",
+      "🖐️ hoch: Reset · 🖐️ ↔️↕️: steuern (Mitte=Stopp) · ☝️: zeigen · 👌: Planet wählen · ☝️ Menü halten: Seite · Detail 🖐️ ↕️: scrollen · ✊: schließen",
     handGestureRulesBookAria: "Handgesten-Regeln anzeigen",
     handGestureRulesDialogAria: "Handgesten-Regeln",
     handGestureRulesBookTitle: "REGELBUCH",
@@ -502,7 +502,7 @@ const tr: TranslationMessages = {
     cameraControlOn: "camera control on",
     handGestureAwaitPalm: "🎉 Hands Mode Aktif! 🎉",
     handGestureArmedHint:
-      "🖐️ yukarı: sıfırla · 🖐️ ↔️↕️: yönlendir (orta=dur) · ☝️: işaret · 👌: seç · detay 🖐️ ↕️: kaydır · ✊: kapat",
+      "🖐️ yukarı: sıfırla · 🖐️ ↔️↕️: yönlendir (orta=dur) · ☝️: işaret · 👌: gezegen seç · ☝️ menüde bekle: sayfa · detay 🖐️ ↕️: kaydır · ✊: kapat",
     handGestureRulesBookAria: "El jesti kurallarını göster",
     handGestureRulesDialogAria: "El jesti kuralları",
     handGestureRulesBookTitle: "KURAL KİTABI",

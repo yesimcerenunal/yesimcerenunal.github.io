@@ -6,15 +6,18 @@ import {
   playGalleryClickSound,
   primeGalleryAudioEngineFromUserGesture,
 } from "../utils/galleryHoverSfx";
+import {
+  findHandNavTarget,
+  HAND_NAV_COOLDOWN_MS,
+  HAND_NAV_DWELL_MS,
+  isHandPinching,
+} from "../utils/handFooterNav";
 
 type ShellHandNavBridgeProps = {
   active: boolean;
 };
 
-/** Alt menüye ☝️ ile nişan al + 👌 ile tıkla — sayfa değiştirme. */
-const FOOTER_ZONE_Y = 0.62;
-const NAV_COOLDOWN_MS = 700;
-
+/** Alt menü: ☝️ ile nişan al + uzun bekle → sayfa değişir (🤏 pinch değil). */
 export function ShellHandNavBridge({ active }: ShellHandNavBridgeProps) {
   const hand = useGalleryHandControl();
   const navigate = useNavigate();
@@ -22,7 +25,10 @@ export function ShellHandNavBridge({ active }: ShellHandNavBridgeProps) {
 
   const cursorRef = useRef<HTMLDivElement | null>(null);
   const ringRef = useRef<HTMLDivElement | null>(null);
+  const progressRef = useRef<HTMLDivElement | null>(null);
   const lastNavAtRef = useRef(0);
+  const dwellTargetRef = useRef<HTMLElement | null>(null);
+  const dwellStartRef = useRef(0);
   const pathRef = useRef(location.pathname);
   pathRef.current = location.pathname;
 
@@ -34,26 +40,31 @@ export function ShellHandNavBridge({ active }: ShellHandNavBridgeProps) {
     const hideOverlay = () => {
       if (cursorRef.current) cursorRef.current.style.opacity = "0";
       if (ringRef.current) ringRef.current.style.opacity = "0";
+      if (progressRef.current) progressRef.current.style.width = "0%";
+      dwellTargetRef.current = null;
+      dwellStartRef.current = 0;
     };
 
     const tick = () => {
       raf = requestAnimationFrame(tick);
 
       const s = hand.sampleRef.current;
-      const engaged =
+      const x = s.pointerX * window.innerWidth;
+      const y = s.pointerY * window.innerHeight;
+      const canEngage =
         hand.enabled &&
         active &&
         !hand.detailModalOpen &&
         s.pointerActive &&
-        s.pointerY >= FOOTER_ZONE_Y;
+        !isHandPinching(s);
+
+      const target = canEngage ? findHandNavTarget(x, y) : null;
+      const engaged = target != null;
 
       if (!engaged) {
         hideOverlay();
         return;
       }
-
-      const x = s.pointerX * window.innerWidth;
-      const y = s.pointerY * window.innerHeight;
 
       const cursor = cursorRef.current;
       if (cursor) {
@@ -61,47 +72,42 @@ export function ShellHandNavBridge({ active }: ShellHandNavBridgeProps) {
         cursor.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
       }
 
-      const links = Array.from(
-        document.querySelectorAll<HTMLElement>("[data-hand-nav]"),
-      );
-      let best: HTMLElement | null = null;
-      let bestDist = Infinity;
-      for (const el of links) {
-        const r = el.getBoundingClientRect();
-        if (r.width === 0 || r.height === 0) continue;
-        const cx = r.left + r.width / 2;
-        const d = Math.abs(cx - x);
-        if (d < bestDist) {
-          bestDist = d;
-          best = el;
-        }
-      }
-
       const ring = ringRef.current;
-      if (best && ring) {
-        const r = best.getBoundingClientRect();
+      const progress = progressRef.current;
+      if (ring && target) {
+        const r = target.getBoundingClientRect();
         ring.style.opacity = "1";
         ring.style.left = `${r.left - 12}px`;
         ring.style.top = `${r.top - 7}px`;
         ring.style.width = `${r.width + 24}px`;
         ring.style.height = `${r.height + 14}px`;
-      } else if (ring) {
-        ring.style.opacity = "0";
       }
 
       const now = performance.now();
+      if (target !== dwellTargetRef.current) {
+        dwellTargetRef.current = target;
+        dwellStartRef.current = now;
+      }
+
+      const dwellMs = now - dwellStartRef.current;
+      const dwellRatio = Math.min(1, dwellMs / HAND_NAV_DWELL_MS);
+      if (progress) {
+        progress.style.width = `${dwellRatio * 100}%`;
+      }
+
       if (
-        s.selectPulse &&
-        best &&
-        now - lastNavAtRef.current > NAV_COOLDOWN_MS
+        dwellRatio >= 1 &&
+        now - lastNavAtRef.current > HAND_NAV_COOLDOWN_MS
       ) {
-        const target = best.getAttribute("data-hand-nav");
-        if (target && target !== pathRef.current) {
+        const navPath = target.getAttribute("data-hand-nav");
+        if (navPath && navPath !== pathRef.current) {
           lastNavAtRef.current = now;
+          dwellTargetRef.current = null;
+          dwellStartRef.current = 0;
           primeGalleryAudioEngineFromUserGesture();
           playGalleryClickSound();
           hand.setHintOpen(false);
-          navigate(target);
+          navigate(navPath);
         }
       }
     };
@@ -119,9 +125,15 @@ export function ShellHandNavBridge({ active }: ShellHandNavBridgeProps) {
     <>
       <div
         ref={ringRef}
-        className="pointer-events-none fixed left-0 top-0 z-[99997] rounded-full border-2 border-[#007FFF] bg-[#007FFF]/15 opacity-0 transition-opacity duration-150"
+        className="pointer-events-none fixed left-0 top-0 z-[99997] overflow-hidden rounded-full border-2 border-[#007FFF] bg-[#007FFF]/10 opacity-0 transition-opacity duration-150"
         aria-hidden
-      />
+      >
+        <div
+          ref={progressRef}
+          className="absolute bottom-0 left-0 h-1 bg-[#007FFF]/80 transition-[width] duration-75 ease-linear"
+          style={{ width: "0%" }}
+        />
+      </div>
       <div
         ref={cursorRef}
         className="pointer-events-none fixed left-0 top-0 z-[99998] opacity-0"

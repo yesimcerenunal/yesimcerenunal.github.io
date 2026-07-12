@@ -249,6 +249,7 @@ function pauseDetailVideoElement(v: HTMLVideoElement): void {
   delete v.dataset.detailUserPaused;
   v.dataset.detailPlayGen = String(Number(v.dataset.detailPlayGen ?? 0) + 1);
   v.dataset.detailPausedBySync = "1";
+  v.playbackRate = 1;
   v.pause();
   v.muted = true;
   queueMicrotask(() => {
@@ -272,6 +273,16 @@ function tryPlayDetailVideo(
   if (!v.isConnected || shouldBlockPlay?.()) return;
   if (v.dataset.detailUserPaused === "1") return;
 
+  v.playbackRate = 1;
+  if (
+    !v.paused &&
+    !v.ended &&
+    v.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA
+  ) {
+    applyDetailVideoVolume(v, projectKey);
+    return;
+  }
+
   const playGen = String(Number(v.dataset.detailPlayGen ?? 0) + 1);
   v.dataset.detailPlayGen = playGen;
   const appliedVolume = applyDetailVideoVolume(v, projectKey);
@@ -288,6 +299,7 @@ function tryPlayDetailVideo(
       return;
     }
     v.muted = true;
+    v.playbackRate = 1;
     void v.play()
       .then(() => {
         if (
@@ -348,17 +360,29 @@ function tryPlayDetailVideo(
   );
 }
 
-function detailVideoVisibility(r: DOMRect, viewH: number): number {
-  return Math.max(0, Math.min(r.bottom, viewH) - Math.max(r.top, 0));
+function detailVideoVisibility(
+  rect: DOMRect,
+  clipRect: DOMRect | null,
+  viewH: number,
+): number {
+  const top = clipRect ? Math.max(rect.top, clipRect.top) : rect.top;
+  const bottom = clipRect
+    ? Math.min(rect.bottom, clipRect.bottom)
+    : Math.min(rect.bottom, viewH);
+  return Math.max(0, bottom - top);
 }
 
 /** Klip ekranda yeterince görünüyorsa oynat; kaydırıp geçince dur. */
-const DETAIL_VIDEO_MIN_VISIBLE_PX = 72;
-/** Portre klip üstte az görünürken (mobil metin kaydırma) sesin devam etmesini engeller. */
-const DETAIL_VIDEO_MIN_VISIBLE_RATIO = 0.4;
+const DETAIL_VIDEO_MIN_VISIBLE_PX = 48;
+/** Portre klip scroll kenarında kısmen görünürken de oynatılabilsin (üst/alt slayt). */
+const DETAIL_VIDEO_MIN_VISIBLE_RATIO = 0.22;
 
-function detailVideoShouldAutoplay(rect: DOMRect, viewH: number): boolean {
-  const visible = detailVideoVisibility(rect, viewH);
+function detailVideoShouldAutoplay(
+  rect: DOMRect,
+  clipRect: DOMRect | null,
+  viewH: number,
+): boolean {
+  const visible = detailVideoVisibility(rect, clipRect, viewH);
   const height = rect.height;
   if (visible < DETAIL_VIDEO_MIN_VISIBLE_PX || height <= 0) return false;
   return visible / height >= DETAIL_VIDEO_MIN_VISIBLE_RATIO;
@@ -369,9 +393,11 @@ function pickDetailVideoPlayIndex(
   srcFor: (u: string) => string,
   failed: Record<string, boolean>,
   itemEls: readonly (HTMLElement | null)[],
+  scrollRoot: HTMLElement | null,
   fullscreenIndex: number | null = null,
 ): number {
   const viewH = typeof window !== "undefined" ? window.innerHeight : 800;
+  const clipRect = scrollRoot?.getBoundingClientRect() ?? null;
 
   if (fullscreenIndex != null) {
     const u = detailUrls[fullscreenIndex];
@@ -379,7 +405,7 @@ function pickDetailVideoPlayIndex(
       const wrap = itemEls[fullscreenIndex];
       if (
         wrap &&
-        detailVideoShouldAutoplay(wrap.getBoundingClientRect(), viewH)
+        detailVideoShouldAutoplay(wrap.getBoundingClientRect(), clipRect, viewH)
       ) {
         return fullscreenIndex;
       }
@@ -394,8 +420,8 @@ function pickDetailVideoPlayIndex(
     const wrap = itemEls[i];
     if (!wrap) continue;
     const rect = wrap.getBoundingClientRect();
-    if (!detailVideoShouldAutoplay(rect, viewH)) continue;
-    const visible = detailVideoVisibility(rect, viewH);
+    if (!detailVideoShouldAutoplay(rect, clipRect, viewH)) continue;
+    const visible = detailVideoVisibility(rect, clipRect, viewH);
     if (visible > bestVisible) {
       bestVisible = visible;
       bestI = i;
@@ -411,6 +437,7 @@ function syncDetailVideoPlayback(
   failed: Record<string, boolean>,
   itemEls: readonly (HTMLElement | null)[],
   videoEls: readonly (HTMLVideoElement | null)[],
+  scrollRoot: HTMLElement | null,
   fullscreenIndex: number | null = null,
   projectKey?: string,
 ): void {
@@ -419,6 +446,7 @@ function syncDetailVideoPlayback(
     srcFor,
     failed,
     itemEls,
+    scrollRoot,
     fullscreenIndex,
   );
 
@@ -428,9 +456,12 @@ function syncDetailVideoPlayback(
     const u = detailUrls[i];
     if (!u || failed[u] || !isVideoUrl(srcFor(u))) continue;
     if (i === playIndex) {
-      if (v.dataset.detailUserPaused !== "1") {
+      if (v.dataset.detailUserPaused === "1") {
+        applyDetailVideoVolume(v, projectKey);
+      } else if (v.paused) {
         tryPlayDetailVideo(v, undefined, projectKey);
       } else {
+        v.playbackRate = 1;
         applyDetailVideoVolume(v, projectKey);
       }
     } else {
@@ -3500,6 +3531,7 @@ const ProjectImageScroll = forwardRef(function ProjectImageScroll(
       failed,
       itemRefs.current,
       videoRefs.current,
+      scrollRef.current,
       fullscreenVideoIndexRef.current,
       playbackSyncKey,
     );
@@ -3568,7 +3600,10 @@ const ProjectImageScroll = forwardRef(function ProjectImageScroll(
 
     const io = new IntersectionObserver(
       () => schedulePlaybackSync(),
-      { root: null, threshold: [0, 0.15, 0.35, 0.5, 0.65, 0.85, 1] },
+      {
+        root: inner,
+        threshold: [0, 0.15, 0.35, 0.5, 0.65, 0.85, 1],
+      },
     );
     for (const el of itemRefs.current) {
       if (el) io.observe(el);
@@ -3711,6 +3746,7 @@ const ProjectImageScroll = forwardRef(function ProjectImageScroll(
                   onPlaying={(e) => {
                     const v = e.currentTarget;
                     if (v.dataset.detailPausedBySync === "1") return;
+                    v.playbackRate = 1;
                     const target = detailVideoVolumeForProject(playbackSyncKey);
                     if (Math.abs(v.volume - target) > 0.001) {
                       v.volume = target;
@@ -3720,6 +3756,7 @@ const ProjectImageScroll = forwardRef(function ProjectImageScroll(
                   onPlay={(e) => {
                     const v = e.currentTarget;
                     if (v.dataset.detailPausedBySync === "1") return;
+                    v.playbackRate = 1;
                     delete v.dataset.detailUserPaused;
                     applyDetailVideoVolume(v, playbackSyncKey);
                   }}
