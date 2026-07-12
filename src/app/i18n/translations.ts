@@ -333,7 +333,7 @@ const en: TranslationMessages = {
   },
   about: {
     lead:
-      "Hi, I'm Ceren. I'm a Cologne-based real-time FX artist who uses 2D/3D visual assets to create visual FX, generative systems, and real-time environmental experiences.",
+      "Hi, I'm Ceren. I'm a Cologne-based real-time FX artist who uses 2D/3D visual assets to create visual FX, generative systems, and real-time interactive experiences.",
     p2:
       "I received my M.A. in 3D Animation for Film & Games from TH Köln in 2025, and my B.A. in Graphic Design from Bilkent University in 2019.",
     p3:
@@ -453,7 +453,7 @@ const de: TranslationMessages = {
   },
   about: {
     lead:
-      "Hallo, ich bin Ceren. Ich bin eine in Köln ansässige Real-Time-FX-Künstlerin, die mit 2D/3D-Visual-Assets arbeitet, um Visual FX, generative Systeme und Echtzeit-Umgebungserlebnisse zu schaffen.",
+      "Hallo, ich bin Ceren. Ich bin eine in Köln ansässige Real-Time-FX-Künstlerin, die mit 2D/3D-Visual-Assets arbeitet, um Visual FX, generative Systeme und interaktive Echtzeit-Erlebnisse zu schaffen.",
     p2:
       "Meinen M.A. in 3D Animation for Film & Games habe ich 2025 an der TH Köln erhalten, meinen B.A. in Grafikdesign 2019 an der Bilkent University.",
     p3:
